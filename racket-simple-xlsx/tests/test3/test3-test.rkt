@@ -12,7 +12,7 @@
   (test-suite
    "test-test3"
 
-   (with-input-from-excel-file
+   (with-input-from-xlsx-file
     (build-path "test3" "test3.xlsx")
     (lambda ()
       (test-case

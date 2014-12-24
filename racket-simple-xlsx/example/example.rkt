@@ -1,6 +1,6 @@
 #lang racket
 
-(require xlsx-reader)
+(require simple-xlsx)
 
 (with-input-from-excel-file
   "test1.xlsx"
