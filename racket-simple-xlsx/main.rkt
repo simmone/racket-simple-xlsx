@@ -10,6 +10,6 @@
           [with-output-to-xlsx-file (-> path-string? void?)]
           ))
 
-(require "read.rkt")
+(require "reader.rkt")
 
-(require "write.rkt")
+(require "writer.rkt")
