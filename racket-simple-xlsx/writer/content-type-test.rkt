@@ -19,3 +19,5 @@
     )
 
    ))
+
+(run-tests test-content-type)

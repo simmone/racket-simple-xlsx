@@ -1,10 +1,8 @@
 #lang racket
 
-(provide test-lib)
-
 (require rackunit/text-ui)
 
-(require rackunit "../../lib/lib.rkt")
+(require rackunit "lib.rkt")
 
 (define test-lib
   (test-suite
@@ -78,3 +76,5 @@
     (check-equal? (format-time 0.5) "12:00:00"))
 
    ))
+
+(run-tests test-lib)

@@ -1,19 +1,17 @@
 #lang racket
 
-(provide test-test3)
-
 (require rackunit/text-ui)
 
-(require rackunit "../../main.rkt")
+(require rackunit "../../../main.rkt")
 
-(require "../../lib/lib.rkt")
+(require "../../../lib/lib.rkt")
 
 (define test-test3
   (test-suite
    "test-test3"
 
    (with-input-from-xlsx-file
-    (build-path "test3" "test3.xlsx")
+    "test3.xlsx"
     (lambda ()
       (test-case
        "test-get-sheet-data"
@@ -43,3 +41,5 @@
        )
 
       ))))
+
+(run-tests test-test3)

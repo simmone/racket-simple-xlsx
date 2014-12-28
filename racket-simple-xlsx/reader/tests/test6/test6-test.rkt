@@ -1,19 +1,17 @@
 #lang racket
 
-(provide test-test6)
-
 (require rackunit/text-ui)
 
-(require rackunit "../../main.rkt")
+(require rackunit "../../../main.rkt")
 
-(require "../../lib/lib.rkt")
+(require "../../../lib/lib.rkt")
 
 (define test-test6
   (test-suite
    "test-test6"
 
    (with-input-from-xlsx-file
-    (build-path "test6" "test6.xlsx")
+    "test6.xlsx"
     (lambda ()
       (test-case
        "test-get-sheet-data"
@@ -30,3 +28,5 @@
        (check-equal? (get-cell-value "A25") "11014494971201")
        (check-equal? (get-cell-value "A44") "1801342996690100370001        ")
       )))))
+
+(run-tests test-test6)
