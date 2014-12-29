@@ -8,3 +8,4 @@ echo "reader-test6";cd ~/racket-simple-xlsx/racket-simple-xlsx/reader/tests/test
 
 echo "writer-content-type";cd ~/racket-simple-xlsx/racket-simple-xlsx/writer/;racket content-type-test.rkt
 echo "writer-rels";cd ~/racket-simple-xlsx/racket-simple-xlsx/writer/;racket rels-test.rkt
+echo "writer-docprops-app";cd ~/racket-simple-xlsx/racket-simple-xlsx/writer/;racket docprops-app-test.rkt

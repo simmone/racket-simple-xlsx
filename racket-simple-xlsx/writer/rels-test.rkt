@@ -1,7 +1,5 @@
 #lang racket
 
-(provide test-rels)
-
 (require rackunit/text-ui)
 
 (require rackunit "rels.rkt")

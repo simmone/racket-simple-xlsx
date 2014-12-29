@@ -1,7 +1,5 @@
 #lang racket
 
-(provide test-content-type)
-
 (require rackunit/text-ui)
 
 (require rackunit "content-type.rkt")
