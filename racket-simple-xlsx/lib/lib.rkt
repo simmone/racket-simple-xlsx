@@ -16,6 +16,8 @@
           [number->list (-> number? list?)]
           [format-date (-> date? string?)]
           [format-time (-> number? string?)]
+          [value-of-time (-> string? date?)]
+          [format-w3cdtf (-> date? string?)]
           ))
 
 (define (format-date the_date)
@@ -135,4 +137,52 @@
     (if (<= index num)
         `(,@s_list ,@(cons index (loop s_list (add1 index))))
         s_list)))
-    
+
+;; YYYYMMDD HH:MM:SS
+(define (value-of-time time_str)
+  (let ([year (string->number (substring time_str 0 4))]
+        [month (string->number (substring time_str 4 6))]
+        [day (string->number (substring time_str 6 8))]
+        [hour (string->number (substring time_str 9 11))]
+        [minute (string->number (substring time_str 12 14))]
+        [second (string->number (substring time_str 15 17))])
+    (seconds->date (find-seconds second minute hour day month year))))
+
+;; "3" -> "03" or "30"
+(define (string-fill str char len #:direction [direction 'left])
+  (let* ([str_len (string-length str)]
+         [distance (- len str_len)])
+
+    (if (> distance 0)
+        (with-output-to-string 
+          (lambda ()
+            
+            (when (eq? direction 'right)
+              (printf str))
+
+            (let ([count 0])
+              (letrec ([recur
+                        (lambda ()
+                          (set! count (add1 count))
+
+                          (when (<= count distance)
+                            (printf "~a" char)
+                            (recur)))])
+                (recur)))
+
+            (when (eq? direction 'left)
+              (printf str))))
+        str)))
+
+;; 2014-12-15T13:24:27+08:00
+(define (format-w3cdtf the_date)
+  (format "~a-~a-~aT~a:~a:~a~a~a:00" 
+          (date-year the-date) 
+          (string-fill (number->string (date-month the-date)) #\0 2)
+          (string-fill (number->string (date-day the-date)) #\0 2)
+          (string-fill (number->string (date-hour the-date)) #\0 2)
+          (string-fill (number->string (date-minute the-date)) #\0 2)
+          (string-fill (number->string seconds) #\0 2)
+          (if (>=? (date-time-zone-offset the_date) 0) "+" "-")
+          (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))))))
+  

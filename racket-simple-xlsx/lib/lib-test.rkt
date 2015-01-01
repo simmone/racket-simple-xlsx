@@ -49,6 +49,10 @@
     (check-equal? (format-time 0.5560763888888889) "13:20:45")
     (check-equal? (format-time 0.2560763888888889) "06:08:45")
     (check-equal? (format-time 0.5) "12:00:00"))
+   
+   (test-case
+    "test-format-w3cdtf"
+    (check-equal? (format-w3cdtf 
 
    ))
 
