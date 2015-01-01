@@ -14,27 +14,9 @@
           [abc->number (-> string? number?)]
           [number->abc (-> number? string?)]
           [number->list (-> number? list?)]
-          [find-date (-> exact-nonnegative-integer? date?)]
           [format-date (-> date? string?)]
           [format-time (-> number? string?)]
           ))
-
-;; correct on mac
-(define (find-date-mac days)
-  (let ([actual_days 0])
-    (if (<= days 60)
-        (set! actual_days (sub1 days))
-        (set! actual_days (- days 2)))
-    (let ([start_date (seconds->date (find-seconds 0 0 0 1 1 1900))])
-      (seconds->date (+ (date->seconds start_date) (* actual_days 24 60 60))))))
-
-(define (find-date days)
-  (let ([actual_days 0])
-    (if (<= days 60)
-        (set! actual_days (- days 1 25568))
-        (set! actual_days (- days 2 25568)))
-    (let ([start_date (seconds->date (find-seconds 1 0 0 2 1 1970))])
-      (seconds->date (+ (date->seconds start_date) (* actual_days 24 60 60))))))
 
 (define (format-date the_date)
   (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))

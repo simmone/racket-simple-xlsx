@@ -45,31 +45,6 @@
     (check-equal? (number->list 5) '(1 2 3 4 5)))
    
    (test-case
-    "test-find-date"
-    (when (not (equal? (system-type 'os) 'windows))
-          (let ([the_date (find-date 1)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-1-1"))
-
-          (let ([the_date (find-date 2)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-1-2"))
-
-          (let ([the_date (find-date 59)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-2-28"))
-
-          (let ([the_date (find-date 60)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-3-1"))
-
-          (let ([the_date (find-date 61)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-3-1"))
-
-          (let ([the_date (find-date 62)])
-            (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "1900-3-2")))
-
-    (let ([the_date (find-date 41640)])
-      (check-equal? (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)) "2014-1-1"))
-    )
-   
-   (test-case
     "test-format-hour"
     (check-equal? (format-time 0.5560763888888889) "13:20:45")
     (check-equal? (format-time 0.2560763888888889) "06:08:45")
