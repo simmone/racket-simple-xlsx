@@ -163,5 +163,5 @@
           (string-fill (number->string (date-minute the_date)) #\0 2)
           (string-fill (number->string (date-second the_date)) #\0 2)
           (if (>= (date-time-zone-offset the_date) 0) "+" "-")
-          (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))))))
+          (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))) #\0 2)))
   

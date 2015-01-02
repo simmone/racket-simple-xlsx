@@ -56,6 +56,10 @@
     (check-equal? (format-complete-time (value-of-time "20141231 12:31:23")) "20141231 12:31:23")
     (check-equal? (format-complete-time (value-of-time "20140105 12:31:23")) "20140105 12:31:23"))
 
+   (test-case
+    "test-format-w3cdtf"
+    (check-equal? (format-w3cdtf (date* 44 17 13 2 1 2015 5 1 #f 28800 996159076 "CST")) "2015-01-02T13:17:44+08:00"))
+
    ))
 
 (run-tests test-lib)
