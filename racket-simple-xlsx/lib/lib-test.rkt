@@ -1,6 +1,7 @@
 #lang racket
 
 (require rackunit/text-ui)
+(require racket/date)
 
 (require rackunit "lib.rkt")
 
@@ -51,8 +52,9 @@
     (check-equal? (format-time 0.5) "12:00:00"))
    
    (test-case
-    "test-format-w3cdtf"
-    (check-equal? (format-w3cdtf 
+    "test-value-of-time"
+    (check-equal? (format-complete-time (value-of-time "20141231 12:31:23")) "20141231 12:31:23")
+    (check-equal? (format-complete-time (value-of-time "20140105 12:31:23")) "20140105 12:31:23"))
 
    ))
 

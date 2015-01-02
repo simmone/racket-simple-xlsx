@@ -15,6 +15,7 @@
           [number->abc (-> number? string?)]
           [number->list (-> number? list?)]
           [format-date (-> date? string?)]
+          [format-complete-time (-> date? string?)]
           [format-time (-> number? string?)]
           [value-of-time (-> string? date?)]
           [format-w3cdtf (-> date? string?)]
@@ -23,30 +24,14 @@
 (define (format-date the_date)
   (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))
 
-(define (string-fill str char len #:direction [direction 'left])
-  (let* ([str_len (string-length str)]
-         [distance (- len str_len)])
-
-    (if (> distance 0)
-        (with-output-to-string 
-          (lambda ()
-            
-            (when (eq? direction 'right)
-              (printf str))
-
-            (let ([count 0])
-              (letrec ([recur
-                        (lambda ()
-                          (set! count (add1 count))
-
-                          (when (<= count distance)
-                            (printf "~a" char)
-                            (recur)))])
-                (recur)))
-
-            (when (eq? direction 'left)
-              (printf str))))
-        str)))
+(define (format-complete-time the_date)
+  (format "~a~a~a ~a:~a:~a" 
+          (string-fill (number->string (date-year the_date)) #\0 4)
+          (string-fill (number->string (date-month the_date)) #\0 2)
+          (string-fill (number->string (date-day the_date)) #\0 2)
+          (string-fill (number->string (date-hour the_date)) #\0 2)
+          (string-fill (number->string (date-minute the_date)) #\0 2)
+          (string-fill (number->string (date-second the_date)) #\0 2)))
 
 (define (format-time time_s)
   (let* ([hour_s (* time_s 24)]
@@ -156,33 +141,27 @@
     (if (> distance 0)
         (with-output-to-string 
           (lambda ()
-            
             (when (eq? direction 'right)
               (printf str))
 
-            (let ([count 0])
-              (letrec ([recur
-                        (lambda ()
-                          (set! count (add1 count))
-
-                          (when (<= count distance)
-                            (printf "~a" char)
-                            (recur)))])
-                (recur)))
+            (let loop ([count 1])
+              (when (<= count distance)
+                    (printf "~a" char)
+                    (loop (add1 count))))
 
             (when (eq? direction 'left)
-              (printf str))))
+                  (printf str))))
         str)))
 
 ;; 2014-12-15T13:24:27+08:00
 (define (format-w3cdtf the_date)
   (format "~a-~a-~aT~a:~a:~a~a~a:00" 
-          (date-year the-date) 
-          (string-fill (number->string (date-month the-date)) #\0 2)
-          (string-fill (number->string (date-day the-date)) #\0 2)
-          (string-fill (number->string (date-hour the-date)) #\0 2)
-          (string-fill (number->string (date-minute the-date)) #\0 2)
-          (string-fill (number->string seconds) #\0 2)
-          (if (>=? (date-time-zone-offset the_date) 0) "+" "-")
+          (date-year the_date) 
+          (string-fill (number->string (date-month the_date)) #\0 2)
+          (string-fill (number->string (date-day the_date)) #\0 2)
+          (string-fill (number->string (date-hour the_date)) #\0 2)
+          (string-fill (number->string (date-minute the_date)) #\0 2)
+          (string-fill (number->string (date-second the_date)) #\0 2)
+          (if (>= (date-time-zone-offset the_date) 0) "+" "-")
           (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))))))
   
