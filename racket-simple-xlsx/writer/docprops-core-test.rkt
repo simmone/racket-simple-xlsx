@@ -2,7 +2,9 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "docprops-app.rkt")
+(require rackunit "docprops-core.rkt")
+
+(require "../lib/lib.rkt")
 
 (define test-docprops-app
   (test-suite
@@ -10,10 +12,11 @@
 
    (test-case
     "test-docprops-app"
-    (check-equal? (write-docprops-app '("Sheet1" "Sheet2" "Sheet3"))
+    (check-equal? (write-docprops-core (date* 44 17 13 2 1 2015 5 1 #f 28800 996159076 "CST"))
                   (string-append
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-                    "<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size=\"2\" baseType=\"variant\"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>3</vt:i4></vt:variant></vt:vector></HeadingPairs><TitlesOfParts><vt:vector size=\"3\" baseType=\"lpstr\"><vt:lpstr>Sheet1</vt:lpstr><vt:lpstr>Sheet2</vt:lpstr><vt:lpstr>Sheet3</vt:lpstr></vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>")))
+                   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                   "<cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:dcmitype=\"http://purl.org/dc/dcmitype/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><dc:creator></dc:creator><cp:lastModifiedBy></cp:lastModifiedBy><dcterms:created xsi:type=\"dcterms:W3CDTF\">2006-09-13T11:21:51Z</dcterms:created><dcterms:modified xsi:type=\"dcterms:W3CDTF\">2015-01-02T13:17:44+08:00</dcterms:modified></cp:coreProperties>")))
+
    ))
 
 (run-tests test-docprops-app)
