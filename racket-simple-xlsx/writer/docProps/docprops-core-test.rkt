@@ -4,7 +4,7 @@
 
 (require rackunit "docprops-core.rkt")
 
-(require "../lib/lib.rkt")
+(require "../../lib/lib.rkt")
 
 (define test-docprops-app
   (test-suite

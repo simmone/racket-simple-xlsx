@@ -8,5 +8,6 @@ echo "reader-test5";cd; cd $HOME_DIR/reader/tests/test5/;racket test5-test.rkt
 echo "reader-test6";cd; cd $HOME_DIR/reader/tests/test6/;racket test6-test.rkt
 
 echo "writer-content-type";cd; cd $HOME_DIR/writer/;racket content-type-test.rkt
-echo "writer-rels";cd; cd $HOME_DIR/writer/;racket rels-test.rkt
-echo "writer-docprops-app";cd; cd $HOME_DIR/writer/;racket docprops-app-test.rkt
+echo "writer-rels";cd; cd $HOME_DIR/writer/_rels;racket rels-test.rkt
+echo "writer-docprops-app";cd; cd $HOME_DIR/writer/docProps;racket docprops-app-test.rkt
+echo "writer-docprops-core";cd; cd $HOME_DIR/writer/docProps;racket docprops-core-test.rkt

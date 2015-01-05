@@ -4,7 +4,7 @@
 (require racket/list)
 (require racket/contract)
 
-(require "../lib/lib.rkt")
+(require "../../lib/lib.rkt")
 
 (provide (contract-out
           [write-docprops-core (-> date? string?)]
