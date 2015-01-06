@@ -12,3 +12,4 @@ echo "writer-rels";cd; cd $HOME_DIR/writer/_rels;racket rels-test.rkt
 echo "writer-docprops-app";cd; cd $HOME_DIR/writer/docProps;racket docprops-app-test.rkt
 echo "writer-docprops-core";cd; cd $HOME_DIR/writer/docProps;racket docprops-core-test.rkt
 echo "writer-xl-rels-workbook-xml-rels";cd; cd $HOME_DIR/writer/xl/_rels;racket workbook-xml-rels-test.rkt
+echo "writer-xl-cal-chain";cd; cd $HOME_DIR/writer/xl;racket cal-chain-test.rkt
