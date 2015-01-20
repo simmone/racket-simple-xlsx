@@ -15,3 +15,4 @@ echo "writer-xl-rels-workbook-xml-rels";cd; cd $HOME_DIR/writer/xl/_rels;racket 
 echo "writer-xl-cal-chain";cd; cd $HOME_DIR/writer/xl;racket cal-chain-test.rkt
 echo "writer-shared-strings";cd; cd $HOME_DIR/writer/xl;racket sharedStrings-test.rkt
 echo "writer-styles";cd; cd $HOME_DIR/writer/xl;racket styles-test.rkt
+echo "writer-workbook";cd; cd $HOME_DIR/writer/xl;racket workbook-test.rkt
