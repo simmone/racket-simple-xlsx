@@ -4,7 +4,6 @@
 (require racket/list)
 (require racket/contract)
 
-;; strings list convert to (string . place) hash
 (provide (contract-out
           [write-workbook (-> list? string?)]
           ))
