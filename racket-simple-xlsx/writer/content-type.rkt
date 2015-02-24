@@ -6,6 +6,7 @@
 
 (provide (contract-out
           [write-content-type (-> exact-nonnegative-integer? string?)]
+          [write-content-type-file (-> path-string? exact-nonnegative-integer? void?)]
           ))
 
 (define S string-append)
@@ -21,3 +22,11 @@
             count)
           (loop (add1 count))))))|<Override PartName="/xl/calcChain.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>
 })
+
+(define (write-content-type-file dir sheet_count)
+  (with-output-to-file (build-path dir "[ContentType_Types].xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-content-type sheet_count)))))
+    
+    
