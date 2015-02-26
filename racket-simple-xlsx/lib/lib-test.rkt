@@ -59,6 +59,11 @@
    (test-case
     "test-format-w3cdtf"
     (check-equal? (format-w3cdtf (date* 44 17 13 2 1 2015 5 1 #f 28800 996159076 "CST")) "2015-01-02T13:17:44+08:00"))
+   
+   (test-case
+    "test-create-sheet-name-list"
+    (check-equal? (create-sheet-name-list 5) '("Sheet1" "Sheet2" "Sheet3" "Sheet4" "Sheet5"))
+    (check-equal? (create-sheet-name-list 1) '("Sheet1")))
 
    ))
 

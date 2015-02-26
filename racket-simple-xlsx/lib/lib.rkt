@@ -19,6 +19,7 @@
           [format-time (-> number? string?)]
           [value-of-time (-> string? date?)]
           [format-w3cdtf (-> date? string?)]
+          [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
           ))
 
 (define (format-date the_date)
@@ -164,4 +165,14 @@
           (string-fill (number->string (date-second the_date)) #\0 2)
           (if (>= (date-time-zone-offset the_date) 0) "+" "-")
           (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))) #\0 2)))
+
+;; create auto sheet name list: Sheet1, Sheet2, ...
+(define (create-sheet-name-list sheet_count)
+  (let loop ([sheet_name_list '()]
+             [count 1])
+    (if (<= count sheet_count)
+        (begin
+          (set! sheet_name_list `(,@sheet_name_list ,(string-append "Sheet" (number->string count))))
+          (loop sheet_name_list (add1 count)))
+        sheet_name_list)))
   

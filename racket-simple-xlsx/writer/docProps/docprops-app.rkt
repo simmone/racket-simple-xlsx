@@ -6,6 +6,7 @@
 
 (provide (contract-out
           [write-docprops-app (-> list? string?)]
+          [write-docprops-app-file (-> path-string? list? void?)]
           ))
 
 (define S string-append)
@@ -19,3 +20,10 @@
         (printf "<vt:lpstr>~a</vt:lpstr>" sheet_name))
       sheet_name_list)))|</vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
 })
+
+(define (write-docprops-app-file dir sheet_name_list)
+  (with-output-to-file (build-path dir "app.xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-docprops-app sheet_name_list)))))
+
