@@ -6,6 +6,7 @@
 
 (provide (contract-out
           [write-workbook-xml-rels (-> exact-nonnegative-integer? string?)]
+          [write-workbook-xml-rels-file (-> path-string? exact-nonnegative-integer? void?)]
           ))
 
 (define S string-append)
@@ -39,3 +40,10 @@
             "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain\" Target=\"calcChain.xml\"/></Relationships>"
             seq))))|
 })
+
+(define (write-workbook-xml-rels-file dir sheet_count)
+  (with-output-to-file (build-path dir "workbook.xml.rels")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-workbook-xml-rels sheet_count)))))
+

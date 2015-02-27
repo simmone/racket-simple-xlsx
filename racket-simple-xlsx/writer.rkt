@@ -19,6 +19,7 @@
 (require "writer/_rels/rels.rkt")
 (require "writer/docProps/docprops-app.rkt")
 (require "writer/docProps/docprops-core.rkt")
+(require "writer/xl/_rels/workbook-xml-rels.rkt")
 
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
@@ -41,5 +42,15 @@
               (make-directory* doc_props_dir)
               (write-docprops-app-file doc_props_dir real_sheet_name_list)
               (write-docprops-core-file doc_props_dir (current-date)))
+            
+            ;; xl
+            (let ([xl_dir (build-path tmp_dir "xl")])
+              ;; _rels
+              (let ([rels_dir (build-path xl_dir "_rels")])
+                (make-directory* rels_dir)
+                (write-workbook-xml-rels-file rels_dir sheet_count))
+              
+              )
+              
           ))
         (lambda () (void)))))
