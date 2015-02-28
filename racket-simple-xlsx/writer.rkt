@@ -20,7 +20,7 @@
 (require "writer/docProps/docprops-app.rkt")
 (require "writer/docProps/docprops-core.rkt")
 (require "writer/xl/_rels/workbook-xml-rels.rkt")
-
+(require "writer/xl/printerSettings/printerSettings.rkt")
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
   (let ([tmp_dir #f])
@@ -50,6 +50,10 @@
                 (make-directory* rels_dir)
                 (write-workbook-xml-rels-file rels_dir sheet_count))
               
+              ;; printerSettings
+              (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
+                (make-directory* printer_settings_dir)
+                (create-printer-settings printer_settings_dir sheet_count))
               )
               
           ))
