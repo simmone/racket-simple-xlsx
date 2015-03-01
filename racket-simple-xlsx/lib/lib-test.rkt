@@ -65,6 +65,28 @@
     (check-equal? (create-sheet-name-list 5) '("Sheet1" "Sheet2" "Sheet3" "Sheet4" "Sheet5"))
     (check-equal? (create-sheet-name-list 1) '("Sheet1")))
 
-   ))
+   (test-case
+    "test-get-dimension"
+    (check-equal? (get-dimension '(("1" "2") ("1") () ("1" "2" "3" "4")))
+                  "D4")
+                  )
+    
+   (test-case
+    "test-get-string-index-map"
+    (let-values ([(index_list index_map) (get-string-index '((("1" "2") (1) () ("1" "2" "3" 4)) (("7" "8"))))])
+      (check-equal? (hash-ref index_map "1") 0)
+      (check-equal? (hash-ref index_map "2") 1)
+      (check-equal? (hash-ref index_map "3") 2)
+      (check-equal? (hash-ref index_map "7") 3)
+      (check-equal? (hash-ref index_map "8") 4)
+
+      (check-equal? (list-ref index_list 0) "1")
+      (check-equal? (list-ref index_list 1) "2")
+      (check-equal? (list-ref index_list 2) "3")
+      (check-equal? (list-ref index_list 3) "7")
+      (check-equal? (list-ref index_list 4) "8")
+      ))
+   
+    ))
 
 (run-tests test-lib)

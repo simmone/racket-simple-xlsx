@@ -7,6 +7,7 @@
 ;; strings list convert to (string . place) hash
 (provide (contract-out
           [write-shared-strings (-> list? string?)]
+          [write-shared-strings-file (-> path-string? list? void?)]
           ))
 
 (define S string-append)
@@ -20,3 +21,9 @@
           (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (car strings))
           (loop (cdr strings))))))|</sst>
 })
+
+(define (write-shared-strings-file dir string_list)
+  (with-output-to-file (build-path dir "sharedStrings.xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-shared-strings string_list)))))

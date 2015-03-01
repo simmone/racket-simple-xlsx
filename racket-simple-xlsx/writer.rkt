@@ -21,40 +21,45 @@
 (require "writer/docProps/docprops-core.rkt")
 (require "writer/xl/_rels/workbook-xml-rels.rkt")
 (require "writer/xl/printerSettings/printerSettings.rkt")
+(require "writer/xl/sharedStrings.rkt")
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
   (let ([tmp_dir #f])
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
-          (let* ([sheet_count (length data_list)]
-                 [real_sheet_name_list (if sheet_name_list sheet_name_list (create-sheet-name-list sheet_count))])
-            ;; [Content_Types].xml
-            (write-content-type-file tmp_dir sheet_count)
+          (let-values ([(string_index_list string_index_map) (get-string-index data_list)])
+            (printf "~a:~a\n" string_index_list string_index_map)
+            (let* ([sheet_count (length data_list)]
+                   [real_sheet_name_list (if sheet_name_list sheet_name_list (create-sheet-name-list sheet_count))])
+              ;; [Content_Types].xml
+              (write-content-type-file tmp_dir sheet_count)
 
-            ;; _rels
-            (let ([rels_dir (build-path tmp_dir "_rels")])
-              (make-directory* rels_dir)
-              (write-rels-file rels_dir))
-
-            ;; docProps
-            (let ([doc_props_dir (build-path tmp_dir "docProps")])
-              (make-directory* doc_props_dir)
-              (write-docprops-app-file doc_props_dir real_sheet_name_list)
-              (write-docprops-core-file doc_props_dir (current-date)))
-            
-            ;; xl
-            (let ([xl_dir (build-path tmp_dir "xl")])
               ;; _rels
-              (let ([rels_dir (build-path xl_dir "_rels")])
+              (let ([rels_dir (build-path tmp_dir "_rels")])
                 (make-directory* rels_dir)
-                (write-workbook-xml-rels-file rels_dir sheet_count))
+                (write-rels-file rels_dir))
+
+              ;; docProps
+              (let ([doc_props_dir (build-path tmp_dir "docProps")])
+                (make-directory* doc_props_dir)
+                (write-docprops-app-file doc_props_dir real_sheet_name_list)
+                (write-docprops-core-file doc_props_dir (current-date)))
               
-              ;; printerSettings
-              (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
-                (make-directory* printer_settings_dir)
-                (create-printer-settings printer_settings_dir sheet_count))
-              )
-              
-          ))
+              ;; xl
+              (let ([xl_dir (build-path tmp_dir "xl")])
+                ;; _rels
+                (let ([rels_dir (build-path xl_dir "_rels")])
+                  (make-directory* rels_dir)
+                  (write-workbook-xml-rels-file rels_dir sheet_count))
+                
+                ;; printerSettings
+                (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
+                  (make-directory* printer_settings_dir)
+                  (create-printer-settings printer_settings_dir sheet_count))
+
+                ;; sharedStrings
+                (write-shared-strings-file xl_dir string_index_list)
+                )
+          )))
         (lambda () (void)))))
