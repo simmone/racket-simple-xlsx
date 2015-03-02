@@ -22,6 +22,8 @@
 (require "writer/xl/_rels/workbook-xml-rels.rkt")
 (require "writer/xl/printerSettings/printerSettings.rkt")
 (require "writer/xl/sharedStrings.rkt")
+(require "writer/xl/styles.rkt")
+(require "writer/xl/theme/theme.rkt")
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
   (let ([tmp_dir #f])
@@ -29,7 +31,6 @@
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
           (let-values ([(string_index_list string_index_map) (get-string-index data_list)])
-            (printf "~a:~a\n" string_index_list string_index_map)
             (let* ([sheet_count (length data_list)]
                    [real_sheet_name_list (if sheet_name_list sheet_name_list (create-sheet-name-list sheet_count))])
               ;; [Content_Types].xml
@@ -60,6 +61,14 @@
 
                 ;; sharedStrings
                 (write-shared-strings-file xl_dir string_index_list)
+
+                ;; styles.xml
+                (write-styles-file xl_dir)
+
+                ;; theme
+                (let ([theme_dir (build-path xl_dir "theme")])
+                  (make-directory* theme_dir)
+                  (write-theme-file theme_dir))
                 )
           )))
         (lambda () (void)))))

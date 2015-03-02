@@ -7,6 +7,7 @@
 ;; strings list convert to (string . place) hash
 (provide (contract-out
           [write-styles (-> string?)]
+          [write-styles-file (-> path-string? void?)]
           ))
 
 (define S string-append)
@@ -15,3 +16,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="1"><font /></fonts><fills count="1"><fill /></fills><borders count="1"><border /></borders><cellStyleXfs count="1"><xf /></cellStyleXfs><cellXfs count="2"><xf /><xf fontId="1" /></cellXfs></styleSheet>
 })
+
+(define (write-styles-file dir)
+  (with-output-to-file (build-path dir "styles.xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-styles)))))
+

@@ -1,11 +1,10 @@
 #lang racket
 
 (provide (contract-out
-          [create-theme (-> void?)]
+          [write-theme-file (-> path-string? void?)]
           ))
 
-(define (create-theme)
-  (make-directory* (build-path "xl" "theme"))
+(define (write-theme-file dir)
   (copy-file
-   "theme.template"
-   (build-path "xl" "theme" "theme1.xml")))
+   (build-path "writer" "xl" "theme" "theme.template")
+   (build-path dir "theme1.xml")))
