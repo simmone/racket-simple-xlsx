@@ -6,6 +6,7 @@
 
 (provide (contract-out
           [write-workbook (-> list? string?)]
+          [write-workbook-file (-> path-string? list? void?)]
           ))
 
 (define S string-append)
@@ -20,3 +21,10 @@
           (printf "<sheet name=\"~a\" sheetId=\"~a\" r:id=\"rId~a\"/>" (car name_list) num num)
           (loop (cdr name_list) (add1 num))))))|</sheets><calcPr calcId="124519"/></workbook>
 })
+
+(define (write-workbook-file dir sheet_name_list)
+  (with-output-to-file (build-path dir "workbook.xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-workbook sheet_name_list)))))
+

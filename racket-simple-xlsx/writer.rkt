@@ -24,6 +24,7 @@
 (require "writer/xl/sharedStrings.rkt")
 (require "writer/xl/styles.rkt")
 (require "writer/xl/theme/theme.rkt")
+(require "writer/xl/workbook.rkt")
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
   (let ([tmp_dir #f])
@@ -69,6 +70,9 @@
                 (let ([theme_dir (build-path xl_dir "theme")])
                   (make-directory* theme_dir)
                   (write-theme-file theme_dir))
+
+                ;; workbook
+                (write-workbook-file xl_dir real_sheet_name_list)
                 )
           )))
         (lambda () (void)))))
