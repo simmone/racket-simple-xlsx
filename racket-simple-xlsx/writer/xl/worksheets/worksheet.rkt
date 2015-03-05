@@ -9,15 +9,16 @@
 ;; write-sheet '('()...)
 (provide (contract-out
           [write-sheet (-> list? hash? string?)]
+          [write-sheet-file (-> path-string? exact-nonnegative-integer? list? hash? void?)]
           ))
 
 (define S string-append)
 
-(define (write-sheet data_list string_index_map) @S{
+(define (write-sheet sheet_data_list string_index_map) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:@|(get-dimension data_list)|"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/><sheetData>@|(with-output-to-string
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:@|(get-dimension sheet_data_list)|"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/><sheetData>@|(with-output-to-string
 (lambda ()
-  (let loop-row ([loop_rows data_list]
+  (let loop-row ([loop_rows sheet_data_list]
                  [row_seq 1])
     (when (not (null? loop_rows))
           (printf "<row r=\"~a\">" row_seq)
@@ -27,7 +28,7 @@
                                  [col_seq 1])
                     (when (not (null? loop_cols))
                           (let ([cell (car loop_cols)]
-                                [dimension (string-append (number->abc col_seq) row_seq)])
+                                [dimension (string-append (number->abc col_seq) (number->string row_seq))])
                             (cond
                              [(string? cell)
                               (printf "<c r=\"~a\" t=\"s\"><v>~a</v></c>" dimension (hash-ref string_index_map cell))]
@@ -39,3 +40,9 @@
           (printf "</row>")
           (loop-row (cdr loop_rows) (add1 row_seq))))))|</sheetData><phoneticPr fontId="1" type="noConversion"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" horizontalDpi="200" verticalDpi="200" r:id="rId1"/></worksheet>
 })
+
+(define (write-sheet-file dir sheet_index sheet_data_list string_index_map)
+  (with-output-to-file (build-path dir (string-append "sheet" (number->string sheet_index) ".xml"))
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-sheet sheet_data_list string_index_map)))))

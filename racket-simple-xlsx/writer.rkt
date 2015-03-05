@@ -26,6 +26,7 @@
 (require "writer/xl/theme/theme.rkt")
 (require "writer/xl/workbook.rkt")
 (require "writer/xl/worksheets/_rels/rels.rkt")
+(require "writer/xl/worksheets/worksheet.rkt")
 
 (define (write-xlsx-file data_list sheet_name_list file_name)
   (let ([tmp_dir #f])
@@ -80,7 +81,15 @@
                   ;; _rels
                   (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
                     (make-directory* worksheets_rels_dir)
-                    (write-worksheets-rels-file worksheets_rels_dir sheet_count)))
+                    (write-worksheets-rels-file worksheets_rels_dir sheet_count))
+
+                  ;; worksheet
+                  (let loop ([sheets_data data_list]
+                             [index 1])
+                    (when (not (null? sheets_data))
+                          (write-sheet-file worksheets_dir index (car sheets_data) string_index_map)
+                          (loop (cdr sheets_data) (add1 index))))
+                  )
                 )
           )))
         (lambda () (void)))))
