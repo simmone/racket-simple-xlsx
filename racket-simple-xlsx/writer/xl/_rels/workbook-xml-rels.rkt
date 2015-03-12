@@ -34,10 +34,6 @@
           (set! seq (add1 seq))
           (printf
             "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\" Target=\"sharedStrings.xml\"/>"
-            seq)
-          (set! seq (add1 seq))
-          (printf
-            "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain\" Target=\"calcChain.xml\"/></Relationships>"
             seq))))|
 })
 

@@ -9,6 +9,6 @@
     (when (>= nums 1)
           (copy-file
            (build-path "writer" "xl" "printerSettings" "printerSettings.template")
-           (build-path dir (string-append "printerSettings" (number->string nums))))
+           (build-path dir (string-append "printerSettings" (number->string nums) ".bin")))
           (loop (sub1 nums)))))
 
