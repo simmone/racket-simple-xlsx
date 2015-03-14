@@ -8,15 +8,15 @@
 
 ;; write-sheet '('()...)
 (provide (contract-out
-          [write-sheet (-> list? hash? string?)]
+          [write-sheet (-> list? hash? boolean? string?)]
           [write-sheet-file (-> path-string? exact-nonnegative-integer? list? hash? void?)]
           ))
 
 (define S string-append)
 
-(define (write-sheet sheet_data_list string_index_map) @S{
+(define (write-sheet sheet_data_list string_index_map is_active?) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:@|(get-dimension sheet_data_list)|"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/><sheetData>@|(with-output-to-string
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="@|(if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))|"/><sheetViews><sheetView @|(if is_active? "tabSelected=\"1\"" "")| workbookViewId="0">@|(if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")|</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/><sheetData>@|(with-output-to-string
 (lambda ()
   (let loop-row ([loop_rows sheet_data_list]
                  [row_seq 1])
@@ -45,4 +45,6 @@
   (with-output-to-file (build-path dir (string-append "sheet" (number->string sheet_index) ".xml"))
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-sheet sheet_data_list string_index_map)))))
+      (if (= sheet_index 1)
+          (printf "~a" (write-sheet sheet_data_list string_index_map #t))
+          (printf "~a" (write-sheet sheet_data_list string_index_map #f))))))

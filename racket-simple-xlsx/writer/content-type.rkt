@@ -24,7 +24,7 @@
 })
 
 (define (write-content-type-file dir sheet_count)
-  (with-output-to-file (build-path dir "[ContentType_Types].xml")
+  (with-output-to-file (build-path dir "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
       (printf "~a" (write-content-type sheet_count)))))
