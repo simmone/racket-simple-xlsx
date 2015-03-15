@@ -28,7 +28,10 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 
-(define (write-xlsx-file data_list sheet_name_list file_name)
+(define (write-xlsx-file data_list sheet_name_list xlsx_file_name)
+  (when (file-exists? xlsx_file_name)
+        (delete-file xlsx_file_name))
+  
   (let ([tmp_dir #f])
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
@@ -92,6 +95,6 @@
                   )
                 )
               ))
-          (zip-xlsx file_name tmp_dir))
+          (zip-xlsx xlsx_file_name tmp_dir))
         (lambda ()
           (delete-directory/files tmp_dir)))))
