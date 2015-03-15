@@ -1,6 +1,7 @@
 #lang racket
 
 (require file/unzip)
+(require file/zip)
 (require xml)
 (require xml/path)
 (require racket/date)
@@ -22,6 +23,7 @@
           [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
           [get-dimension (-> list? string?)]
           [get-string-index (-> list? (values list? hash?))]
+          [zip-xlsx (-> path-string? path-string? void?)]
           ))
 
 (define (format-date the_date)
@@ -214,3 +216,12 @@
             (loop (cdr loop_list) (add1 index))))
     
     (values string_index_list string_index_map)))
+
+(define (zip-xlsx zip_file content_dir)
+  (let ([pwd #f])
+    (dynamic-wind
+        (lambda () (set! pwd (current-directory)))
+        (lambda ()
+          (current-directory content_dir)
+          (zip zip_file "[Content_Types].xml" "_rels" "docProps" "xl"))
+        (lambda () (current-directory pwd)))))
