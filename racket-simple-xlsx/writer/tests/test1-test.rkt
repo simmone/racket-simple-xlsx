@@ -15,8 +15,7 @@
          (lambda ()
            (write-xlsx-file data_list #f "test1.xlsx"))
          (lambda ()
-           (with-input-from-xlsx-file
-            "test1.xlsx"
+           (with-input-from-xlsx-file "test1.xlsx"
             (lambda ()
               (test-case 
                "test-get-sheets"

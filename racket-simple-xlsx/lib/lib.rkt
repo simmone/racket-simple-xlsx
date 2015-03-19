@@ -223,5 +223,7 @@
         (lambda () (set! pwd (current-directory)))
         (lambda ()
           (current-directory content_dir)
-          (zip zip_file "[Content_Types].xml" "_rels" "docProps" "xl"))
+          (if (absolute-path? zip_file)
+              (zip zip_file "[Content_Types].xml" "_rels" "docProps" "xl")
+              (zip (build-path 'up zip_file) "[Content_Types].xml" "_rels" "docProps" "xl")))
         (lambda () (current-directory pwd)))))
