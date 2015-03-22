@@ -17,4 +17,5 @@ echo "writer-shared-strings";cd; cd $HOME_DIR/writer/xl;racket sharedStrings-tes
 echo "writer-styles";cd; cd $HOME_DIR/writer/xl;racket styles-test.rkt
 echo "writer-workbook";cd; cd $HOME_DIR/writer/xl;racket workbook-test.rkt
 
-echo "write-read-test1";cd; cd $HOME_DIR/write/tests/;racket test1-test.rkt
+echo "write-read-test-normal";cd; cd $HOME_DIR/writer/tests/;racket test1-test.rkt
+echo "write-read-test-10000-row";cd; cd $HOME_DIR/writer/tests/;racket test2-test.rkt
