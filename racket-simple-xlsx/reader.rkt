@@ -2,7 +2,7 @@
 
 (provide (contract-out 
           [with-input-from-xlsx-file (-> path-string? (-> void?) void?)]
-          [get-sheet-names (-> list? any/c any)]
+          [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
           [load-sheet (-> string? any/c void?)]
           [get-sheet-dimension (-> any/c pair?)]
