@@ -2,45 +2,34 @@
 
 (provide (contract-out 
           [with-input-from-xlsx-file (-> path-string? (-> void?) void?)]
-          [get-sheet-names (-> list?)]
-          [get-cell-value (-> string? any)]
-          [load-sheet (-> string? void?)]
-          [get-sheet-dimension (-> pair?)]
-          [with-row (-> (-> list? any) any)]
+          [get-sheet-names (-> list? any/c any)]
+          [get-cell-value (-> string? any/c any)]
+          [load-sheet (-> string? any/c void?)]
+          [get-sheet-dimension (-> any/c pair?)]
+          [with-row (-> any/c (-> list? any) any)]
           ))
 
 (require xml)
 
 (require "lib/lib.rkt")
 
-(define xlsx_dir (make-parameter "xlsx_dir"))
-
-(define shared_map (make-parameter #f))
-
-(define sheet_map (make-parameter #f))
-
-(define sheet_name_map (make-parameter #f))
-
-(define relation_name_map (make-parameter #f))
-
-(define data_type_map (make-parameter #f))
-
-(define dimension (make-parameter #f))
+(define xlsx%
+  (class object%
+         (init-field [xlsx_dir ""] [shared_map #f] [sheet_map #f] [sheet_name_map #f] [relation_name_map #f] [data_type_map #f] [dimension #f])
+         (super-new)))
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
   (with-unzip 
    xlsx_file
    (lambda (tmp_dir)
-     (parameterize* ([xlsx_dir tmp_dir]
-                     [shared_map (get-shared-string)]
-                     [sheet_name_map (get-sheet-name-map)]
-                     [relation_name_map (get-relation-name-map)])
-                    (user_proc)))))
+     (let ([xlsx_obj
+            (new xlsx% (xlsx_dir tmp_dir) (shared_map (get-shared-string tmp_dir)) (sheet_name_map (get-sheet-name-map tmp_dir)) (relation_name_map (get-relation-name-map tmp_dir)))])
+       (user_proc xlsx_obj)))))
 
-(define (get-sheet-name-map)
+(define (get-sheet-name-map xlsx_dir)
   (let ([data_map (make-hash)])
     (with-input-from-file 
-        (build-path (xlsx_dir) "xl" "workbook.xml")
+        (build-path xlsx_dir "xl" "workbook.xml")
       (lambda ()
         (let ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
               [sheet_list '()])
@@ -61,13 +50,12 @@
                 attr_list)
                (hash-set! data_map sheet_name sheet_id)))
            (xml-get-list 'sheets xml)))))
-    (set! sheet_name_map (make-parameter data_map))
     data_map))
 
-(define (get-relation-name-map)
+(define (get-relation-name-map xlsx_dir)
   (let ([data_map (make-hash)])
     (with-input-from-file 
-        (build-path (xlsx_dir) "xl" "_rels" "workbook.xml.rels")
+        (build-path xlsx_dir "xl" "_rels" "workbook.xml.rels")
       (lambda ()
         (let ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
               [sheet_list '()])
@@ -88,19 +76,18 @@
                 attr_list)
                (hash-set! data_map sheet_name sheet_id)))
            (xml-get-list 'Relationships xml)))))
-    (set! relation_name_map (make-parameter data_map))
     data_map))
 
-(define (get-sheet-names)
+(define (get-sheet-names xlsx)
   (map
    (lambda (item)
      (car item))
-   (sort #:key cdr (hash->list (sheet_name_map)) string<?)))
+   (sort #:key cdr (hash->list (get-field sheet_name_map xlsx)) string<?)))
 
-(define (get-shared-string)
+(define (get-shared-string xlsx_dir)
   (let ([data_map (make-hash)])
     (with-input-from-file 
-        (build-path (xlsx_dir) "xl" "sharedStrings.xml")
+        (build-path xlsx_dir "xl" "sharedStrings.xml")
       (lambda ()
         (let loop1 ([line (read-line)])
           (when (not (eof-object? line))
@@ -118,11 +105,11 @@
                 (loop1 (read-line))))))
   data_map))
 
-(define (load-sheet sheet_name)
+(define (load-sheet sheet_name xlsx)
   (let ([data_map (make-hash)]
         [type_map (make-hash)])
     (with-input-from-file 
-        (build-path (xlsx_dir) "xl" (hash-ref (relation_name_map) (hash-ref (sheet_name_map) sheet_name)))
+        (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))
       (lambda ()
         (let* ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
                [v_list (xml-get-list 'sheetData xml)]
@@ -168,32 +155,32 @@
                  [items (regexp-match (regexp "([A-Z]+)([0-9]+)") dest_item)]
                  [col_str (cadr items)]
                  [row_str (caddr items)])
-            (set! dimension (make-parameter (cons (string->number row_str) (abc->number col_str)))))
+            (set-field! dimension xlsx (cons (string->number row_str) (abc->number col_str))))
           )))
-    (set! sheet_map (make-parameter data_map))
-    (set! data_type_map (make-parameter type_map))))
+    (set-field! sheet_map xlsx data_map)
+    (set-field! data_type_map xlsx type_map)))
 
-(define (get-cell-value item_name)
-  (if (hash-has-key? (sheet_map) item_name)
-      (let* ([type (hash-ref (data_type_map) item_name)]
+(define (get-cell-value item_name xlsx)
+  (if (hash-has-key? (get-field sheet_map xlsx) item_name)
+      (let* ([type (hash-ref (get-field data_type_map xlsx) item_name)]
              [type_t (car type)]
              [type_s (cdr type)]
-             [value (hash-ref (sheet_map) item_name)])
+             [value (hash-ref (get-field sheet_map xlsx) item_name)])
       (cond
        [(string=? type_t "s")
-        (hash-ref (shared_map) value)]
+        (hash-ref (get-field shared_map xlsx) value)]
        [(string=? type_s "5")
         (format-time (string->number value))]
        [(or (string=? type_t "") (string=? type_s "2"))
         (string->number value)]))
       ""))
 
-(define (get-sheet-dimension)
-  (dimension))
+(define (get-sheet-dimension xlsx)
+  (get-field dimension xlsx))
   
-(define (with-row proc)
-  (let ([rows (car (dimension))]
-        [cols (cdr (dimension))])
+(define (with-row xlsx proc)
+  (let ([rows (car (get-field dimension xlsx))]
+        [cols (cdr (get-field dimension xlsx))])
     (let loop ([row_index 1])
       (when (<= row_index rows)
             (proc (map

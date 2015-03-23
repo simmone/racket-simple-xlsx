@@ -12,20 +12,20 @@
 
    (with-input-from-xlsx-file
     "test1.xlsx"
-    (lambda ()
+    (lambda (xlsx)
       (test-case 
        "test-get-sheets"
        
-       (check-equal? (get-sheet-names) '("Sheet1" "Sheet2" "Sheet3")))
+       (check-equal? (get-sheet-names xlsx) '("Sheet1" "Sheet2" "Sheet3")))
    
       (test-case
        "test-get-sheet-data"
        
-       (load-sheet "Sheet1")
-       (check-equal? (get-cell-value "A1") "chenxiao")
-       (check-equal? (get-cell-value "B1") "love")
-       (check-equal? (get-cell-value "C1") "chensiheng")
-       (check-equal? (get-cell-value "C2") 7)
+       (load-sheet "Sheet1" xlsx)
+       (check-equal? (get-cell-value "A1" xlsx) "chenxiao")
+       (check-equal? (get-cell-value "B1" xlsx) "love")
+       (check-equal? (get-cell-value "C1" xlsx) "chensiheng")
+       (check-equal? (get-cell-value "C2" xlsx) 7)
        )
 
       (test-case
@@ -39,7 +39,7 @@
       (test-case
        "test-with-row"
        (let ([row_index 1])
-         (with-row
+         (with-row xlsx
           (lambda (row)
             (when (= row_index 1)
                 (check-equal? (first row) "chenxiao")
