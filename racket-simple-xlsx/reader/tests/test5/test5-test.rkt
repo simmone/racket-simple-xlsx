@@ -12,12 +12,12 @@
 
    (with-input-from-xlsx-file
     "test5.xlsx"
-    (lambda ()
+    (lambda (xlsx)
       (test-case
        "test-get-sheet-data"
 
-       (load-sheet "Sheet1")
-       (check-equal? (get-cell-value "D1") 100)
+       (load-sheet "Sheet1" xlsx)
+       (check-equal? (get-cell-value "D1" xlsx) 100)
       )))))
 
 (run-tests test-test5)

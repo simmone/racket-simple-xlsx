@@ -1,7 +1,7 @@
 #lang racket
 
 (provide (contract-out 
-          [with-input-from-xlsx-file (-> path-string? (-> void?) void?)]
+          [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]
           [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
           [load-sheet (-> string? any/c void?)]
@@ -185,6 +185,6 @@
       (when (<= row_index rows)
             (proc (map
                    (lambda (col)
-                     (get-cell-value (string-append (number->abc col) (number->string row_index))))
+                     (get-cell-value (string-append (number->abc col) (number->string row_index)) xlsx))
                    (number->list cols)))
             (loop (add1 row_index))))))

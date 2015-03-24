@@ -33,11 +33,11 @@
            (lambda ()
              (with-input-from-xlsx-file
               "test2.xlsx"
-              (lambda ()
-                (load-sheet "Sheet1")
+              (lambda (xlsx)
+                (load-sheet "Sheet1" xlsx)
 
                 (let ([sum 0])
-                  (with-row
+                  (with-row xlsx
                    (lambda (row)
                      (set! sum (+ sum (first row)))))
                   

@@ -31,7 +31,7 @@
       (test-case
        "test-get-sheet-dimension"
 
-       (let ([dimension (get-sheet-dimension)])
+       (let ([dimension (get-sheet-dimension xlsx)])
          (check-equal? (car dimension) 2)
          (check-equal? (cdr dimension) 3))
        )
