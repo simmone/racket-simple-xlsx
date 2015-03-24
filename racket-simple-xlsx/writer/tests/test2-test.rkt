@@ -24,12 +24,13 @@
                (set! correct_sum (+ correct_sum rad))               
                (set! data_list `(,@data_list (,rad)))
                (loop (add1 count) (round (* (random) 1000)))))
-
-       (set! data_list `((,@data_list)))
        
        (dynamic-wind
            (lambda ()
-             (write-xlsx-file data_list #f "test2.xlsx"))
+             (let ([xlsx (new xlsx-data%)])
+               (send xlsx add-sheet data_list "Sheet1")
+
+               (write-xlsx-file xlsx "test2.xlsx")))
            (lambda ()
              (with-input-from-xlsx-file
               "test2.xlsx"

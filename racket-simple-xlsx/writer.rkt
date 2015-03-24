@@ -1,7 +1,9 @@
 #lang racket
 
-(provide (contract-out 
-          [write-xlsx-file (-> list? (or/c list? #f) path-string? void?)]
+(provide (contract-out
+          [xlsx-data% class?]
+          [xlsx-data? any/c]
+          [write-xlsx-file (-> xlsx-data? path-string? void?)]
           ))
 
 ;; data list:
@@ -28,7 +30,21 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 
-(define (write-xlsx-file data_list sheet_name_list xlsx_file_name)
+(define xlsx-data%
+  (class object%
+         (field (sheet_data_list '()))
+         (field (sheet_name_list '()))
+
+         (define/public (add-sheet sheet_row_list sheet_name)
+           (set! sheet_data_list `(,@sheet_data_list ,sheet_row_list))
+           (set! sheet_name_list `(,@sheet_name_list ,sheet_name)))
+
+         (super-new)))
+
+(define (xlsx-data? obj)
+  (and (field-bound? sheet_data_list obj) (field-bound? sheet_name_list obj)))
+
+(define (write-xlsx-file xlsx_data xlsx_file_name)
   (when (file-exists? xlsx_file_name)
         (delete-file xlsx_file_name))
   
@@ -36,65 +52,66 @@
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
-          (let-values ([(string_index_list string_index_map) (get-string-index data_list)])
-            (let* ([sheet_count (length data_list)]
-                   [real_sheet_name_list (if sheet_name_list sheet_name_list (create-sheet-name-list sheet_count))])
-              ;; [Content_Types].xml
-              (write-content-type-file tmp_dir sheet_count)
+          (let ([sheet_data_list (get-field sheet_data_list xlsx_data)]
+                [sheet_name_list (get-field sheet_name_list xlsx_data)])
+            (let-values ([(string_index_list string_index_map) (get-string-index sheet_data_list)])
+              (let ([sheet_count (length sheet_data_list)])
+                ;; [Content_Types].xml
+                (write-content-type-file tmp_dir sheet_count)
 
-              ;; _rels
-              (let ([rels_dir (build-path tmp_dir "_rels")])
-                (make-directory* rels_dir)
-                (write-rels-file rels_dir))
-
-              ;; docProps
-              (let ([doc_props_dir (build-path tmp_dir "docProps")])
-                (make-directory* doc_props_dir)
-                (write-docprops-app-file doc_props_dir real_sheet_name_list)
-                (write-docprops-core-file doc_props_dir (current-date)))
-              
-              ;; xl
-              (let ([xl_dir (build-path tmp_dir "xl")])
                 ;; _rels
-                (let ([rels_dir (build-path xl_dir "_rels")])
+                (let ([rels_dir (build-path tmp_dir "_rels")])
                   (make-directory* rels_dir)
-                  (write-workbook-xml-rels-file rels_dir sheet_count))
+                  (write-rels-file rels_dir))
+
+                ;; docProps
+                (let ([doc_props_dir (build-path tmp_dir "docProps")])
+                  (make-directory* doc_props_dir)
+                  (write-docprops-app-file doc_props_dir sheet_name_list)
+                  (write-docprops-core-file doc_props_dir (current-date)))
                 
-                ;; printerSettings
-                (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
-                  (make-directory* printer_settings_dir)
-                  (create-printer-settings printer_settings_dir sheet_count))
-
-                ;; sharedStrings
-                (write-shared-strings-file xl_dir string_index_list)
-
-                ;; styles.xml
-                (write-styles-file xl_dir)
-
-                ;; theme
-                (let ([theme_dir (build-path xl_dir "theme")])
-                  (make-directory* theme_dir)
-                  (write-theme-file theme_dir))
-
-                ;; workbook
-                (write-workbook-file xl_dir real_sheet_name_list)
-
-                ;; worksheets
-                (let ([worksheets_dir (build-path xl_dir "worksheets")])
+                ;; xl
+                (let ([xl_dir (build-path tmp_dir "xl")])
                   ;; _rels
-                  (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
-                    (make-directory* worksheets_rels_dir)
-                    (write-worksheets-rels-file worksheets_rels_dir sheet_count))
+                  (let ([rels_dir (build-path xl_dir "_rels")])
+                    (make-directory* rels_dir)
+                    (write-workbook-xml-rels-file rels_dir sheet_count))
+                  
+                  ;; printerSettings
+                  (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
+                    (make-directory* printer_settings_dir)
+                    (create-printer-settings printer_settings_dir sheet_count))
 
-                  ;; worksheet
-                  (let loop ([sheets_data data_list]
-                             [index 1])
-                    (when (not (null? sheets_data))
-                          (write-sheet-file worksheets_dir index (car sheets_data) string_index_map)
-                          (loop (cdr sheets_data) (add1 index))))
+                  ;; sharedStrings
+                  (write-shared-strings-file xl_dir string_index_list)
+
+                  ;; styles.xml
+                  (write-styles-file xl_dir)
+
+                  ;; theme
+                  (let ([theme_dir (build-path xl_dir "theme")])
+                    (make-directory* theme_dir)
+                    (write-theme-file theme_dir))
+
+                  ;; workbook
+                  (write-workbook-file xl_dir sheet_name_list)
+
+                  ;; worksheets
+                  (let ([worksheets_dir (build-path xl_dir "worksheets")])
+                    ;; _rels
+                    (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
+                      (make-directory* worksheets_rels_dir)
+                      (write-worksheets-rels-file worksheets_rels_dir sheet_count))
+
+                    ;; worksheet
+                    (let loop ([sheets_data sheet_data_list]
+                               [index 1])
+                      (when (not (null? sheets_data))
+                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map)
+                            (loop (cdr sheets_data) (add1 index))))
+                    )
                   )
-                )
-              ))
-          (zip-xlsx xlsx_file_name tmp_dir))
-        (lambda ()
-          (delete-directory/files tmp_dir)))))
+                ))
+            (zip-xlsx xlsx_file_name tmp_dir)))
+          (lambda ()
+            (delete-directory/files tmp_dir)))))

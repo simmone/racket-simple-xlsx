@@ -7,7 +7,9 @@
           [load-sheet (-> string? any/c void?)]
           [get-sheet-dimension (-> any/c pair?)]
           [with-row (-> any/c (-> list? any) any)]
-          [write-xlsx-file (-> list? (or/c list? #f) path-string? void?)]          
+          [xlsx-data% class?]
+          [xlsx-data? any/c]
+          [write-xlsx-file (-> xlsx-data? path-string? void?)]
           ))
 
 (require "reader.rkt")
