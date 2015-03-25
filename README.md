@@ -7,7 +7,7 @@ A Open Xml File format spreadsheet(.xlsx) reader and writer
 # Usage Example
 ```racket
 
-(require simple-xlsx)
+    (require simple-xlsx)
 
     ;; write
     ;; data type must be string or number
@@ -28,6 +28,7 @@ A Open Xml File format spreadsheet(.xlsx) reader and writer
                 (get-cell-value "E2" xlsx) ; 456.34))
 
     ;; loop for row
+
     (with-input-from-xlsx-file "test1.xlsx"
         (lambda (xlsx)
             (load-sheet "Sheet1" xlsx)
