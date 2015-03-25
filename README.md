@@ -23,9 +23,9 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
     (with-input-from-xlsx-file "test1.xlsx"
         (lambda (xlsx)
             (load-sheet "Sheet1" xlsx)
-                (get-cell-value "A1" xlsx) ; "chenxiao"
-                (get-cell-value "B1" xlsx) ; "xiaomin"
-                (get-cell-value "E2" xlsx) ; 456.34))
+                (printf "~a\n" (get-cell-value "A1" xlsx)) ; "chenxiao"
+                (printf "~a\n" (get-cell-value "B1" xlsx)) ; "cx"
+                (printf "~a\n" (get-cell-value "E2" xlsx)))) ; 456.34
 
     ;; loop for row
 
@@ -34,5 +34,5 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
             (load-sheet "Sheet1" xlsx)
                 (with-row xlsx
                     (lambda (row)
-                        (printf "~a " (first row)))))) ;; chenxiao 1
+                        (printf "~a\n" (first row)))))) ;; chenxiao 1
 ```

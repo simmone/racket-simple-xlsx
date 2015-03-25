@@ -1,4 +1,4 @@
-HOME_DIR="racket-simple-xlsx/racket-simple-xlsx"
+HOME_DIR="racket-simple-xlsx/simple-xlsx"
 echo "lib";cd; cd $HOME_DIR/lib/;racket lib-test.rkt
 echo "reader-test1";cd; cd $HOME_DIR/reader/tests/test1/;racket test1-test.rkt
 echo "reader-test2";cd; cd $HOME_DIR/reader/tests/test2/;racket test2-test.rkt
