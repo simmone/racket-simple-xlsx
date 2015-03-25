@@ -1,10 +1,10 @@
-A Open Xml File format spreadsheet(.xlsx) reader and writer
+A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 ==================
 
 # Install
     raco pkg install simple-xlsx
 
-# Usage Basic
+# Basic Usage
 ```racket
 
     (require simple-xlsx)
@@ -34,5 +34,5 @@ A Open Xml File format spreadsheet(.xlsx) reader and writer
             (load-sheet "Sheet1" xlsx)
                 (with-row xlsx
                     (lambda (row)
-                        (printf "~a\n" (first row)))))) ;; chenxiao 1
+                        (printf "~a " (first row)))))) ;; chenxiao 1
 ```
