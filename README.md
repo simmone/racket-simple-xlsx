@@ -4,7 +4,7 @@ A Open Xml File format spreadsheet(.xlsx) reader and writer
 # Install
     raco pkg install simple-xlsx
 
-# Usage Example
+# Usage Basic
 ```racket
 
     (require simple-xlsx)
@@ -36,8 +36,3 @@ A Open Xml File format spreadsheet(.xlsx) reader and writer
                     (lambda (row)
                         (printf "~a\n" (first row)))))) ;; chenxiao 1
 ```
-
-# To do list
-
-    column format: width, color, etc;
-    
