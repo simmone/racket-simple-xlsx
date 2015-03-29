@@ -9,6 +9,7 @@
           [with-row (-> any/c (-> list? any) any)]
           [xlsx-data% class?]
           [xlsx-data? any/c]
+          [col-attr any/c]
           [write-xlsx-file (-> xlsx-data? path-string? void?)]
           ))
 
