@@ -24,7 +24,17 @@
           [get-dimension (-> list? string?)]
           [get-string-index (-> list? (values list? hash?))]
           [zip-xlsx (-> path-string? path-string? void?)]
+          [struct col-attr ((width number?) (color string?))]
+          [cx-round (-> number? integer? number?)]          
           ))
+
+(define (cx-round num precise)
+  (let ([factor (expt 10 precise)])
+    (/ (round (* num factor)) factor)))
+
+;; represent a column's attibutes, if not want set a specific attr, set it to #f
+;; example: (col-attr #f "red") means only set color
+(struct col-attr (width color) #:transparent)
 
 (define (format-date the_date)
   (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))

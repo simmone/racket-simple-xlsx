@@ -31,10 +31,6 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 
-;; represent a column's attibutes, if not want set a specific attr, set it to #f
-;; example: (col-attr #f "red") means only set color
-(struct col-attr (width color))
-
 ;; col_attr_hash used to set col's attribute: '#hash(("A" . (col-attr 100 "white")))
 (define xlsx-data%
   (class object%
@@ -46,7 +42,7 @@
            (set! sheet_data_list `(,@sheet_data_list ,sheet_row_list))
            (set! sheet_name_list `(,@sheet_name_list ,sheet_name))
            (when col_attr_hash
-                 (hash-set! sheet_attr_hash (length sheet_data_list) col_attr_hash)))
+                 (hash-set! sheet_attr_hash (add1 (length sheet_data_list)) col_attr_hash)))
 
          (super-new)))
 
@@ -62,7 +58,9 @@
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
           (let ([sheet_data_list (get-field sheet_data_list xlsx_data)]
-                [sheet_name_list (get-field sheet_name_list xlsx_data)])
+                [sheet_name_list (get-field sheet_name_list xlsx_data)]
+                [sheet_attr_hash (get-field sheet_attr_hash xlsx_data)]
+                )
             (let-values ([(string_index_list string_index_map) (get-string-index sheet_data_list)])
               (let ([sheet_count (length sheet_data_list)])
                 ;; [Content_Types].xml
@@ -116,7 +114,7 @@
                     (let loop ([sheets_data sheet_data_list]
                                [index 1])
                       (when (not (null? sheets_data))
-                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map)
+                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_atr_map)
                             (loop (cdr sheets_data) (add1 index))))
                     )
                   )
