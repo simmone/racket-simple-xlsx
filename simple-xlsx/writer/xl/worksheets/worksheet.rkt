@@ -16,11 +16,11 @@
 
 (define (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index is_active?) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="@|(if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))|"/><sheetViews><sheetView @|(if is_active? "tabSelected=\"1\"" "")| workbookViewId="0">@|(if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")|</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/><sheetData>@|(with-output-to-string
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="@|(if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))|"/><sheetViews><sheetView @|(if is_active? "tabSelected=\"1\"" "")| workbookViewId="0">@|(if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")|</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/>@|(with-output-to-string
 (lambda ()
   (when (hash-has-key? sheet_attr_map sheet_index)
-        (printf "<cols>\n")
-        (let loop-col ([loop_cols (sort string>? #:key car (hash->list (hash-ref sheet_attr_map sheet_index)))])
+        (printf "<cols>")
+        (let loop-col ([loop_cols (sort (hash->list (hash-ref sheet_attr_map sheet_index)) string<? #:key car)])
           (when (not (null? loop_cols))
                 (let* ([col (car loop_cols)]
                        [col_index (abc->number (car col))]
@@ -29,9 +29,11 @@
                   (printf "<col min=\"~a\" max=\"~a\" width=\"~a\" customWidth=\"1\"/>"
                           col_index
                           col_index
-                          (cx-round (/ col_width 8) 2)))
+                          (exact->inexact (cx-round (/ col_width 8) 2))))
                 (loop-col (cdr loop_cols))))
-          (printf "<cols>\n"))
+        (printf "</cols>"))
+
+  (printf "<sheetData>")
                         
   (let loop-row ([loop_rows sheet_data_list]
                  [row_seq 1])
@@ -61,5 +63,5 @@
     #:exists 'replace
     (lambda ()
       (if (= sheet_index 1)
-          (printf "~a" (write-sheet sheet_data_list string_index_map sheeet_attr_map sheet_index #t))
+          (printf "~a" (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index #t))
           (printf "~a" (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index #f))))))

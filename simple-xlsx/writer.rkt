@@ -42,7 +42,7 @@
            (set! sheet_data_list `(,@sheet_data_list ,sheet_row_list))
            (set! sheet_name_list `(,@sheet_name_list ,sheet_name))
            (when col_attr_hash
-                 (hash-set! sheet_attr_hash (add1 (length sheet_data_list)) col_attr_hash)))
+                 (hash-set! sheet_attr_hash (length sheet_data_list) col_attr_hash)))
 
          (super-new)))
 
@@ -114,7 +114,7 @@
                     (let loop ([sheets_data sheet_data_list]
                                [index 1])
                       (when (not (null? sheets_data))
-                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_atr_map)
+                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash)
                             (loop (cdr sheets_data) (add1 index))))
                     )
                   )
