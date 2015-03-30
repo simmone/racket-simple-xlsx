@@ -4,8 +4,6 @@
 
 (require rackunit "../../main.rkt")
 
-(require "../../lib/lib.rkt")
-
 (define test-test2
   (test-suite
    "test-test2"
