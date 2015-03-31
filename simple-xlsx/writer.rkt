@@ -7,14 +7,6 @@
           [write-xlsx-file (-> xlsx-data? path-string? void?)]
           ))
 
-;; data list:
-;; '(((1 2 3 4) (1 2 3) (1 3 4)) ((3 4 5 6) (3 6 7 8)))
-;; first level children is sheets
-;; each sheet contains rows, row's length is not same
-;; sheet name list:
-;; '("Sheet1" "Sheet2" ...)
-;; #f use default Sheet1, Sheet2... as sheet name
-
 (require racket/date)
 
 (require "lib/lib.rkt")
@@ -102,7 +94,7 @@
 
                   ;; styles and worksheets
                   (let ([worksheets_dir (build-path xl_dir "worksheets")]
-                        [styles_map (write-styles-file xl_dir sheet_attr_hash)])
+                        [color_style_map (write-styles-file xl_dir sheet_attr_hash)])
                     ;; _rels
                     (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
                       (make-directory* worksheets_rels_dir)
@@ -112,7 +104,7 @@
                     (let loop ([sheets_data sheet_data_list]
                                [index 1])
                       (when (not (null? sheets_data))
-                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash styles_map)
+                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash color_style_map)
                             (loop (cdr sheets_data) (add1 index))))
                     )
                   )
