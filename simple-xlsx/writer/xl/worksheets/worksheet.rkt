@@ -50,7 +50,7 @@
                              [(string? cell)
                               (printf "<c r=\"~a\" t=\"s\"><v>~a</v></c>" dimension (hash-ref string_index_map cell))]
                              [(number? cell)
-                              (printf "<c r=\"~a\"><v>~a</v></c>" dimension (number->string cell))]
+                              (printf "<c r=\"~a\"><v>~a</v></c>" dimension (number->string (exact->inexact cell)))]
                              [else
                               (printf "<c r=\"~a\"><v>0</v></c>" dimension)]))
                           (loop-col (cdr loop_cols) (add1 col_seq))))))
