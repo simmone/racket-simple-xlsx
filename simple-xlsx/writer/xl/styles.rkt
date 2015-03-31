@@ -4,6 +4,8 @@
 (require racket/list)
 (require racket/contract)
 
+<fill><patternFill patternType="solid"><fgColor rgb="FFFF0000"/><bgColor indexed="64"/></patternFill></fill>
+
 ;; strings list convert to (string . place) hash
 (provide (contract-out
           [write-styles (-> string?)]
