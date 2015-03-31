@@ -92,9 +92,6 @@
                   ;; sharedStrings
                   (write-shared-strings-file xl_dir string_index_list)
 
-                  ;; styles.xml
-                  (write-styles-file xl_dir)
-
                   ;; theme
                   (let ([theme_dir (build-path xl_dir "theme")])
                     (make-directory* theme_dir)
@@ -103,8 +100,9 @@
                   ;; workbook
                   (write-workbook-file xl_dir sheet_name_list)
 
-                  ;; worksheets
-                  (let ([worksheets_dir (build-path xl_dir "worksheets")])
+                  ;; styles and worksheets
+                  (let ([worksheets_dir (build-path xl_dir "worksheets")]
+                        [styles_map (write-styles-file xl_dir sheet_attr_hash)])
                     ;; _rels
                     (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
                       (make-directory* worksheets_rels_dir)
@@ -114,7 +112,7 @@
                     (let loop ([sheets_data sheet_data_list]
                                [index 1])
                       (when (not (null? sheets_data))
-                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash)
+                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash styles_map)
                             (loop (cdr sheets_data) (add1 index))))
                     )
                   )
