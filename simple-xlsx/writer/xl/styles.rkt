@@ -20,7 +20,13 @@
     (for-each
      (lambda (style_rec)
        (printf "<fill><patternFill patternType=\"solid\"><fgColor rgb=\"~a\"/><bgColor indexed=\"64\"/></patternFill></fill>" (first style_rec)))
-     style_list)))|</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"><alignment vertical="center"/></xf></cellStyleXfs><cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/></styleSheet>
+     style_list)))|</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"><alignment vertical="center"/></xf></cellStyleXfs><cellXfs count="@|(number->string (add1 (length style_list)))|"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>@|(with-output-to-string
+(lambda ()
+  (let loop ([loop_list style_list]
+             [index 2])
+    (when (not (null? loop_list))
+          (printf "<xf numFmtId=\"0\" fontId=\"0\" fillId=\"~a\" borderId=\"0\" xfId=\"0\" applyFill=\"1\"><alignment vertical=\"center\"/></xf>" index)
+          (loop (cdr loop_list) (add1 index))))))|</cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/></styleSheet>
 })
 
 (define (write-styles-file dir sheet_attr_map)
@@ -29,7 +35,7 @@
       #:exists 'replace
       (lambda ()
         (let ([style_list '()]
-              [style_index 2])
+              [style_index 1])
           (hash-for-each
            sheet_attr_map
            (lambda (sheet_index col_attr_map)

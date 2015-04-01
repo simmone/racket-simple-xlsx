@@ -5,17 +5,18 @@
 (require "../simple-xlsx/main.rkt")
 
 ;; write a xlsx file, with multiple sheets, set the column attributes(width, color)
-(let ([xlsx (new xlsx-data%)])
-  (let ([col_attr_hash (make-hash)])
-    (hash-set! col_attr_hash "A" (col-attr 100 ""))
-    (hash-set! col_attr_hash "B" (col-attr 200 ""))
+(let ([xlsx (new xlsx-data%)]
+      [col_attr_hash (make-hash)])
+    (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
+    (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
+    (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
 
-    (send xlsx add-sheet '(("chenxiao" "陈晓") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
+    (send xlsx add-sheet '(("Jane Birkin" "Leonard Cohen" "Matthew McConaughey") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
     (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
     (send xlsx add-sheet '(("a" "b")) "Sheet3")
     (send xlsx add-sheet '(("a" "b")) "Sheet4" #:col_attr_hash col_attr_hash)
     (send xlsx add-sheet '(("")) "Sheet5" #:col_attr_hash col_attr_hash)
-    (write-xlsx-file xlsx "test1.xlsx")))
+    (write-xlsx-file xlsx "test1.xlsx"))
 
 ;; write a xlsx file and read it back
 (let ([xlsx (new xlsx-data%)])
