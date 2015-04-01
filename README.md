@@ -54,6 +54,4 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
   
 ```
 
-# Screenshot
-
-![](https://github.com/github/simmone/racket-simple-xlsx/master/example/example.png)
+![ScreenShot](example/example.png)
