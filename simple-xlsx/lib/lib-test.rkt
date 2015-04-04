@@ -37,7 +37,36 @@
     (check-equal? (number->abc 677) "ZA")
     (check-equal? (number->abc 702) "ZZ")
     (check-equal? (number->abc 703) "AAA")
-   )
+    )
+
+   (test-case
+    "test-AZ-RANGE"
+    (check-equal? (abc->range "A") '(1 . 1))
+    (check-equal? (abc->range "B") '(2 . 2))
+    (check-equal? (abc->range "2") '(2 . 2))
+    (check-equal? (abc->range "C-D") '(3 . 4))
+    (check-equal? (abc->range "3-4") '(3 . 4))
+    (check-equal? (abc->range "1-26") '(1 . 26))
+    (check-equal? (abc->range "26-1") '(1 . 1))
+    (check-equal? (abc->range "A-Z") '(1 . 26))
+    (check-equal? (abc->range "Z-A") '(1 . 1))
+    (check-equal? (abc->range "A-B-C") '(1 . 1))
+    )
+
+   (test-case
+    "test-get-range-ref"
+    (let ([range_hash (make-hash)])
+      (hash-set! range_hash '(1 . 2) 1)
+      (hash-set! range_hash '(3 . 4) 2)
+      
+      (check-equal? (get-range-ref range_hash 1) 1) 
+      (check-equal? (get-range-ref range_hash 2) 1)
+      (check-equal? (get-range-ref range_hash 3) 2)
+      (check-equal? (get-range-ref range_hash 4) 2)
+      (check-equal? (get-range-ref range_hash 5) #f)
+      (check-equal? (get-range-ref range_hash 0) #f)
+      )
+    )
 
    (test-case 
     "test-number->list"

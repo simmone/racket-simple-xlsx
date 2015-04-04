@@ -25,23 +25,23 @@
             (let loop-col ([loop_cols (sort (hash->list (hash-ref sheet_attr_map sheet_index)) string<? #:key car)])
               (when (not (null? loop_cols))
                     (let* ([col (car loop_cols)]
-                           [col_index (abc->number (car col))]
+                           [col_index_range (abc->range (car col))]
                            [col_attr (cdr col)]
                            [col_width (col-attr-width col_attr)]
                            [col_color (col-attr-color col_attr)]
                            [col_style_index (if (hash-has-key? color_style_map col_color) (hash-ref color_style_map col_color) #f)])
-                    (printf "<col min=\"~a\" max=\"~a\" width=\"~a\" ~a/>"
-                            col_index
-                            col_index
-                            (exact->inexact (cx-round (/ col_width 8) 2))
-                            (if col_style_index 
-                                (begin
-                                  (hash-set! col_style_map col_index col_style_index)
-                                  (string-append "style=\"" (number->string col_style_index)"\""))
-                                "")
-                            ))
-                  (loop-col (cdr loop_cols))))
-          (printf "</cols>"))
+                      (printf "<col min=\"~a\" max=\"~a\" width=\"~a\" ~a/>"
+                              (car col_index_range)
+                              (cdr col_index_range)
+                              (exact->inexact (cx-round (/ col_width 8) 2))
+                              (if col_style_index 
+                                  (begin
+                                    (hash-set! col_style_map col_index_range col_style_index)
+                                    (string-append "style=\"" (number->string col_style_index)"\""))
+                                  "")
+                              ))
+                    (loop-col (cdr loop_cols))))
+            (printf "</cols>"))
 
       (printf "<sheetData>")
     
@@ -54,11 +54,10 @@
                       (let loop-col ([loop_cols item_list]
                                      [col_seq 1])
                         (when (not (null? loop_cols))
-                              (let ([cell (car loop_cols)]
-                                    [dimension (string-append (number->abc col_seq) (number->string row_seq))]
-                                    [style (if (hash-has-key? col_style_map col_seq)
-                                               (string-append "s=\"" (number->string (hash-ref col_style_map col_seq)) "\"")
-                                               "")])
+                              (let* ([cell (car loop_cols)]
+                                     [dimension (string-append (number->abc col_seq) (number->string row_seq))]
+                                     [style_index (get-range-ref col_style_map col_seq)]
+                                     [style (if style_index (string-append "s=\"" (number->string style_index) "\"") "")])
                                 (cond
                                  [(string? cell)
                                   (printf "<c r=\"~a\" ~a t=\"s\"><v>~a</v></c>" dimension style (hash-ref string_index_map cell))]

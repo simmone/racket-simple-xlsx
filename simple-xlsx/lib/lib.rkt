@@ -13,7 +13,9 @@
           [xml-get-attr (-> symbol? string? xexpr? string?)]
           [xml-get (-> symbol? xexpr? string?)]
           [abc->number (-> string? number?)]
+          [abc->range (-> string? pair?)]
           [number->abc (-> number? string?)]
+          [get-range-ref (-> hash? number? (or/c any/c #f))]
           [number->list (-> number? list?)]
           [format-date (-> date? string?)]
           [format-complete-time (-> date? string?)]
@@ -115,6 +117,47 @@
               (set! sum (+ (* alpha_int (expt 26 base)) sum)))
             (loop (cdr char_list) (add1 base))))
     sum))
+
+(define (abc->range abc_range)
+  (let ([abc_items (regexp-split #rx"-" abc_range)])
+    (if (= (length abc_items) 2)
+        (let* ([first_item (first abc_items)]
+               [second_item (second abc_items)]
+               [start_index
+                (cond
+                 [(exact-nonnegative-integer? first_item)
+                  first_item]
+                 [(string? first_item)
+                  (abc->number first_item)]
+                 [else
+                  1])]
+               [end_index
+                (cond
+                 [(exact-nonnegative-integer? second_item)
+                  second_item]
+                 [(string? second_item)
+                  (abc->number second_item)]
+                 [else
+                  1])])
+          (if (<= start_index end_index)
+                (cons start_index end_index)
+                (cons 1 1)))
+        (cond
+         [(exact-nonnegative-integer? abc_range)
+          (cons abc_range abc_range)]
+         [(string? abc_range)
+          (cons (abc->number abc_range) (abc->number abc_range))]))))
+
+(define (get-range-ref range_hash index)
+  (let ([result #f])
+    (let loop ([data_list (hash->list range_hash)])
+      (when (not (null? data_list))
+            (let ([range (caar data_list)]
+                  [value (cdar data_list)])
+       (if (and (>= index (car range)) (<= index (cdr range)))
+           (set! result value)
+           (loop (cdr data_list))))))
+    result))
 
 (define (number->abc num)
   (let ([abc ""])
