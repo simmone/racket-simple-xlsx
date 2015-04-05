@@ -51,6 +51,8 @@
     (check-equal? (abc->range "A-Z") '(1 . 26))
     (check-equal? (abc->range "Z-A") '(1 . 1))
     (check-equal? (abc->range "A-B-C") '(1 . 1))
+    (check-equal? (abc->range "A-ksdk344") '(1 . 1))
+    (check-equal? (abc->range "sdksjdkf-%^%$#") '(1 . 1))
     )
 
    (test-case
