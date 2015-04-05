@@ -119,30 +119,25 @@
     sum))
 
 (define (abc->range abc_range)
-  (printf "~a:~a\n" abc_range (abc->number abc_range))
-  (printf "~a\n" (regexp-match #rx"([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)" abc_range))
-  (printf "~a\n" (regexp-match #rx"[0-9]+" abc_range))
-  (printf "~a\n" (regexp-match #rx"[A-Z]+" abc_range))
-  
   (cond
-   [(regexp-match #rx"[0-9]+|[A-Z]+-[0-9]+|[A-Z]+" abc_range)
+   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" abc_range)
     (let ([abc_items (regexp-split #rx"-" abc_range)])
       (if (= (length abc_items) 2)
           (let* ([first_item (first abc_items)]
                  [second_item (second abc_items)]
                  [start_index
                   (cond
-                   [(regexp-match #rx"[0-9]+" first_item)
-                    first_item]
-                   [(regexp-match #rx"[A-Z]+" first_item)
+                   [(regexp-match #rx"^[0-9]+$" first_item)
+                    (string->number first_item)]
+                   [(regexp-match #rx"^[A-Z]+$" first_item)
                     (abc->number first_item)]
                    [else
                     1])]
                  [end_index
                   (cond
-                   [(regexp-match #rx"[0-9]+" second_item)
-                    second_item]
-                   [(regexp-match #rx"[A-Z]+" second_item)
+                   [(regexp-match #rx"^[0-9]+$" second_item)
+                    (string->number second_item)]
+                   [(regexp-match #rx"^[A-Z]+$" second_item)
                     (abc->number second_item)]
                    [else
                     1])])
@@ -150,9 +145,9 @@
                 (cons start_index end_index)
                 (cons 1 1)))
           (cons 1 1)))]
-   [(regexp-match #rx"[0-9]+" abc_range)
-    (cons abc_range abc_range)]
-   [(regexp-match #rx"[A-Z]+" abc_range)
+   [(regexp-match #rx"^[0-9]+$" abc_range)
+    (cons (string->number abc_range) (string->number abc_range))]
+   [(regexp-match #rx"^[A-Z]+$" abc_range)
     (cons (abc->number abc_range) (abc->number abc_range))]
    [else
     (cons 1 1)]))

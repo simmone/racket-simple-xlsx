@@ -12,6 +12,7 @@
    (test-case 
     "test-AZ-NUMBER"
     (check-equal? (abc->number "A") 1)
+    (check-equal? (abc->number "B") 2)
     (check-equal? (abc->number "Z") 26)
     (check-equal? (abc->number "AA") 27)
     (check-equal? (abc->number "AB") 28)
