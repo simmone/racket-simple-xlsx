@@ -15,6 +15,8 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
       (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
       (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
       (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
+      (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
+      (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
   
       (send xlsx add-sheet '(("Jane Birkin" "Leonard Cohen" "Matthew McConaughey") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
       (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
