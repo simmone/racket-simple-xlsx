@@ -15,7 +15,8 @@
        "test-get-sheet-data"
 
        (load-sheet (car (get-sheet-names xlsx)) xlsx)
-       (check-equal? (get-cell-value "D7" xlsx) "66260001")
+       (check-equal? (get-cell-value "A2" xlsx) "er")
+       (check-equal? (get-cell-value "A1" xlsx) "1、请按在行离行标识分成两张表\r\n2、每张表请按设备类型、日均交易笔数排序")
       )))))
 
 (run-tests test-test7)

@@ -104,8 +104,8 @@
           (unzip zip_file (make-filesystem-entry-reader #:dest temp_dir #:exists 'replace))
           (do_proc temp_dir))
         (lambda ()
-          (void)))))
-;          (delete-directory/files temp_dir)))))
+;          (void)))))
+          (delete-directory/files temp_dir)))))
 
 (define (abc->number abc)
   (let ([sum 0])

@@ -89,20 +89,18 @@
     (with-input-from-file 
         (build-path xlsx_dir "xl" "sharedStrings.xml")
       (lambda ()
-        (let loop1 ([line (read-line)])
-          (when (not (eof-object? line))
-                (let loop2 ([split_items1 (regexp-split #rx"</si>" line)]
-                            [index 0])
-                  (when (not (null? split_items1))
-                        (let ([split_items2 (regexp-split #rx"<si>" (car split_items1))])
-                          (when (> (length split_items2) 1)
-                                (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
-                                       [v_list (xml-get-list 't xml)])
-                                  (hash-set! data_map 
-                                             (number->string index) 
-                                             (regexp-replace* #rx" " (foldr (lambda (a b) (string-append a b)) "" v_list) " ")))))
-                        (loop2 (cdr split_items1) (add1 index))))
-                (loop1 (read-line))))))
+        (let ([xml_str (port->string (current-input-port))])
+          (let loop2 ([split_items1 (regexp-split #rx"</si>" xml_str)]
+                      [index 0])
+            (when (not (null? split_items1))
+                  (let ([split_items2 (regexp-split #rx"<si>" (car split_items1))])
+                    (when (> (length split_items2) 1)
+                          (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
+                                 [v_list (xml-get-list 't xml)])
+                            (hash-set! data_map 
+                                       (number->string index) 
+                                       (regexp-replace* #rx" " (foldr (lambda (a b) (string-append a b)) "" v_list) " ")))))
+                  (loop2 (cdr split_items1) (add1 index)))))))
   data_map))
 
 (define (load-sheet sheet_name xlsx)
