@@ -1,10 +1,10 @@
 #lang racket
 
 (provide (contract-out 
-          [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]          
+          [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]
+          [load-sheet (-> string? any/c void?)]
           [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
-          [load-sheet (-> string? any/c void?)]
           [get-sheet-dimension (-> any/c pair?)]
           [with-row (-> any/c (-> list? any) any)]
           [xlsx-data% class?]
