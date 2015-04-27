@@ -27,7 +27,16 @@ there is also a complete read and write example on github:@link["https://github.
 
 @defproc[(with-input-from-xlsx-file
               [xlsx_file_path (path-string?)]
-              [user-proc (-> any/c void?)])
+              [user-proc (-> xlsx_handler void?)])
             void?]{
   read xlsx's main outer func, all read assosiated action is include in user-proc.
 }
+
+@defproc[(load-sheet
+           [sheet_name (string?)]
+           [xlsx_handler (xlsx_handler)])
+           void?]{
+  load specified sheet by sheet name.@linebreak{}
+  must first called before other func, because any other func is based on specified sheet.
+}
+
