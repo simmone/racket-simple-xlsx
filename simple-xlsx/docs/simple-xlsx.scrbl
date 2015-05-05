@@ -40,3 +40,131 @@ there is also a complete read and write example on github:@link["https://github.
   must first called before other func, because any other func is based on specified sheet.
 }
 
+@defproc[(get-sheet-names
+            [xlsx_handler (xlsx_handler)])
+            list?]{
+  get sheet names.@linebreak{}
+}
+
+@defproc[(get-cell-value
+            [cell_axis (string?)]
+            [xlsx_handler (xlsx_handler)])
+            any]{
+  get cell value through cell's axis.@linebreak{}
+  cell axis: A1 B2 C3...
+}
+
+@defproc[(get-sheet-dimension
+            [xlsx_handler (xlsx_handler)])
+            string?]{
+  get current sheet's dimension.@linebreak{}
+  like A1:C5
+}
+
+@defproc[(with-row
+            [xlsx_handler (xlsx_handler)]
+            [user_proc (-> list? any)])
+            any]{
+  with-row is like for-each, deal a line one time.
+}
+
+@section{Write}
+
+write a xlsx file means instance a xlsx-data% class.@linebreak{}
+use add-sheet to fill a xlsx-data% instance and write it to file.
+
+@subsection{xlsx-data%}
+
+xlsx-data% class represent a whole xlsx file's data.@linebreak{}
+it contains sheet data and col attibutes.@linebreak{}
+xlsx-data% have only one method: add-sheet.@linebreak{}
+sheet data just a list: (list (list cell ...) (list cell ...)...).@linebreak{}
+
+this is a simple xlsx-data% example without col attributes:@linebreak{}
+
+@verbatim{
+  (let ([xlsx (new xlsx-data%)])
+    (send xlsx add-sheet '(("chenxiao" "cx") (1 2 34 100 456.34)) "Sheet1")
+}
+
+@subsection{col-attribute}
+
+col-attribute used to specify column's attribute.@linebreak{}
+you can set column's width, color by now.@linebreak{}
+
+col-attribute is a hash.@linebreak{}
+hash's key is column's dimension, value is a struct named:col-attr.@linebreak{}
+
+for example:@linebreak{}
+@verbatim{
+  ;; set column A width: 100, color: FF0000
+  (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
+  (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
+  (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
+  (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
+  (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
+}
+
+@subsection{func}
+
+@defproc[(write-xlsx-file
+            [xlsx-data (xlsx-data%)]
+            [path (path-string?)])
+            void?]{
+  write xlsx-data% to xlsx file.
+}
+
+@section{Example}
+
+@verbatim{
+  #lang racket
+
+  (require simple-xlsx)
+
+  ;; write a xlsx file, with multiple sheets, set the column attributes(width, color)
+  (let ([xlsx (new xlsx-data%)]
+        [col_attr_hash (make-hash)])
+      (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
+      (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
+      (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
+      (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
+      (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
+  
+      (send xlsx add-sheet '(("Jane Birkin" "Leonard Cohen" "Matthew McConaughey") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
+      (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
+      (send xlsx add-sheet '(("a" "b")) "Sheet3")
+      (send xlsx add-sheet '(("a" "b")) "Sheet4" #:col_attr_hash col_attr_hash)
+      (send xlsx add-sheet '(("")) "Sheet5" #:col_attr_hash col_attr_hash)
+      (write-xlsx-file xlsx "test1.xlsx"))
+  
+  ;; write a xlsx file and read it back
+  (let ([xlsx (new xlsx-data%)])
+    (send xlsx add-sheet '(("chenxiao" "cx") (1 2 34 100 456.34)) "Sheet1")
+    (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
+    (send xlsx add-sheet '(("")) "Sheet3")
+    (write-xlsx-file xlsx "test2.xlsx")
+  
+    ;; read specific cell
+    (with-input-from-xlsx-file
+     "test2.xlsx"
+     (lambda (xlsx)
+       (printf "~a\n" (get-sheet-names xlsx)) ;(Sheet1 Sheet2 Sheet3)
+       
+       (load-sheet "Sheet1" xlsx)
+  
+       (printf "~a\n" (get-sheet-dimension xlsx)) ; (2 . 5)
+       (printf "~a\n" (get-cell-value "A1" xlsx)) ; "chenxiao"
+       (printf "~a\n" (get-cell-value "B1" xlsx)) ; "cx"
+       (printf "~a\n" (get-cell-value "E2" xlsx)))) ; 456.34
+  
+    ;; loop for row
+    (with-input-from-xlsx-file
+      "test2.xlsx"
+      (lambda (xlsx)
+        (load-sheet "Sheet1" xlsx)
+        (with-row xlsx
+                  (lambda (row)
+                    (printf "~a\n" (first row))))))) ;; chenxiao 1
+}  
+            
+
