@@ -2,24 +2,20 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "../../main.rkt")
+(require rackunit "../../../main.rkt")
 
-(let ([xlsx (new xlsx-data%)]
-      [rows '()])
-
-  (printf "t01\n")
+(let ([xlsx (new xlsx-data%)])
   (with-input-from-file "test.data"
     (lambda ()
-      (let loop ([line (read-line)]
+      (let loop ([rows '()]
+                 [line (read-line)]
                  [count 1])
-        (when (not (eof-object? line))
+                 
+        (if (not (eof-object? line))
+            (begin
               (when (= (remainder count 10000) 0)
                     (printf "~a\n" count))
-              (set! rows `(,@rows ,(list (list (regexp-replace* #rx"\n|\r" line "")))))
-              (loop (read-line) (add1 count))))))
+              (loop (cons (list (regexp-replace* #rx"\n|\r" line "")) rows) (read-line) (add1 count)))
+            (send xlsx add-sheet rows "Sheet1")))))
 
-    (printf "t02\n")
-    (send xlsx add-sheet rows "Sheet1")
-
-    (printf "t03\n")
   (write-xlsx-file xlsx "test1.xlsx"))
