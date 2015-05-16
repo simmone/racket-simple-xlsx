@@ -8,6 +8,8 @@
                "rackunit-lib"
                "at-exp-lib"))
 
-(define build-deps '("rackunit-lib"
+(define build-deps '("racket-doc"
+                     "scribble-lib"
+                     "rackunit-lib"
                      "at-exp-lib"))
 
