@@ -2,7 +2,7 @@
 
 @(require (for-label racket))
 
-@title{simple-xlsx package usage}
+@title{Simple-Xlsx: Open Xml Spreadsheet(.xlsx) Reader and Writer}
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
