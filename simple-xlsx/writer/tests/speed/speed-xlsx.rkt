@@ -16,6 +16,6 @@
               (when (= (remainder count 10000) 0)
                     (printf "~a\n" count))
               (loop (cons (list (regexp-replace* #rx"\n|\r" line "")) rows) (read-line) (add1 count)))
-            (send xlsx add-sheet rows "Sheet1")))))
+            (send xlsx add-sheet (reverse rows) "Sheet1")))))
 
   (write-xlsx-file xlsx "test1.xlsx"))
