@@ -169,30 +169,30 @@ for example:@linebreak{}
             
 @section{FAQ}
 
-@subsection{Why simple-xlsx'write is so slow when I have much more rows?}
+@subsection{Why simple-xlsx'writer is so slow when I have much more rows?}
 
 No, simple-xlsx's write is not slow(not so fast, perhaps).
 
 If you find it turns slow when you have much rows, it perhaphs you prepare rows like below:
 
-@verbatim {
+@racketblock[
   (let ([rows '()])
     (set! rows `(,@rows ,row))
  or (set! rows (append rows row)))
-}
+]
 
 When rows's count is small, its ok, but when you have thousands rows, it's getting too slow to complete.
 
 When work on big data, you should do like this:
 
-@verbatim {
+@racketblock[
   (let loop ([rows '()]
              [line (read-line)])
                  
       (if (not (eof-object? line))
           (loop (cons (list (regexp-replace* #rx"\n|\r" line "")) rows) (read-line) (add1 count)))
           (send xlsx add-sheet (reverse rows) "Sheet1"))
-}
+]
 
 Please notice you should use reverse list order when use cons to chain a list up.
            
