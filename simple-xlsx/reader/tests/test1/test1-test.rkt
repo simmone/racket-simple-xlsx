@@ -27,6 +27,16 @@
        )
 
       (test-case
+       "test-load-sheet-ref"
+       
+       (load-sheet-ref 0 xlsx)
+       (check-equal? (get-cell-value "A1" xlsx) "chenxiao")
+       (check-equal? (get-cell-value "B1" xlsx) "love")
+       (check-equal? (get-cell-value "C1" xlsx) "chensiheng")
+       (check-equal? (get-cell-value "C2" xlsx) 7)
+       )
+
+      (test-case
        "test-get-sheet-dimension"
 
        (let ([dimension (get-sheet-dimension xlsx)])

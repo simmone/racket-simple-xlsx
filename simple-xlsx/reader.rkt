@@ -5,6 +5,7 @@
           [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
           [load-sheet (-> string? any/c void?)]
+          [load-sheet-ref (-> string? exact-nonnegative-integer? void?)]          
           [get-sheet-dimension (-> any/c pair?)]
           [with-row (-> any/c (-> list? any) any)]
           ))
@@ -157,6 +158,9 @@
           )))
     (set-field! sheet_map xlsx data_map)
     (set-field! data_type_map xlsx type_map)))
+
+(define (load-sheet-ref sheet_index xlsx)
+  (load-sheet (list-ref (get-sheet-names xlsx) sheet_index) xlsx))
 
 (define (get-cell-value item_name xlsx)
   (if (hash-has-key? (get-field sheet_map xlsx) item_name)
