@@ -3,7 +3,7 @@
 (provide (contract-out 
           [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]
           [load-sheet (-> string? any/c void?)]
-          [load-sheet-ref (-> string? exact-nonnegative-integer? void?)]          
+          [load-sheet-ref (-> exact-nonnegative-integer? any/c void?)]                    
           [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
           [get-sheet-dimension (-> any/c pair?)]

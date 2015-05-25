@@ -5,7 +5,7 @@
           [get-sheet-names (-> any/c list?)]
           [get-cell-value (-> string? any/c any)]
           [load-sheet (-> string? any/c void?)]
-          [load-sheet-ref (-> string? exact-nonnegative-integer? void?)]          
+          [load-sheet-ref (-> exact-nonnegative-integer? any/c void?)]          
           [get-sheet-dimension (-> any/c pair?)]
           [with-row (-> any/c (-> list? any) any)]
           ))

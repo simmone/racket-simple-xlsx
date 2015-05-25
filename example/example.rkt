@@ -40,11 +40,11 @@
      (printf "~a\n" (get-cell-value "B1" xlsx)) ; "cx"
      (printf "~a\n" (get-cell-value "E2" xlsx)))) ; 456.34
 
-  ;; loop for row
+  ;; load sheet from sequence, loop for row
   (with-input-from-xlsx-file
     "test2.xlsx"
     (lambda (xlsx)
-      (load-sheet "Sheet1" xlsx)
+      (load-sheet-ref 0 xlsx)
       (with-row xlsx
                 (lambda (row)
                   (printf "~a\n" (first row))))))) ;; chenxiao 1

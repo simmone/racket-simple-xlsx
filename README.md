@@ -49,7 +49,7 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
     (with-input-from-xlsx-file
       "test2.xlsx"
       (lambda (xlsx)
-        (load-sheet "Sheet1" xlsx)
+        (load-sheet-ref 0 xlsx)
         (with-row xlsx
                   (lambda (row)
                     (printf "~a\n" (first row))))))) ;; chenxiao 1
