@@ -2,7 +2,7 @@
 
 ;(require simple-xlsx)
 
-(require "../simple-xlsx/main.rkt")
+(require "../main.rkt")
 
 ;; write a xlsx file, with multiple sheets, set the column attributes(width, color)
 (let ([xlsx (new xlsx-data%)]
