@@ -8,6 +8,7 @@
 (provide (contract-out
           [write-shared-strings (-> list? string?)]
           [write-shared-strings-file (-> path-string? list? void?)]
+          [filter-string (-> string? string?)]
           ))
 
 (define S string-append)
@@ -18,9 +19,18 @@
     (lambda () 
       (let loop ([strings string_list])
         (when (not (null? strings))
-          (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (car strings))
+          (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (filter-string (car strings)))
           (loop (cdr strings))))))|</sst>
 })
+
+(define (filter-string str)
+  (regexp-replace* 
+   #rx"<"
+   (regexp-replace*
+    #rx">"
+    str
+    "\\&gt;")
+   "\\&lt;"))
 
 (define (write-shared-strings-file dir string_list)
   (with-output-to-file (build-path dir "sharedStrings.xml")
