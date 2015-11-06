@@ -24,13 +24,17 @@
 })
 
 (define (filter-string str)
-  (regexp-replace* 
-   #rx"<"
-   (regexp-replace*
-    #rx">"
-    str
-    "\\&gt;")
-   "\\&lt;"))
+  (regexp-replace*
+   #rx"&"
+   (regexp-replace* 
+    #rx"<"
+    (regexp-replace*
+     #rx">"
+     str
+     "\\&gt;")
+    "\\&lt;")
+   "\\&amp;")
+   )
 
 (define (write-shared-strings-file dir string_list)
   (with-output-to-file (build-path dir "sharedStrings.xml")
