@@ -56,4 +56,4 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
   
 ```
 
-![ScreenShot](example/example.png)
+![ScreenShot](simple-xlsx/example/example.png)
