@@ -18,6 +18,7 @@
    (test-case
     "test-filter-string"
     (check-equal? (filter-string "<a>") "&lt;a&gt;")
+    (check-equal? (filter-string "<&a>") "&lt;&amp;a&gt;")
     (check-equal? (filter-string "<<a>>") "&lt;&lt;a&gt;&gt;")
    )))
 

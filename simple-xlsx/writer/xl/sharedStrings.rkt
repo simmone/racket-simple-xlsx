@@ -25,15 +25,15 @@
 
 (define (filter-string str)
   (regexp-replace*
-   #rx"&"
+   #rx"<"
    (regexp-replace* 
-    #rx"<"
+    #rx">"
     (regexp-replace*
-     #rx">"
-     str
+     #rx"&amp;"
+     "&amp;"
+     str)
      "\\&gt;")
     "\\&lt;")
-   "\\&amp;")
    )
 
 (define (write-shared-strings-file dir string_list)
