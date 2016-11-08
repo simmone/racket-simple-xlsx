@@ -4,12 +4,15 @@
 
 (require rackunit "../../../main.rkt")
 
+(require racket/runtime-path)
+(define-runtime-path test_file "test6.xlsx")
+
 (define test-test6
   (test-suite
    "test-test6"
 
    (with-input-from-xlsx-file
-    "test6.xlsx"
+    test_file
     (lambda (xlsx)
       (test-case
        "test-get-sheet-data"
