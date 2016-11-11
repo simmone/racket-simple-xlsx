@@ -1,0 +1,3 @@
+<Override PartName="/xl/charts/chart1.xml" ContentType="application/vnd.openxmlformats-officedocume;nt.drawingml.chart+xml"/>
+<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>
+<Override PartName="/xl/chartsheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml"/>
