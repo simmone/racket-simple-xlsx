@@ -2,14 +2,14 @@
 
 (provide (contract-out
           [struct sheet 
-                  ((sheet_name string?)
-                   (sheet_id string?)
-                   (sheet_type symbol?)
-                   (sheet_data list?)
+                  ((name string?)
+                   (r_id string?)
+                   (type symbol?)
+                   (data list?)
                    (col_attr_hash hash?)
                    )]
           ))
 
-(struct sheet (name r_id type data))
+(struct sheet ([name #:mutable] [r_id #:mutable] [type #:mutable] [data #:mutable]))
 
-(struct col_attr (width back_color))
+(struct col_attr ([width #:mutable] [back_color #:mutable]))
