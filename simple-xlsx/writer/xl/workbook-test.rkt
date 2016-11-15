@@ -1,5 +1,7 @@
 #lang racket
 
+(require "../../define.rkt")
+
 (require rackunit/text-ui)
 
 (require rackunit "workbook.rkt")
@@ -10,10 +12,20 @@
 
    (test-case
     "test-workbook"
-    (check-equal? (write-workbook '("陈晓" "陈思衡" "陈敏"))
-                  (string-append
-                   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-                   "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><fileVersion appName=\"xl\" lastEdited=\"4\" lowestEdited=\"4\" rupBuild=\"4505\"/><workbookPr filterPrivacy=\"1\" defaultThemeVersion=\"124226\"/><bookViews><workbookView xWindow=\"0\" yWindow=\"90\" windowWidth=\"19200\" windowHeight=\"10590\"/></bookViews><sheets><sheet name=\"陈晓\" sheetId=\"1\" r:id=\"rId1\"/><sheet name=\"陈思衡\" sheetId=\"2\" r:id=\"rId2\"/><sheet name=\"陈敏\" sheetId=\"3\" r:id=\"rId3\"/></sheets><calcPr calcId=\"124519\"/></workbook>")))
-   ))
+
+    (let ([sheet_list
+           (list
+            (sheetData "Sheet1" 1 'data 0 '() (make-hash))
+            (sheetData "Sheet2" 2 'data 0 '() (make-hash))
+            (sheetData "Sheet3" 3 'data 0 '() (make-hash))
+            (sheetData "Chart1" 4 'chart 0 '() (make-hash))
+            (sheetData "Chart2" 5 'chart 0 '() (make-hash))
+            (sheetData "Chart3" 6 'chart 0 '() (make-hash)))])
+
+      (check-equal? (write-workbook sheet_list)
+                    (string-append
+                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                     "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><fileVersion appName=\"xl\" lastEdited=\"4\" lowestEdited=\"4\" rupBuild=\"4505\"/><workbookPr filterPrivacy=\"1\" defaultThemeVersion=\"124226\"/><bookViews><workbookView xWindow=\"0\" yWindow=\"90\" windowWidth=\"19200\" windowHeight=\"10590\"/></bookViews><sheets><sheet name=\"Sheet1\" sheetId=\"1\" r:id=\"rId1\"/><sheet name=\"Sheet2\" sheetId=\"2\" r:id=\"rId2\"/><sheet name=\"Sheet3\" sheetId=\"3\" r:id=\"rId3\"/><sheet name=\"Chart1\" sheetId=\"4\" r:id=\"rId4\"/><sheet name=\"Chart2\" sheetId=\"5\" r:id=\"rId5\"/><sheet name=\"Chart3\" sheetId=\"6\" r:id=\"rId6\"/></sheets><calcPr calcId=\"124519\"/></workbook>"))))
+    ))
 
 (run-tests test-workbook)
