@@ -2,7 +2,9 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "chartsheet.rkt")
+(require "../../../define.rkt")
+
+(require rackunit "chart.rkt")
 
 (define test-chart
   (test-suite
@@ -10,6 +12,11 @@
 
    (test-case
     "test-chart"
+
+    (let ([(lineChartData
+            "测试线形图"
+            "
+
 
     (check-equal? (write-chart 1)
                   (string-append
