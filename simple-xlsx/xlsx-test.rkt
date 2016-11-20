@@ -1,0 +1,40 @@
+#lang racket
+
+(require rackunit/text-ui)
+
+(require rackunit "xlsx.rkt")
+
+(define test-xlsx
+  (test-suite
+   "test-xlsx"
+
+   (test-case
+    "test-xlsx"
+
+    (let ([xlsx (new xlsx%)])
+      (check-equal? (get-field sheets xlsx) '())
+      
+      (send xlsx add-data-sheet "测试" '())
+
+      (send xlsx add-data-sheet "测试1" '(1))
+      
+      (let ([sheet (send xlsx sheet-ref 0)])
+        (check-equal? (sheet-name sheet) "测试")
+        (check-equal? (sheet-seq sheet) 1)
+        (check-equal? (sheet-type sheet) 'data)
+        (check-equal? (sheet-typeSeq sheet) 1)
+        (check-equal? (sheet-data sheet) '())
+        )
+      
+      (let ([sheet (send xlsx sheet-ref 1)])
+        (check-equal? (sheet-name sheet) "测试1")
+        (check-equal? (sheet-seq sheet) 2)
+        (check-equal? (sheet-type sheet) 'data)
+        (check-equal? (sheet-typeSeq sheet) 2)
+        (check-equal? (sheet-data sheet) '(1))
+        )
+      )
+    )
+   ))
+
+(run-tests test-xlsx)
