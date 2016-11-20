@@ -10,15 +10,25 @@
                   (typeSeq exact-nonnegative-integer?)
                   (data list?)
                   )]
+          [struct data-sheet
+                  (
+                   (rows list?)
+                   (col_attr_hash hash?)
+                   )]
+          [struct line-chart-sheet
+                  (
+                   (topic string?)
+                   (x_data list?)
+                   (y_data_hash
           ))
 
 (struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [data #:mutable]))
 
-(struct sheetData ([data_list #:mutable] [col_attr_hash #:mutable]))
-
-(struct lineChartData ([topic #:mutable] [x_data #:mutable] [y_data_hash #:mutable]))
-
+(struct data-sheet ([data_list #:mutable] [col_attr_hash #:mutable]))
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
+
+(struct line-chart-sheet ([topic #:mutable] [x_data #:mutable] [y_data_list #:mutable]))
+(struct data-serial ([topic #:mutable] [data_list #:mutable]))
 
 (define xlsx%
   (class object%
