@@ -23,7 +23,6 @@
         (check-equal? (sheet-seq sheet) 1)
         (check-equal? (sheet-type sheet) 'data)
         (check-equal? (sheet-typeSeq sheet) 1)
-        (check-equal? (sheet-data sheet) '())
         )
       
       (let ([sheet (send xlsx sheet-ref 1)])
@@ -31,7 +30,12 @@
         (check-equal? (sheet-seq sheet) 2)
         (check-equal? (sheet-type sheet) 'data)
         (check-equal? (sheet-typeSeq sheet) 2)
-        (check-equal? (sheet-data sheet) '(1))
+
+        (send xlsx set-sheet-col-width! sheet "A-C" 100)
+        (check-equal? (hash-ref (data-sheet-width_hash (sheet-content sheet)) "A-C") 100)
+
+        (send xlsx set-sheet-col-color! sheet "A-C" "red")
+        (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A-C") "red")
         )
       )
     )

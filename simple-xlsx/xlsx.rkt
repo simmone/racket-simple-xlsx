@@ -8,23 +8,25 @@
                   (seq exact-nonnegative-integer?)
                   (type symbol?)
                   (typeSeq exact-nonnegative-integer?)
-                  (data list?)
+                  (content (or/c data-sheet? line-chart-sheet?))
                   )]
           [struct data-sheet
                   (
                    (rows list?)
-                   (col_attr_hash hash?)
+                   (width_hash hash?)
+                   (color_hash hash?)
                    )]
           [struct line-chart-sheet
                   (
                    (topic string?)
                    (x_data list?)
-                   (y_data_hash
+                   (y_data_list list?)
+                   )]
           ))
 
-(struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [data #:mutable]))
+(struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
 
-(struct data-sheet ([data_list #:mutable] [col_attr_hash #:mutable]))
+(struct data-sheet ([rows #:mutable] [width_hash #:mutable] [color_hash #:mutable]))
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
 
 (struct line-chart-sheet ([topic #:mutable] [x_data #:mutable] [y_data_list #:mutable]))
@@ -48,10 +50,15 @@
                               seq
                               'data
                               type_seq
-                              sheet_data)))))
+                              (data-sheet sheet_data (make-hash) (make-hash)))))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
+         
+         (define/public (set-sheet-col-width! sheet col_range width)
+           (hash-set! (data-sheet-width_hash (sheet-content sheet)) col_range width))
 
+         (define/public (set-sheet-col-color! sheet col_range color)
+           (hash-set! (data-sheet-color_hash (sheet-content sheet)) col_range color))
          ))
 
