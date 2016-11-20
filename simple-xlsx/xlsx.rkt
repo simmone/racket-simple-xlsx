@@ -22,6 +22,11 @@
                    (x_data list?)
                    (y_data_list list?)
                    )]
+          [struct data-serial
+                  (
+                   (topic string?)
+                   (data_list list?)
+                   )]
           ))
 
 (struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
@@ -51,6 +56,24 @@
                               'data
                               type_seq
                               (data-sheet sheet_data (make-hash) (make-hash)))))))
+
+         (define/public (add-line-chart-sheet sheet_name topic)
+           (let* ([sheet_length (length sheets)]
+                  [seq (add1 sheet_length)]
+                  [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'chart)) sheets)))])
+             (set! sheets `(,@sheets
+                            ,(sheet
+                              sheet_name
+                              seq
+                              'chart
+                              type_seq
+                              (line-chart-sheet topic '() '()))))))
+
+         (define/public (set-line-chart-x-data! line_chart_sheet data_list)
+           (set-line-chart-sheet-x_data! line_chart_sheet data_list))
+
+         (define/public (add-line-chart-y-data! line_chart_sheet y_topic data_list)
+           (set-line-chart-sheet-y_data_list! line_chart_sheet `(,@(line-chart-sheet-y_data_list line_chart_sheet) ,(data-serial y_topic data_list))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
