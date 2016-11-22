@@ -19,9 +19,12 @@
           [struct line-chart-sheet
                   (
                    (topic string?)
-                   (x_data list?)
+                   (x_data )
                    (y_data_list list?)
                    )]
+          [struct data_ref
+                  (
+                   (sheet_
           [struct data-serial
                   (
                    (topic string?)
