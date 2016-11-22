@@ -57,18 +57,27 @@
 
         (check-equal? (line-chart-sheet-topic (sheet-content sheet)) "图表2")
 
-        (send xlsx set-line-chart-x-data! (sheet-content sheet) '(1 2 3 4))
-        (check-equal? (line-chart-sheet-x_data (sheet-content sheet)) '(1 2 3 4))
+        (send xlsx set-line-chart-x-data! (sheet-content sheet) "测试1" "A2-A10")
+        (let ([data_range (line-chart-sheet-x_data_range (sheet-content sheet))])
+          (check-equal? (data-range-range_str data_range) "A2-A10")
+          (check-equal? (data-range-sheet_name data_range) "测试1"))
         
-        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线1" '(5 6 7 8))
-        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线2" '(15 16 17 18))
-        (check-equal? (data-serial-topic (first (line-chart-sheet-y_data_list (sheet-content sheet)))) "折线1")
-        (check-equal? (data-serial-data_list (first (line-chart-sheet-y_data_list (sheet-content sheet)))) '(5 6 7 8))
-        (check-equal? (data-serial-topic (second (line-chart-sheet-y_data_list (sheet-content sheet)))) "折线2")
-        (check-equal? (data-serial-data_list (second (line-chart-sheet-y_data_list (sheet-content sheet)))) '(15 16 17 18))
-        )
-      )
-    )
+        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线1" "测试1" "B2-B10")
+
+        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线2" "测试2" "C2-C10")
+
+        (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
+               [y_data1 (first y_data_list)]
+               [y_data2 (second y_data_list)])
+          (check-equal? (data-serial-topic y_data1) "折线1")
+          (check-equal? (data-range-sheet_name (data-serial-data_range y_data1)) "测试1")
+          (check-equal? (data-range-range_str (data-serial-data_range y_data1)) "B2-B10")
+
+          (check-equal? (data-serial-topic y_data2) "折线2")
+          (check-equal? (data-range-sheet_name (data-serial-data_range y_data2)) "测试2")
+          (check-equal? (data-range-range_str (data-serial-data_range y_data2)) "C2-C10")
+        ))
+      ))
    ))
 
 (run-tests test-xlsx)

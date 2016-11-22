@@ -19,16 +19,18 @@
           [struct line-chart-sheet
                   (
                    (topic string?)
-                   (x_data )
-                   (y_data_list list?)
+                   (x_data_range data-range?)
+                   (y_data_range_list list?)
                    )]
-          [struct data_ref
+          [struct data-range
                   (
-                   (sheet_
+                   (sheet_name string?)
+                   (range_str string?)
+                   )]
           [struct data-serial
                   (
                    (topic string?)
-                   (data_list list?)
+                   (data_range data-range?)
                    )]
           ))
 
@@ -37,8 +39,9 @@
 (struct data-sheet ([rows #:mutable] [width_hash #:mutable] [color_hash #:mutable]))
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
 
-(struct line-chart-sheet ([topic #:mutable] [x_data #:mutable] [y_data_list #:mutable]))
-(struct data-serial ([topic #:mutable] [data_list #:mutable]))
+(struct line-chart-sheet ([topic #:mutable] [x_data_range #:mutable] [y_data_range_list #:mutable]))
+(struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
+(struct data-serial ([topic #:mutable] [data_range #:mutable]))
 
 (define xlsx%
   (class object%
@@ -70,13 +73,13 @@
                               seq
                               'chart
                               type_seq
-                              (line-chart-sheet topic '() '()))))))
+                              (line-chart-sheet topic (data-range "" "") '()))))))
 
-         (define/public (set-line-chart-x-data! line_chart_sheet data_list)
-           (set-line-chart-sheet-x_data! line_chart_sheet data_list))
+         (define/public (set-line-chart-x-data! line_chart_sheet sheet_name data_range)
+           (set-line-chart-sheet-x_data_range! line_chart_sheet (data-range sheet_name data_range)))
 
-         (define/public (add-line-chart-y-data! line_chart_sheet y_topic data_list)
-           (set-line-chart-sheet-y_data_list! line_chart_sheet `(,@(line-chart-sheet-y_data_list line_chart_sheet) ,(data-serial y_topic data_list))))
+         (define/public (add-line-chart-y-data! line_chart_sheet y_topic sheet_name data_range)
+           (set-line-chart-sheet-y_data_range_list! line_chart_sheet `(,@(line-chart-sheet-y_data_range_list line_chart_sheet) ,(data-serial y_topic (data-range sheet_name data_range)))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
