@@ -42,8 +42,15 @@
 
       (send xlsx add-line-chart-sheet "测试4" "图表2")
 
+      (send xlsx add-data-sheet "测试5" '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
+
       (let ([sheet (send xlsx get-sheet-by-name "测试3")])
         (check-equal? (sheet-name sheet) "测试3"))
+
+      (check-equal? (send xlsx get-range-data "测试5" "A1-A3") '(1 4 8))
+      (check-equal? (send xlsx get-range-data "测试5" "B1-B3") '(2 5 9))
+      (check-equal? (send xlsx get-range-data "测试5" "C1-C3") '(3 6 10))
+      (check-equal? (send xlsx get-range-data "测试5" "D1-D3") '(4 7 11))
 
       (let ([sheet (send xlsx sheet-ref 2)])
         (check-equal? (sheet-name sheet) "测试3")

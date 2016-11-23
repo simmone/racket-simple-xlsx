@@ -1,5 +1,7 @@
 #lang racket
 
+(require "lib/lib.rkt")
+
 (provide (contract-out
           [xlsx% class?]
           [struct sheet
@@ -82,7 +84,7 @@
          (define/public (get-sheet-by-name sheet_name)
            (let loop ([loop_list sheets])
              (if (string=? sheet_name (sheet-name (car loop_list)))
-                 (sheet-content (car loop_list))
+                 (car loop_list)
                  (loop (cdr loop_list)))))
          
          (define/public (get-range-data sheet_name range_str)
@@ -90,9 +92,9 @@
                   [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
                   [col_number (sub1 (abc->number col_name))]
                   [row_range (regexp-match* #rx"([0-9]+)" range_str)]
-                  [row_start_index (first row_range)]
-                  [row_end_index (second row_range)])
-             (let loop ([loop_list (data-sheet-rows data_sheet)]
+                  [row_start_index (string->number (first row_range))]
+                  [row_end_index (string->number (second row_range))])
+             (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
                         [row_count 1]
                         [result_list '()])
                (if (not (null? loop_list))
