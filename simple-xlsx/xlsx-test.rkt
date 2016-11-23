@@ -78,6 +78,15 @@
           (check-equal? (data-range-range_str (data-serial-data_range y_data2)) "C2-C10")
         ))
       ))
+
+   (test-case
+    "test-convert-range"
+    
+    (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
+
+    (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
+    )
+
    ))
 
 (run-tests test-xlsx)

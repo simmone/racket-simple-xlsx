@@ -11,23 +11,9 @@
 
 (define S string-append)
 
-(define (write-chart-sheet topic x_data y_data_list) @S{
+(define (write-chart-sheet chart_sheet_name xlsx) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<c:lang val="zh-CN"/>
-<c:chart>
-<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang="zh-CN" altLang="en-US"/><a:t>@|topic|</a:t></a:r><a:r>/a:p></c:rich></c:tx><c:layout/></c:title>
-<c:plotArea>
-
-<c:layout/>
-
-<c:lineChart><c:grouping val="standard"/>
-
-<c:cat>
-<c:numRef>
-<c:f>数据页面!$A$2:$A$14</c:f>
-<c:numCache><c:formatCode>General</c:formatCode>
-<c:ptCount val="13"/>
+<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:lang val="zh-CN"/><c:chart><c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang="zh-CN" altLang="en-US"/><a:t>@|topic|</a:t></a:r><a:r>/a:p></c:rich></c:tx><c:layout/></c:title><c:plotArea><c:layout/><c:lineChart><c:grouping val="standard"/><c:cat><c:numRef><c:f>@|(date-range-sheet_name x_data_range)|!@|(convert-range (data-ranage-range_str x_data_range))|</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="13"/>
 <c:pt idx="0"><c:v>201601</c:v></c:pt>
 <c:pt idx="1"><c:v>201602</c:v></c:pt>
 <c:pt idx="2"><c:v>201603</c:v></c:pt>

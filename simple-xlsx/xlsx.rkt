@@ -27,6 +27,7 @@
                    (sheet_name string?)
                    (range_str string?)
                    )]
+          [convert-range (-> string? string?)]
           [struct data-serial
                   (
                    (topic string?)
@@ -42,6 +43,16 @@
 (struct line-chart-sheet ([topic #:mutable] [x_data_range #:mutable] [y_data_range_list #:mutable]))
 (struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
 (struct data-serial ([topic #:mutable] [data_range #:mutable]))
+
+(define (convert-range range_str)
+  (let loop ([loop_list (regexp-split #rx"-" range_str)]
+             [result_str ""])
+    (if (not (null? loop_list))
+          (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (car loop_list))])
+            (if (string=? result_str "")
+                (loop (cdr loop_list) (string-append "$" (second items) "$" (third items) ":"))
+                (loop (cdr loop_list) (string-append result_str "$" (second items) "$" (third items)))))
+          result_str)))
 
 (define xlsx%
   (class object%
