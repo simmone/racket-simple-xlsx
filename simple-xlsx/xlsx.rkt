@@ -28,6 +28,7 @@
                    (range_str string?)
                    )]
           [convert-range (-> string? string?)]
+          [range-length (-> string? exact-nonnegative-integer?)]
           [struct data-serial
                   (
                    (topic string?)
@@ -54,6 +55,10 @@
                 (loop (cdr loop_list) (string-append result_str "$" (second items) "$" (third items)))))
           result_str)))
 
+(define (range-length range_str)
+  (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])
+    (add1 (- (string->number (second numbers)) (string->number (first numbers))))))
+
 (define xlsx%
   (class object%
          (super-new)
@@ -73,6 +78,28 @@
                               'data
                               type_seq
                               (data-sheet sheet_data (make-hash) (make-hash)))))))
+         
+         (define/public (get-sheet-by-name sheet_name)
+           (let loop ([loop_list sheets])
+             (if (string=? sheet_name (sheet-name (car loop_list)))
+                 (sheet-content (car loop_list))
+                 (loop (cdr loop_list)))))
+         
+         (define/public (get-range-data sheet_name range_str)
+           (let* ([data_sheet (get-sheet-by-name sheet_name)]
+                  [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
+                  [col_number (sub1 (abc->number col_name))]
+                  [row_range (regexp-match* #rx"([0-9]+)" range_str)]
+                  [row_start_index (first row_range)]
+                  [row_end_index (second row_range)])
+             (let loop ([loop_list (data-sheet-rows data_sheet)]
+                        [row_count 1]
+                        [result_list '()])
+               (if (not (null? loop_list))
+                   (if (and (>= row_count row_start_index) (<= row_count row_end_index))
+                       (loop (cdr loop_list) (add1 row_count) (cons (list-ref (car loop_list) col_number) result_list))
+                       (loop (cdr loop_list) (add1 row_count) result_list))
+                   (reverse result_list)))))
 
          (define/public (add-line-chart-sheet sheet_name topic)
            (let* ([sheet_length (length sheets)]

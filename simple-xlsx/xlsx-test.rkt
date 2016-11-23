@@ -42,6 +42,9 @@
 
       (send xlsx add-line-chart-sheet "测试4" "图表2")
 
+      (let ([sheet (send xlsx get-sheet-by-name "测试3")])
+        (check-equal? (sheet-name sheet) "测试3"))
+
       (let ([sheet (send xlsx sheet-ref 2)])
         (check-equal? (sheet-name sheet) "测试3")
         (check-equal? (sheet-seq sheet) 3)
@@ -85,6 +88,13 @@
     (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
 
     (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
+    )
+
+   (test-case
+    "test-range-length"
+    
+    (check-equal? (range-length "$A$2:$A$20") 19)
+    (check-equal? (range-length "$AB$21:$AB$21") 1)
     )
 
    ))
