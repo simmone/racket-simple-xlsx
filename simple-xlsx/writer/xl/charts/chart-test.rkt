@@ -1,8 +1,11 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/class)
 (require racket/list)
 (require rackunit/text-ui)
+
+(require "../../../xlsx.rkt")
 
 (require rackunit "chart.rkt")
 
@@ -20,11 +23,35 @@
    (test-case
     "test-chart"
 
-    (let ([(lineChartData
-            "测试线形图"
-            "
-    (check-equal? (write-chart "测试1" xlsx) (chart-data))
-    )))
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet "数据页面"
+            '(
+              ("月份" "金额1" "金额2" "金额3")
+              ("201601" 100 110 1110)
+              ("201602" 200 210 1210)
+              ("201603" 300 310 1310)
+              ("201604" 400 410 1410)
+              ("201605" 500 510 1510)
+              ("201606" 600 610 1610)
+              ("201607" 500 510 1510)
+              ("201608" 400 410 1410)
+              ("201609" 300 310 1310)
+              ("201610" 300 310 1310)
+              ("201611" 100 110 1110)
+              ("201612" 100 110 1110)
+              ("201701" 500 510 1510)
+              ))
+      (send xlsx add-line-chart-sheet "Chart1" "测试图表")
+      
+      (send xlsx set-line-chart-x-data! "Chart1" "数据页面" "A2-A14")
+      (send xlsx add-line-chart-y-data! "Chart1" "金额1" "数据页面" "B2-B14")
+      (send xlsx add-line-chart-y-data! "Chart1" "金额2" "数据页面" "C2-C14")
+      (send xlsx add-line-chart-y-data! "Chart1" "金额3" "数据页面" "D2-D14")
+
+      (check-equal? (write-chart-sheet "Chart1" xlsx) (chart-data))
+    ))
+   
+   ))
 
 (run-tests test-chart)
 

@@ -67,14 +67,14 @@
 
         (check-equal? (line-chart-sheet-topic (sheet-content sheet)) "图表2")
 
-        (send xlsx set-line-chart-x-data! (sheet-content sheet) "测试1" "A2-A10")
+        (send xlsx set-line-chart-x-data! "测试4" "测试1" "A2-A10")
         (let ([data_range (line-chart-sheet-x_data_range (sheet-content sheet))])
           (check-equal? (data-range-range_str data_range) "A2-A10")
           (check-equal? (data-range-sheet_name data_range) "测试1"))
         
-        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线1" "测试1" "B2-B10")
+        (send xlsx add-line-chart-y-data! "测试4" "折线1" "测试1" "B2-B10")
 
-        (send xlsx add-line-chart-y-data! (sheet-content sheet) "折线2" "测试2" "C2-C10")
+        (send xlsx add-line-chart-y-data! "测试4" "折线2" "测试2" "C2-C10")
 
         (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]

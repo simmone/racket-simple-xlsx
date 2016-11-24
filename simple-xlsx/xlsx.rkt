@@ -83,9 +83,10 @@
          
          (define/public (get-sheet-by-name sheet_name)
            (let loop ([loop_list sheets])
-             (if (string=? sheet_name (sheet-name (car loop_list)))
-                 (car loop_list)
-                 (loop (cdr loop_list)))))
+             (when (not (null? loop_list))
+                   (if (string=? sheet_name (sheet-name (car loop_list)))
+                       (car loop_list)
+                       (loop (cdr loop_list))))))
          
          (define/public (get-range-data sheet_name range_str)
            (let* ([data_sheet (get-sheet-by-name sheet_name)]
@@ -115,11 +116,11 @@
                               type_seq
                               (line-chart-sheet topic (data-range "" "") '()))))))
 
-         (define/public (set-line-chart-x-data! line_chart_sheet sheet_name data_range)
-           (set-line-chart-sheet-x_data_range! line_chart_sheet (data-range sheet_name data_range)))
+         (define/public (set-line-chart-x-data! line_chart_sheet_name data_sheet_name data_range)
+           (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range)))
 
-         (define/public (add-line-chart-y-data! line_chart_sheet y_topic sheet_name data_range)
-           (set-line-chart-sheet-y_data_range_list! line_chart_sheet `(,@(line-chart-sheet-y_data_range_list line_chart_sheet) ,(data-serial y_topic (data-range sheet_name data_range)))))
+         (define/public (add-line-chart-y-data! line_chart_sheet_name y_topic sheet_name data_range)
+           (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range)))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
