@@ -7,6 +7,16 @@
 (define test-xlsx
   (test-suite
    "test-xlsx"
+   
+   (test-case
+    "test-check-data-list"
+    
+    (check-exn exn:fail? (lambda () (check-equal? (check-data-list '()) #f)))
+    (check-exn exn:fail? (lambda () ((check-data-list '((1) 4)))))
+    (check-exn exn:fail? (lambda () (check-data-list '((1) (1 2)))))
+    
+    (check-true (check-data-list '((1 2) (3 4))))
+    )
 
    (test-case
     "test-xlsx"
@@ -14,11 +24,11 @@
     (let ([xlsx (new xlsx%)])
       (check-equal? (get-field sheets xlsx) '())
       
-      (send xlsx add-data-sheet "测试1" '())
+      (send xlsx add-data-sheet "测试1" '((1)))
 
       (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
 
-      (send xlsx add-data-sheet "测试2" '(1))
+      (send xlsx add-data-sheet "测试2" '((1)))
       
       (let ([sheet (send xlsx sheet-ref 0)])
         (check-equal? (sheet-name sheet) "测试1")
@@ -54,7 +64,7 @@
 
       (check-exn exn:fail? (lambda () (check-data-range-valid xlsx "测试5" "E1-E3")))
 
-      (check-data-range-valid xlsx "测试5" "C1-C5")
+      (check-exn exn:fail? (lambda () (check-data-range-valid xlsx "测试5" "C1-C4")))
 
       (check-equal? (send xlsx get-range-data "测试5" "A1-A3") '(1 4 8))
       (check-equal? (send xlsx get-range-data "测试5" "B1-B3") '(2 5 9))
@@ -76,25 +86,25 @@
 
         (check-equal? (line-chart-sheet-topic (sheet-content sheet)) "图表2")
 
-        (send xlsx set-line-chart-x-data! "测试4" "测试1" "A2-A10")
+        (send xlsx set-line-chart-x-data! "测试4" "测试5" "A1-A3")
         (let ([data_range (line-chart-sheet-x_data_range (sheet-content sheet))])
-          (check-equal? (data-range-range_str data_range) "A2-A10")
-          (check-equal? (data-range-sheet_name data_range) "测试1"))
+          (check-equal? (data-range-range_str data_range) "A1-A3")
+          (check-equal? (data-range-sheet_name data_range) "测试5"))
         
-        (send xlsx add-line-chart-y-data! "测试4" "折线1" "测试1" "B2-B10")
+        (send xlsx add-line-chart-y-data! "测试4" "折线1" "测试5" "B1-B3")
 
-        (send xlsx add-line-chart-y-data! "测试4" "折线2" "测试2" "C2-C10")
+        (send xlsx add-line-chart-y-data! "测试4" "折线2" "测试5" "C1-C3")
         
         (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]
                [y_data2 (second y_data_list)])
           (check-equal? (data-serial-topic y_data1) "折线1")
-          (check-equal? (data-range-sheet_name (data-serial-data_range y_data1)) "测试1")
-          (check-equal? (data-range-range_str (data-serial-data_range y_data1)) "B2-B10")
+          (check-equal? (data-range-sheet_name (data-serial-data_range y_data1)) "测试5")
+          (check-equal? (data-range-range_str (data-serial-data_range y_data1)) "B1-B3")
 
           (check-equal? (data-serial-topic y_data2) "折线2")
-          (check-equal? (data-range-sheet_name (data-serial-data_range y_data2)) "测试2")
-          (check-equal? (data-range-range_str (data-serial-data_range y_data2)) "C2-C10")
+          (check-equal? (data-range-sheet_name (data-serial-data_range y_data2)) "测试5")
+          (check-equal? (data-range-range_str (data-serial-data_range y_data2)) "C1-C3")
         ))
       ))
 

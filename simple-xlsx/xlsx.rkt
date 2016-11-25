@@ -26,6 +26,7 @@
                    )]
           [check-range (-> string? boolean?)]
           [check-data-range-valid (-> (is-a?/c xlsx%) string? string? boolean?)]
+          [check-data-list (-> any/c boolean?)]
           [struct data-range
                   (
                    (sheet_name string?)
@@ -48,6 +49,28 @@
 (struct line-chart-sheet ([topic #:mutable] [x_data_range #:mutable] [y_data_range_list #:mutable]))
 (struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
 (struct data-serial ([topic #:mutable] [data_range #:mutable]))
+
+(define (check-data-list data_list)
+  (when (not (list? data_list))
+        (error "data is not list type"))
+  
+  (when (equal? data_list '())
+        (error "data has no children list"))
+  
+  (let loop ([loop_list data_list]
+             [child_length -1])
+    (when (not (null? loop_list))
+          (when (not (list? (car loop_list)))
+                (error "data's children is not list type"))
+          
+          (when (and
+                 (not (= child_length -1))
+                 (not (= child_length (length (car loop_list)))))
+                (error "data's children's length is not consistent."))
+          
+          (loop (cdr loop_list) (length (car loop_list)))))
+  
+  #t)
 
 (define (check-range range_str)
   (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" range_str)
@@ -97,7 +120,7 @@
           (cond
            [(< (length first_row) (add1 col_number))
             (error (format "no such column[~a]" col_name))]
-           [(> (length rows) row_end_index)
+           [(> row_end_index (length rows))
             (error (format "end index beyond data range[~a]" row_end_index))]
            [else
             #t]))))
@@ -112,38 +135,42 @@
           )
          
          (define/public (add-data-sheet sheet_name sheet_data)
-           (if (not (hash-has-key? sheet_name_map sheet_name))
-               (let* ([sheet_length (length sheets)]
-                      [seq (add1 sheet_length)]
-                      [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))])
-                 (set! sheets `(,@sheets
-                                ,(sheet
-                                  sheet_name
-                                  seq
-                                  'data
-                                  type_seq
-                                  (data-sheet sheet_data (make-hash) (make-hash)))))
-                 (hash-set! sheet_name_map sheet_name (sub1 seq)))
-               (error (format "duplicate sheet name[~a]" sheet_name))))
+           (when (check-data-list sheet_data)
+                 (if (not (hash-has-key? sheet_name_map sheet_name))
+                     (let* ([sheet_length (length sheets)]
+                            [seq (add1 sheet_length)]
+                            [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))])
+                       (set! sheets `(,@sheets
+                                      ,(sheet
+                                        sheet_name
+                                        seq
+                                        'data
+                                        type_seq
+                                        (data-sheet sheet_data (make-hash) (make-hash)))))
+                       (hash-set! sheet_name_map sheet_name (sub1 seq)))
+                     (error (format "duplicate sheet name[~a]" sheet_name)))))
          
          (define/public (get-sheet-by-name sheet_name)
-           (list-ref sheets (hash-ref sheet_name_map sheet_name)))
+           (if (hash-has-key? sheet_name_map sheet_name)
+               (list-ref sheets (hash-ref sheet_name_map sheet_name))
+               (error (format "no such sheet[~a]" sheet_name))))
          
          (define/public (get-range-data sheet_name range_str)
-           (let* ([data_sheet (get-sheet-by-name sheet_name)]
-                  [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
-                  [col_number (sub1 (abc->number col_name))]
-                  [row_range (regexp-match* #rx"([0-9]+)" range_str)]
-                  [row_start_index (string->number (first row_range))]
-                  [row_end_index (string->number (second row_range))])
-             (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
-                        [row_count 1]
-                        [result_list '()])
-               (if (not (null? loop_list))
-                   (if (and (>= row_count row_start_index) (<= row_count row_end_index))
-                       (loop (cdr loop_list) (add1 row_count) (cons (list-ref (car loop_list) col_number) result_list))
-                       (loop (cdr loop_list) (add1 row_count) result_list))
-                   (reverse result_list)))))
+           (when (check-data-range-valid this sheet_name range_str)
+                 (let* ([data_sheet (get-sheet-by-name sheet_name)]
+                        [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
+                        [col_number (sub1 (abc->number col_name))]
+                        [row_range (regexp-match* #rx"([0-9]+)" range_str)]
+                        [row_start_index (string->number (first row_range))]
+                        [row_end_index (string->number (second row_range))])
+                   (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
+                              [row_count 1]
+                              [result_list '()])
+                     (if (not (null? loop_list))
+                         (if (and (>= row_count row_start_index) (<= row_count row_end_index))
+                             (loop (cdr loop_list) (add1 row_count) (cons (list-ref (car loop_list) col_number) result_list))
+                             (loop (cdr loop_list) (add1 row_count) result_list))
+                         (reverse result_list))))))
 
          (define/public (add-line-chart-sheet sheet_name topic)
            (if (not (hash-has-key? sheet_name_map sheet_name))
