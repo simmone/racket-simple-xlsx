@@ -24,6 +24,7 @@
                    (x_data_range data-range?)
                    (y_data_range_list list?)
                    )]
+          [check-range (-> string? boolean?)]
           [struct data-range
                   (
                    (sheet_name string?)
@@ -47,7 +48,7 @@
 (struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
 (struct data-serial ([topic #:mutable] [data_range #:mutable]))
 
-(define (convert-range range_str)
+(define (check-range range_str)
   (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" range_str)
       (let* ([range_part (regexp-split #rx"-" range_str)]
              [front_col_name #f]
@@ -68,8 +69,16 @@
          [(> (string->number front_col_index) (string->number back_col_index))
           (error (format "range col index is invalid.[~a][~a]" front_col_index back_col_index))]
          [else
-          (string-append "$" front_col_name "$" front_col_index ":$" back_col_name "$" back_col_index)]))
+          #t]))
       (error (format "range format should like ^[A-Z]+[0-9]+-[A-Z]+[0-9]+$, but get ~a" range_str))))
+
+(define (convert-range range_str)
+  (when (check-range range_str)
+        (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-[A-Z]+([0-9]+)$" range_str)]
+               [col_name (second items)]
+               [start_index (third items)]
+               [end_index (fourth items)])
+          (string-append "$" col_name "$" start_index ":$" col_name "$" end_index))))
 
 (define (range-length range_str)
   (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])
