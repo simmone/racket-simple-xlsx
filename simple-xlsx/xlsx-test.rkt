@@ -52,6 +52,10 @@
       (let ([sheet (send xlsx get-sheet-by-name "测试3")])
         (check-equal? (sheet-name sheet) "测试3"))
 
+      (check-exn exn:fail? (lambda () (check-data-range-valid xlsx "测试5" "E1-E3")))
+
+      (check-data-range-valid xlsx "测试5" "C1-C5")
+
       (check-equal? (send xlsx get-range-data "测试5" "A1-A3") '(1 4 8))
       (check-equal? (send xlsx get-range-data "测试5" "B1-B3") '(2 5 9))
       (check-equal? (send xlsx get-range-data "测试5" "C1-C3") '(3 6 10))
@@ -80,7 +84,7 @@
         (send xlsx add-line-chart-y-data! "测试4" "折线1" "测试1" "B2-B10")
 
         (send xlsx add-line-chart-y-data! "测试4" "折线2" "测试2" "C2-C10")
-
+        
         (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]
                [y_data2 (second y_data_list)])

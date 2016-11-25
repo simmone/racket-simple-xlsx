@@ -25,6 +25,7 @@
                    (y_data_range_list list?)
                    )]
           [check-range (-> string? boolean?)]
+          [check-data-range-valid (-> (is-a?/c xlsx%) string? string? boolean?)]
           [struct data-range
                   (
                    (sheet_name string?)
@@ -83,6 +84,23 @@
 (define (range-length range_str)
   (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])
     (add1 (- (string->number (second numbers)) (string->number (first numbers))))))
+
+(define (check-data-range-valid xlsx sheet_name range_str)
+  (when (check-range range_str)
+        (let* ([rows (data-sheet-rows (sheet-content (send xlsx get-sheet-by-name sheet_name)))]
+               [first_row (first rows)]
+               [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
+               [col_number (sub1 (abc->number col_name))]
+               [row_range (regexp-match* #rx"([0-9]+)" range_str)]
+               [row_start_index (string->number (first row_range))]
+               [row_end_index (string->number (second row_range))])
+          (cond
+           [(< (length first_row) (add1 col_number))
+            (error (format "no such column[~a]" col_name))]
+           [(> (length rows) row_end_index)
+            (error (format "end index beyond data range[~a]" row_end_index))]
+           [else
+            #t]))))
 
 (define xlsx%
   (class object%
@@ -143,11 +161,11 @@
                (error (format "duplicate sheet name[~a]" sheet_name))))
                  
          (define/public (set-line-chart-x-data! line_chart_sheet_name data_sheet_name data_range)
-           (when (check-range-valid data_sheet_name data_range)
+           (when (check-data-range-valid this data_sheet_name data_range)
                  (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range))))
 
          (define/public (add-line-chart-y-data! line_chart_sheet_name y_topic sheet_name data_range)
-           (when (check-range-valid sheet_name data_range)
+           (when (check-data-range-valid this sheet_name data_range)
                  (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range))))))
          
          (define/public (sheet-ref sheet_seq)
