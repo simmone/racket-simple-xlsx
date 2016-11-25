@@ -48,14 +48,28 @@
 (struct data-serial ([topic #:mutable] [data_range #:mutable]))
 
 (define (convert-range range_str)
-  (let loop ([loop_list (regexp-split #rx"-" range_str)]
-             [result_str ""])
-    (if (not (null? loop_list))
-          (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (car loop_list))])
-            (if (string=? result_str "")
-                (loop (cdr loop_list) (string-append "$" (second items) "$" (third items) ":"))
-                (loop (cdr loop_list) (string-append result_str "$" (second items) "$" (third items)))))
-          result_str)))
+  (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" range_str)
+      (let* ([range_part (regexp-split #rx"-" range_str)]
+             [front_col_name #f]
+             [front_col_index #f]
+             [back_col_name #f]
+             [back_col_index #f])
+        (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (first range_part))])
+          (set! front_col_name (second items))
+          (set! front_col_index (third items)))
+
+        (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (second range_part))])
+          (set! back_col_name (second items))
+          (set! back_col_index (third items)))
+        
+        (cond
+         [(not (string=? front_col_name back_col_name))
+          (error (format "range col name not consist[~a][~a]" front_col_name back_col_name))]
+         [(> (string->number front_col_index) (string->number back_col_index))
+          (error (format "range col index is invalid.[~a][~a]" front_col_index back_col_index))]
+         [else
+          (string-append "$" front_col_name "$" front_col_index ":$" back_col_name "$" back_col_index)]))
+      (error (format "range format should like ^[A-Z]+[0-9]+-[A-Z]+[0-9]+$, but get ~a" range_str))))
 
 (define (range-length range_str)
   (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])

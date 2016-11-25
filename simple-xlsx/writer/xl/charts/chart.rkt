@@ -4,7 +4,7 @@
 
 (provide (contract-out
           [write-chart-sheet (-> string? (is-a?/c xlsx%) string?)]
-          [write-chart-sheet-file (-> path-string? string? (is-a?/c xlsx%) exact-nonnegative-integer? void?)]
+          [write-chart-sheet-file (-> path-string? string? (is-a?/c xlsx%) void?)]
           ))
 
 (define (print-x-data xlsx x_data_range)
@@ -63,9 +63,10 @@
         (printf "~a" (print-y-data-list xlsx y_data_range_list))
         (printf "<c:marker val=\"1\"/><c:axId val=\"76367360\"/><c:axId val=\"76368896\"/></c:lineChart><c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76367360\"/><c:crosses val=\"autoZero\"/><c:crossBetween val=\"between\"/></c:valAx></c:plotArea><c:legend><c:legendPos val=\"r\"/><c:layout/></c:legend><c:plotVisOnly val=\"1\"/></c:chart></c:chartSpace>")))))
 
-(define (write-chart-sheet-file dir sheet_name xlsx typeSeq)
-  (with-output-to-file (build-path dir (format "chart~a.xml" typeSeq))
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (write-chart-sheet sheet_name xlsx)))))
+(define (write-chart-sheet-file dir sheet_name xlsx)
+  (let ([sheet (send xlsx get-sheet-by-name sheet_name)])
+    (with-output-to-file (build-path dir (format "chart~a.xml" (sheet-typeSeq sheet)))
+      #:exists 'replace
+      (lambda ()
+        (printf "~a" (write-chart-sheet sheet_name xlsx))))))
 

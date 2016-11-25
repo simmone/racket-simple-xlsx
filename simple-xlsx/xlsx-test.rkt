@@ -95,6 +95,12 @@
     (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
 
     (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
+    
+    (check-exn exn:fail? (lambda () (convert-range "c2")))
+    (check-exn exn:fail? (lambda () (convert-range "c2-c2")))
+
+    (check-exn exn:fail? (lambda () (convert-range "A2-A1")))
+    (check-exn exn:fail? (lambda () (convert-range "A2-B3")))
     )
 
    (test-case
