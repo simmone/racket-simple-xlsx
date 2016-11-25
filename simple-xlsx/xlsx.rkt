@@ -90,26 +90,26 @@
          
          (field 
           [sheets '()]
+          [sheet_name_map (make-hash)]
           )
          
          (define/public (add-data-sheet sheet_name sheet_data)
-           (let* ([sheet_length (length sheets)]
-                  [seq (add1 sheet_length)]
-                  [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))])
-             (set! sheets `(,@sheets
-                            ,(sheet
-                              sheet_name
-                              seq
-                              'data
-                              type_seq
-                              (data-sheet sheet_data (make-hash) (make-hash)))))))
+           (if (not (hash-has-key? sheet_name_map sheet_name))
+               (let* ([sheet_length (length sheets)]
+                      [seq (add1 sheet_length)]
+                      [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))])
+                 (set! sheets `(,@sheets
+                                ,(sheet
+                                  sheet_name
+                                  seq
+                                  'data
+                                  type_seq
+                                  (data-sheet sheet_data (make-hash) (make-hash)))))
+                 (hash-set! sheet_name_map sheet_name (sub1 seq)))
+               (error (format "duplicate sheet name[~a]" sheet_name))))
          
          (define/public (get-sheet-by-name sheet_name)
-           (let loop ([loop_list sheets])
-             (when (not (null? loop_list))
-                   (if (string=? sheet_name (sheet-name (car loop_list)))
-                       (car loop_list)
-                       (loop (cdr loop_list))))))
+           (list-ref sheets (hash-ref sheet_name_map sheet_name)))
          
          (define/public (get-range-data sheet_name range_str)
            (let* ([data_sheet (get-sheet-by-name sheet_name)]
@@ -128,22 +128,27 @@
                    (reverse result_list)))))
 
          (define/public (add-line-chart-sheet sheet_name topic)
-           (let* ([sheet_length (length sheets)]
-                  [seq (add1 sheet_length)]
-                  [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'chart)) sheets)))])
-             (set! sheets `(,@sheets
-                            ,(sheet
-                              sheet_name
-                              seq
-                              'chart
-                              type_seq
-                              (line-chart-sheet topic (data-range "" "") '()))))))
-
+           (if (not (hash-has-key? sheet_name_map sheet_name))
+               (let* ([sheet_length (length sheets)]
+                      [seq (add1 sheet_length)]
+                      [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'chart)) sheets)))])
+                 (set! sheets `(,@sheets
+                                ,(sheet
+                                  sheet_name
+                                  seq
+                                  'chart
+                                  type_seq
+                                  (line-chart-sheet topic (data-range "" "") '()))))
+                 (hash-set! sheet_name_map sheet_name (sub1 seq)))
+               (error (format "duplicate sheet name[~a]" sheet_name))))
+                 
          (define/public (set-line-chart-x-data! line_chart_sheet_name data_sheet_name data_range)
-           (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range)))
+           (when (check-range-valid data_sheet_name data_range)
+                 (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range))))
 
          (define/public (add-line-chart-y-data! line_chart_sheet_name y_topic sheet_name data_range)
-           (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range)))))
+           (when (check-range-valid sheet_name data_range)
+                 (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range))))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))

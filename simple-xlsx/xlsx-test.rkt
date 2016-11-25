@@ -16,6 +16,8 @@
       
       (send xlsx add-data-sheet "测试1" '())
 
+      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
+
       (send xlsx add-data-sheet "测试2" '(1))
       
       (let ([sheet (send xlsx sheet-ref 0)])
@@ -41,6 +43,9 @@
       (send xlsx add-line-chart-sheet "测试3" "图表1")
 
       (send xlsx add-line-chart-sheet "测试4" "图表2")
+
+      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
+      (check-exn exn:fail? (lambda () (send xlsx add-line-chart-sheet "测试4" "test")))
 
       (send xlsx add-data-sheet "测试5" '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
 
@@ -95,6 +100,10 @@
     (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
 
     (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
+    )
+   
+   (test-case
+    "test-check-range"
     
     (check-exn exn:fail? (lambda () (check-range "c2")))
     (check-exn exn:fail? (lambda () (check-range "c2-c2")))
