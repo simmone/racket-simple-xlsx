@@ -1,14 +1,12 @@
 #lang racket
 
 (provide (contract-out
-          [xlsx-data% class?]
-          [xlsx-data? any/c]
-          [col-attr any/c]
-          [write-xlsx-file (-> xlsx-data? path-string? void?)]
+          [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
           ))
 
 (require racket/date)
 
+(require "xlsx.rkt")
 (require "lib/lib.rkt")
 (require "writer/content-type.rkt")
 (require "writer/_rels/rels.rkt")
@@ -23,24 +21,6 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 
-;; col_attr_hash used to set col's attribute: '#hash(("A" . (col-attr 100 "white")))
-(define xlsx-data%
-  (class object%
-         (field (sheet_data_list '()))
-         (field (sheet_name_list '()))
-         (field (sheet_attr_hash (make-hash)))
-
-         (define/public (add-sheet sheet_row_list sheet_name #:col_attr_hash [col_attr_hash #f])
-           (set! sheet_data_list `(,@sheet_data_list ,sheet_row_list))
-           (set! sheet_name_list `(,@sheet_name_list ,sheet_name))
-           (when col_attr_hash
-                 (hash-set! sheet_attr_hash (length sheet_data_list) col_attr_hash)))
-
-         (super-new)))
-
-(define (xlsx-data? obj)
-  (and (field-bound? sheet_data_list obj) (field-bound? sheet_name_list obj)))
-
 (define (write-xlsx-file xlsx_data xlsx_file_name)
   (when (file-exists? xlsx_file_name)
         (delete-file xlsx_file_name))
@@ -49,10 +29,6 @@
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
-          (let ([sheet_data_list (get-field sheet_data_list xlsx_data)]
-                [sheet_name_list (get-field sheet_name_list xlsx_data)]
-                [sheet_attr_hash (get-field sheet_attr_hash xlsx_data)]
-                )
             (let-values ([(string_index_list string_index_map) (get-string-index sheet_data_list)])
               (let ([sheet_count (length sheet_data_list)])
                 ;; [Content_Types].xml

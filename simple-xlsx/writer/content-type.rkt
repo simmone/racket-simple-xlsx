@@ -4,32 +4,24 @@
 (require racket/list)
 (require racket/contract)
 
-(require "../define.rkt")
+(require "../xlsx.rkt")
 
 (provide (contract-out
           [write-content-type (-> list? string?)]
           [write-content-type-file (-> path-string? list? void?)]
-          [sheets->content-type (-> list? string?)]
           ))
 
 (define S string-append)
 
 (define (sheets->content-type sheet_list)
-  (let loop ([loop_list sheet_list]
-             [count 1])
-    (when (not (null? loop_list))
-          (set-sheetData-seq! (car loop_list) count)
-          (loop (cdr loop_list) (add1 count))))
-
   (with-output-to-string 
     (lambda ()
       (let loop ([loop_list sheet_list]
                  [count 1])
         (when (not (null? loop_list))
               (let ([sheet (car loop_list)])
-                (if (eq? (sheetData-type sheet) 'data)
+                (if (eq? (sheet-type sheet) 'data)
                     (begin
-                      (set-sheetData-typeSeq! sheet count)
                       (printf 
                        "<Override PartName=\"/xl/worksheets/sheet~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>" count)
                       (loop (cdr loop_list) (add1 count)))
@@ -39,9 +31,8 @@
                  [count 1])
         (when (not (null? loop_list))
               (let ([sheet (car loop_list)])
-                (if (eq? (sheetData-type sheet) 'chart)
+                (if (eq? (sheet-type sheet) 'chart)
                     (begin
-                      (set-sheetData-typeSeq! sheet count)
                       (printf 
                        "<Override PartName=\"/xl/charts/chart~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocume;nt.drawingml.chart+xml\"/><Override PartName=\"/xl/drawings/drawing~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawing+xml\"/><Override PartName=\"/xl/chartsheets/sheet~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml\"/>"
                        count count count)
@@ -58,5 +49,3 @@
     #:exists 'replace
     (lambda ()
       (printf "~a" (write-content-type sheet_list)))))
-    
-    
