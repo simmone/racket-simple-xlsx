@@ -1,8 +1,9 @@
 #lang racket
 
 (require rackunit/text-ui)
-
 (require rackunit "docprops-app.rkt")
+
+(require "../../xlsx.rkt")
 
 (define test-docprops-app
   (test-suite
@@ -10,10 +11,18 @@
 
    (test-case
     "test-docprops-app"
-    (check-equal? (write-docprops-app '("Sheet1" "Sheet2" "Sheet3"))
+
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet "数据页面" '((1)))
+      (send xlsx add-line-chart-sheet "Chart1" "Chart1")
+      (send xlsx add-data-sheet "Sheet2" '((1)))
+      (send xlsx add-line-chart-sheet "Chart4" "Chart1")
+      (send xlsx add-data-sheet "Sheet3" '((1)))
+
+    (check-equal? (write-docprops-app (get-field sheets xlsx))
                   (string-append
                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-                    "<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size=\"2\" baseType=\"variant\"><vt:variant><vt:lpstr>Worksheets</vt:lpstr></vt:variant><vt:variant><vt:i4>3</vt:i4></vt:variant></vt:vector></HeadingPairs><TitlesOfParts><vt:vector size=\"3\" baseType=\"lpstr\"><vt:lpstr>Sheet1</vt:lpstr><vt:lpstr>Sheet2</vt:lpstr><vt:lpstr>Sheet3</vt:lpstr></vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>")))
+                    "<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size=\"5\" baseType=\"variant\"><vt:variant><vt:lpstr>工作表</vt:lpstr></vt:variant><vt:variant><vt:i4>3</vt:i4></vt:variant><vt:variant><vt:lpstr>图表</vt:lpstr></vt:variant><vt:variant><vt:i4>2</vt:i4></vt:variant></vt:vector></HeadingPairs><TitlesOfParts><vt:vector size=\"5\" baseType=\"lpstr\"><vt:lpstr>数据页面</vt:lpstr><vt:lpstr>Chart1</vt:lpstr><vt:lpstr>Sheet2</vt:lpstr><vt:lpstr>Chart4</vt:lpstr><vt:lpstr>Sheet3</vt:lpstr></vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>"))))
    ))
 
 (run-tests test-docprops-app)
