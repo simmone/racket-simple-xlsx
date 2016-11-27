@@ -43,12 +43,12 @@
             (write-docprops-app-file doc_props_dir sheet_name_list)
             (write-docprops-core-file doc_props_dir (current-date)))
                 
-                ;; xl
-                (let ([xl_dir (build-path tmp_dir "xl")])
-                  ;; _rels
-                  (let ([rels_dir (build-path xl_dir "_rels")])
-                    (make-directory* rels_dir)
-                    (write-workbook-xml-rels-file rels_dir sheet_count))
+          ;; xl
+          (let ([xl_dir (build-path tmp_dir "xl")])
+            ;; _rels
+            (let ([rels_dir (build-path xl_dir "_rels")])
+              (make-directory* rels_dir)
+              (write-workbook-xml-rels-file rels_dir sheet_count))
                   
                   ;; printerSettings
                   (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
