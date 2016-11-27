@@ -50,13 +50,13 @@
               (make-directory* rels_dir)
               (write-workbook-xml-rels-file rels_dir sheet_count))
                   
-                  ;; printerSettings
-                  (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
-                    (make-directory* printer_settings_dir)
-                    (create-printer-settings printer_settings_dir sheet_count))
+            ;; printerSettings
+            (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
+              (make-directory* printer_settings_dir)
+              (create-printer-settings printer_settings_dir sheet_list))
 
-                  ;; sharedStrings
-                  (write-shared-strings-file xl_dir string_index_list)
+            ;; sharedStrings
+            (write-shared-strings-file xl_dir string_index_list)
 
                   ;; theme
                   (let ([theme_dir (build-path xl_dir "theme")])
