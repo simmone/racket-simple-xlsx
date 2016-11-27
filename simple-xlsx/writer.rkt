@@ -21,7 +21,7 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 
-(define (write-xlsx-file xlsx_data xlsx_file_name)
+(define (write-xlsx-file xlsx xlsx_file_name)
   (when (file-exists? xlsx_file_name)
         (delete-file xlsx_file_name))
   
@@ -29,21 +29,19 @@
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
-            (let-values ([(string_index_list string_index_map) (get-string-index sheet_data_list)])
-              (let ([sheet_count (length sheet_data_list)])
-                ;; [Content_Types].xml
-                (write-content-type-file tmp_dir sheet_count)
+          ;; [Content_Types].xml
+          (write-content-type-file tmp_dir (get-field sheets xlsx))
 
-                ;; _rels
-                (let ([rels_dir (build-path tmp_dir "_rels")])
-                  (make-directory* rels_dir)
-                  (write-rels-file rels_dir))
+          ;; _rels
+          (let ([rels_dir (build-path tmp_dir "_rels")])
+            (make-directory* rels_dir)
+            (write-rels-file rels_dir))
 
-                ;; docProps
-                (let ([doc_props_dir (build-path tmp_dir "docProps")])
-                  (make-directory* doc_props_dir)
-                  (write-docprops-app-file doc_props_dir sheet_name_list)
-                  (write-docprops-core-file doc_props_dir (current-date)))
+          ;; docProps
+          (let ([doc_props_dir (build-path tmp_dir "docProps")])
+            (make-directory* doc_props_dir)
+            (write-docprops-app-file doc_props_dir sheet_name_list)
+            (write-docprops-core-file doc_props_dir (current-date)))
                 
                 ;; xl
                 (let ([xl_dir (build-path tmp_dir "xl")])
