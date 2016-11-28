@@ -19,6 +19,16 @@
     )
 
    (test-case
+    "test-add-data-sheet-string-item-map"
+
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet "测试1" '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
+      
+      (let ([string_item_map (get-field string_item_map xlsx)])
+        (check-equal? (hash-count string_item_map) 4)
+        (check-true (hash-has-key? string_item_map "xx")))))
+
+   (test-case
     "test-xlsx"
 
     (let ([xlsx (new xlsx%)])

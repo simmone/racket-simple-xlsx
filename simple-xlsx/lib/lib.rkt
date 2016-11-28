@@ -248,32 +248,6 @@
     
     (string-append (number->abc cols) (number->string rows))))
 
-(define (get-string-index data_list)
-  (let ([string_map (make-hash)]
-        [string_index_list #f]
-        [string_index_map (make-hash)])
-    (let sheet_loop ([sheet_data_list data_list])
-      (when (not (null? sheet_data_list))
-            (let loop ([loop_list (car sheet_data_list)])
-              (when (not (null? loop_list))
-                    (for-each
-                     (lambda (item)
-                       (when (string? item)
-                             (hash-set! string_map item 0)))
-                     (car loop_list))
-                    (loop (cdr loop_list))))
-            (sheet_loop (cdr sheet_data_list))))
-
-    (set! string_index_list (sort (hash-keys string_map) string<?))
-    
-    (let loop ([loop_list string_index_list]
-               [index 0])
-      (when (not (null? loop_list))
-            (hash-set! string_index_map (car loop_list) index)
-            (loop (cdr loop_list) (add1 index))))
-    
-    (values string_index_list string_index_map)))
-
 (define (zip-xlsx zip_file content_dir)
   (let ([pwd #f])
     (dynamic-wind

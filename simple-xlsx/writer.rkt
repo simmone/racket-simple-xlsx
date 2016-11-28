@@ -60,14 +60,8 @@
               (make-directory* theme_dir)
               (write-theme-file theme_dir))
 
-            (let-values ([(string_index_list string_index_map) 
-                          (get-string-index 
-                           (map
-                            (lambda (sheet)
-                              (data-sheet-rows (sheet-content sheet)))
-                            (filter (lambda (st) (eq? (sheet-type st) 'data)) (get-field sheets xlsx))))])
-              ;; sharedStrings
-              (write-shared-strings-file xl_dir string_index_list))
+            ;; sharedStrings
+            (write-shared-strings-file xl_dir (get-field string_item_map xlsx))
 
             ;; workbook
             (write-workbook-file xl_dir (get-field sheets xlsx))

@@ -6,18 +6,18 @@
 
 ;; strings list convert to (string . place) hash
 (provide (contract-out
-          [write-shared-strings (-> list? string?)]
-          [write-shared-strings-file (-> path-string? list? void?)]
+          [write-shared-strings (-> hash? string?)]
+          [write-shared-strings-file (-> path-string? hash? void?)]
           [filter-string (-> string? string?)]
           ))
 
 (define S string-append)
 
-(define (write-shared-strings string_list) @S{
+(define (write-shared-strings string_item_map) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="@|(number->string (length string_list))|" uniqueCount="@|(number->string (length string_list))|">@|(with-output-to-string
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="@|(number->string (hash-count string_item_map))|" uniqueCount="@|(number->string (hash-count string_item_map))|">@|(with-output-to-string
     (lambda () 
-      (let loop ([strings string_list])
+      (let loop ([strings (sort (hash-keys string_item_map) string<?)])
         (when (not (null? strings))
           (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (filter-string (car strings)))
           (loop (cdr strings))))))|</sst>
@@ -36,8 +36,8 @@
     "\\&lt;")
    )
 
-(define (write-shared-strings-file dir string_list)
+(define (write-shared-strings-file dir string_item_map)
   (with-output-to-file (build-path dir "sharedStrings.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-shared-strings string_list)))))
+      (printf "~a" (write-shared-strings string_item_map)))))

@@ -132,6 +132,7 @@
          (field 
           [sheets '()]
           [sheet_name_map (make-hash)]
+          [string_item_map (make-hash)]
           )
          
          (define/public (add-data-sheet sheet_name sheet_data)
@@ -140,6 +141,16 @@
                      (let* ([sheet_length (length sheets)]
                             [seq (add1 sheet_length)]
                             [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))])
+                       
+                       (let loop ([loop_list sheet_data])
+                         (when (not (null? loop_list))
+                               (let inner-loop ([inner_loop_list (car loop_list)])
+                                 (when (not (null? inner_loop_list))
+                                       (when (string? (car inner_loop_list))
+                                             (hash-set! string_item_map (car inner_loop_list) ""))
+                                       (inner-loop (cdr inner_loop_list))))
+                               (loop (cdr loop_list))))
+                       
                        (set! sheets `(,@sheets
                                       ,(sheet
                                         sheet_name

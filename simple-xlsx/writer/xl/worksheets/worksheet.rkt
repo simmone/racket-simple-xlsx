@@ -8,13 +8,13 @@
 
 ;; write-sheet '('()...)
 (provide (contract-out
-          [write-sheet (-> list? hash? hash? exact-nonnegative-integer? hash? boolean? string?)]
+          [write-sheet (-> (is-a?/c xlsx%) string? void?)]
           [write-sheet-file (-> path-string? exact-nonnegative-integer? list? hash? hash? hash? void?)]
           ))
 
 (define S string-append)
 
-(define (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index color_style_map is_active?) @S{
+(define (write-sheet xlsx sheet_name string_index_map) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="@|(if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))|"/><sheetViews><sheetView @|(if is_active? "tabSelected=\"1\"" "")| workbookViewId="0">@|(if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")|</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/>@|
 (let ([col_style_map (make-hash)])
