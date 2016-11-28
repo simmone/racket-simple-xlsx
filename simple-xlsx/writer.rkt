@@ -40,7 +40,7 @@
           ;; docProps
           (let ([doc_props_dir (build-path tmp_dir "docProps")])
             (make-directory* doc_props_dir)
-            (write-docprops-app-file doc_props_dir sheet_name_list)
+            (write-docprops-app-file doc_props_dir (get-field sheets xlsx))
             (write-docprops-core-file doc_props_dir (current-date)))
                 
           ;; xl
@@ -48,41 +48,47 @@
             ;; _rels
             (let ([rels_dir (build-path xl_dir "_rels")])
               (make-directory* rels_dir)
-              (write-workbook-xml-rels-file rels_dir sheet_count))
+              (write-workbook-xml-rels-file rels_dir (get-field sheets xlsx)))
                   
             ;; printerSettings
             (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
               (make-directory* printer_settings_dir)
-              (create-printer-settings printer_settings_dir sheet_list))
+              (create-printer-settings printer_settings_dir (get-field sheets xlsx)))
 
-            ;; sharedStrings
-            (write-shared-strings-file xl_dir string_index_list)
+            ;; theme
+            (let ([theme_dir (build-path xl_dir "theme")])
+              (make-directory* theme_dir)
+              (write-theme-file theme_dir))
 
-                  ;; theme
-                  (let ([theme_dir (build-path xl_dir "theme")])
-                    (make-directory* theme_dir)
-                    (write-theme-file theme_dir))
+            (let-values ([(string_index_list string_index_map) 
+                          (get-string-index 
+                           (map
+                            (lambda (sheet)
+                              (data-sheet-rows (sheet-content sheet)))
+                            (filter (lambda (st) (eq? (sheet-type st) 'data)) (get-field sheets xlsx))))])
+              ;; sharedStrings
+              (write-shared-strings-file xl_dir string_index_list))
 
-                  ;; workbook
-                  (write-workbook-file xl_dir sheet_name_list)
+            ;; workbook
+            (write-workbook-file xl_dir (get-field sheets xlsx))
 
-                  ;; styles and worksheets
-                  (let ([worksheets_dir (build-path xl_dir "worksheets")]
-                        [color_style_map (write-styles-file xl_dir sheet_attr_hash)])
-                    ;; _rels
-                    (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
-                      (make-directory* worksheets_rels_dir)
-                      (write-worksheets-rels-file worksheets_rels_dir sheet_count))
+            ;; styles and worksheets
+            (let ([worksheets_dir (build-path xl_dir "worksheets")]
+                  [color_style_map (write-styles-file xl_dir sheet_attr_hash)])
+              ;; _rels
+              (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
+                (make-directory* worksheets_rels_dir)
+                (write-worksheets-rels-file worksheets_rels_dir sheet_count))
 
-                    ;; worksheet
-                    (let loop ([sheets_data sheet_data_list]
-                               [index 1])
-                      (when (not (null? sheets_data))
-                            (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash color_style_map)
-                            (loop (cdr sheets_data) (add1 index))))
-                    )
-                  )
-                ))
-            (zip-xlsx xlsx_file_name tmp_dir)))
+              ;; worksheet
+              (let loop ([sheets_data sheet_data_list]
+                         [index 1])
+                (when (not (null? sheets_data))
+                      (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash color_style_map)
+                      (loop (cdr sheets_data) (add1 index))))
+              )
+            )
+          ))
+    (zip-xlsx xlsx_file_name tmp_dir)))
           (lambda ()
             (delete-directory/files tmp_dir)))))
