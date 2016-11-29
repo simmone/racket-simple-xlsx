@@ -1,22 +1,26 @@
-#lang at-exp racket/base
-
-(require racket/port)
-(require racket/list)
-(require racket/contract)
+#lang racket
 
 (require "../../../lib/lib.rkt")
+(require "../../../xlsx.rkt")
 
-;; write-sheet '('()...)
 (provide (contract-out
-          [write-sheet (-> (is-a?/c xlsx%) string? void?)]
-          [write-sheet-file (-> path-string? exact-nonnegative-integer? list? hash? hash? hash? void?)]
+          [write-sheet (-> list? string? void?)]
+          [write-sheet-file (-> path-string? list? void?)]
           ))
 
-(define S string-append)
-
-(define (write-sheet xlsx sheet_name string_index_map) @S{
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="@|(if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))|"/><sheetViews><sheetView @|(if is_active? "tabSelected=\"1\"" "")| workbookViewId="0">@|(if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")|</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.5"/>@|
+(define (write-sheet sheet_list) 
+  (with-output-to-string
+    (lambda ()
+      ;; only data sheet
+      (let loop ([loop_list sheet_list])
+        (when (not (null? loop_list))
+          (let* ([sheet (car loop_list)]
+                 [rows (data-sheet-rows sheet)]
+                 [dimension (if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))]
+                 [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
+                 [active_cell (if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")])
+            (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
+            (printf "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"~a\"/><sheetViews><sheetView ~a workbookViewId=\"0\">~a</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"13.5\"/>" dimension is_active active_cell)
 (let ([col_style_map (make-hash)])
   (with-output-to-string
     (lambda ()
@@ -70,11 +74,9 @@
               (loop-row (cdr loop_rows) (add1 row_seq)))))))|</sheetData><phoneticPr fontId="1" type="noConversion"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" horizontalDpi="200" verticalDpi="200" r:id="rId1"/></worksheet>
 })
 
-(define (write-sheet-file dir sheet_index sheet_data_list string_index_map sheet_attr_map color_style_map)
+(define (write-sheet-file dir sheet_list)
   (with-output-to-file (build-path dir (string-append "sheet" (number->string sheet_index) ".xml"))
     #:exists 'replace
     (lambda ()
-      (if (= sheet_index 1)
-          (printf "~a" (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index color_style_map #t))
-          (printf "~a" (write-sheet sheet_data_list string_index_map sheet_attr_map sheet_index color_style_map #f))))))
+      (printf "~a" (write-sheet sheet_list)))))
   

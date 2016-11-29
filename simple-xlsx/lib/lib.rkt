@@ -24,7 +24,6 @@
           [format-w3cdtf (-> date? string?)]
           [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
           [get-dimension (-> list? string?)]
-          [get-string-index (-> list? (values list? hash?))]
           [zip-xlsx (-> path-string? path-string? void?)]
           [struct col-attr ((width number?) (color string?))]
           [cx-round (-> number? integer? number?)]          

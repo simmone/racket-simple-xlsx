@@ -67,19 +67,14 @@
             (write-workbook-file xl_dir (get-field sheets xlsx))
 
             ;; styles and worksheets
-            (let ([worksheets_dir (build-path xl_dir "worksheets")]
-                  [color_style_map (write-styles-file xl_dir sheet_attr_hash)])
+            (let ([worksheets_dir (build-path xl_dir "worksheets")])
               ;; _rels
               (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
                 (make-directory* worksheets_rels_dir)
-                (write-worksheets-rels-file worksheets_rels_dir sheet_count))
+                (write-worksheets-rels-file worksheets_rels_dir (get-field sheets xlsx)))
 
               ;; worksheet
-              (let loop ([sheets_data sheet_data_list]
-                         [index 1])
-                (when (not (null? sheets_data))
-                      (write-sheet-file worksheets_dir index (car sheets_data) string_index_map sheet_attr_hash color_style_map)
-                      (loop (cdr sheets_data) (add1 index))))
+              (write-sheet-file worksheets_dir (get-field sheets xlsx))
               )
             )
           ))
