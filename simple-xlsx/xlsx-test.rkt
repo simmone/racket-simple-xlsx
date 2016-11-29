@@ -53,10 +53,10 @@
         (check-equal? (sheet-type sheet) 'data)
         (check-equal? (sheet-typeSeq sheet) 2)
 
-        (send xlsx set-sheet-col-width! sheet "A-C" 100)
+        (send xlsx set-data-sheet-col-width! "测试2" "A-C" 100)
         (check-equal? (hash-ref (data-sheet-width_hash (sheet-content sheet)) "A-C") 100)
 
-        (send xlsx set-sheet-col-color! sheet "A-C" "red")
+        (send xlsx set-data-sheet-col-color! "测试2" "A-C" "red")
         (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A-C") "red")
         )
 
@@ -142,6 +142,21 @@
     (check-equal? (range-length "$A$2:$A$20") 19)
     (check-equal? (range-length "$AB$21:$AB$21") 1)
     )
+
+   (test-case
+    "test-set-data-sheet-col-color-and-get-style-list"
+
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet "测试1" '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
+
+      (send xlsx set-data-sheet-col-color! "测试1" "A1-A4" "red")
+
+      (send xlsx set-data-sheet-col-color! "测试1" "B1-B4" "blue")
+      
+      (check-equal? (send xlsx get-styles-list) '("blue" "red"))
+      )
+
+      )
 
    ))
 

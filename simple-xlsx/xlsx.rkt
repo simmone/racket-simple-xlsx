@@ -209,10 +209,26 @@
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
          
-         (define/public (set-sheet-col-width! sheet col_range width)
-           (hash-set! (data-sheet-width_hash (sheet-content sheet)) col_range width))
+         (define/public (set-data-sheet-col-width! sheet_name col_range width)
+           (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) col_range width))
 
-         (define/public (set-sheet-col-color! sheet col_range color)
-           (hash-set! (data-sheet-color_hash (sheet-content sheet)) col_range color))
+         (define/public (set-data-sheet-col-color! sheet_name col_range color)
+           (hash-set! (data-sheet-color_hash (sheet-content (get-sheet-by-name sheet_name))) col_range color))
+
+         (define/public (get-styles-list)
+           (let ([style_list '()]
+                 [tmp_hash (make-hash)])
+             (let loop ([loop_list sheets])
+               (when (not (null? loop_list))
+                     (when (eq? (sheet-type (car loop_list)) 'data)
+                           (let ([color_hash (data-sheet-color_hash (sheet-content (car loop_list)))])
+                             (hash-for-each
+                              color_hash
+                              (lambda (range_str color_str)
+                                (hash-set! tmp_hash color_str "")))))
+                     (loop (cdr loop_list))))
+             
+             (sort (hash-keys tmp_hash) string<?)))
+
          ))
 

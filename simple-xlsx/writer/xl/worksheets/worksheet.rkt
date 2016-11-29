@@ -15,18 +15,21 @@
       (let loop ([loop_list sheet_list])
         (when (not (null? loop_list))
           (let* ([sheet (car loop_list)]
+                 [data_sheet (sheet-content sheet)]
                  [rows (data-sheet-rows sheet)]
                  [dimension (if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))]
                  [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
                  [active_cell (if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")])
             (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
             (printf "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"~a\"/><sheetViews><sheetView ~a workbookViewId=\"0\">~a</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"13.5\"/>" dimension is_active active_cell)
-(let ([col_style_map (make-hash)])
-  (with-output-to-string
-    (lambda ()
-      (when (hash-has-key? sheet_attr_map sheet_index)
-            (printf "<cols>")
-            (let loop-col ([loop_cols (sort (hash->list (hash-ref sheet_attr_map sheet_index)) string<? #:key car)])
+            
+            (let ([col_style_map (make-hash)]
+                  [width_hash (data-sheet-width_hash data_sheet)]
+                  [color_hash (data-sheet-color_hash data_sheet)])
+
+              (printf "<cols>")
+
+              (let loop-col ([loop_cols 
               (when (not (null? loop_cols))
                     (let* ([col (car loop_cols)]
                            [col_index_range (abc->range (car col))]
