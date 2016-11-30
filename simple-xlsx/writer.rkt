@@ -80,7 +80,6 @@
               (write-data-sheet-file worksheets_dir (get-field sheets xlsx) (send xlsx get-styles-list) (get-field string_item_map xlsx))
               )
 
-
             )
           ))
     (zip-xlsx xlsx_file_name tmp_dir)))

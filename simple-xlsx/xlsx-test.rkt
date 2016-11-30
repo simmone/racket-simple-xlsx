@@ -56,8 +56,8 @@
         (send xlsx set-data-sheet-col-width! "测试2" "A-C" 100)
         (check-equal? (hash-ref (data-sheet-width_hash (sheet-content sheet)) "A-C") 100)
 
-        (send xlsx set-data-sheet-col-color! "测试2" "A-C" "red")
-        (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A-C") "red")
+        (send xlsx set-data-sheet-cell-color! "测试2" "A1-C2" "red")
+        (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
       (send xlsx add-line-chart-sheet "测试3" "图表1")
@@ -135,6 +135,26 @@
     (check-exn exn:fail? (lambda () (check-range "A2-A1")))
     (check-exn exn:fail? (lambda () (check-range "A2-B3")))
     )
+   
+   (test-case
+    "test-check-col-range"
+    
+    (check-col-range "A-Z")
+    
+    (check-exn exn:fail? (lambda () (check-col-range "B-A")))
+
+    (check-exn exn:fail? (lambda () (check-col-range "A1-A")))
+    )
+
+   (test-case
+    "test-check-cell-range"
+    
+    (check-cell-range "A1-B2")
+
+    (check-exn exn:fail? (lambda () (check-cell-range "A10-B9")))
+
+    (check-exn exn:fail? (lambda () (check-cell-range "B1-A1")))
+    )
 
    (test-case
     "test-range-length"
@@ -144,14 +164,14 @@
     )
 
    (test-case
-    "test-set-data-sheet-col-color-and-get-style-list"
+    "test-set-data-sheet-cell-color-and-get-style-list"
 
     (let ([xlsx (new xlsx%)])
       (send xlsx add-data-sheet "测试1" '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
 
-      (send xlsx set-data-sheet-col-color! "测试1" "A1-A4" "red")
+      (send xlsx set-data-sheet-cell-color! "测试1" "A1-A4" "red")
 
-      (send xlsx set-data-sheet-col-color! "测试1" "B1-B4" "blue")
+      (send xlsx set-data-sheet-cell-color! "测试1" "B1-B4" "blue")
       
       (check-equal? (send xlsx get-styles-list) '("blue" "red"))
       )

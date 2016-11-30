@@ -25,6 +25,8 @@
                    (y_data_range_list list?)
                    )]
           [check-range (-> string? boolean?)]
+          [check-col-range (-> string? boolean?)]
+          [check-cell-range (-> string? boolean?)]
           [check-data-range-valid (-> (is-a?/c xlsx%) string? string? boolean?)]
           [check-data-list (-> any/c boolean?)]
           [struct data-range
@@ -95,6 +97,42 @@
          [else
           #t]))
       (error (format "range format should like ^[A-Z]+[0-9]+-[A-Z]+[0-9]+$, but get ~a" range_str))))
+
+(define (check-col-range col_range_str)
+  (cond
+   [(regexp-match #rx"^[A-Z]+-[A-Z]+$" col_range_str)
+    (let* ([items (regexp-match #rx"^([A-Z]+)-([A-Z]+)$" col_range_str)]
+           [start_col_name (second items)]
+           [end_col_name (third items)])
+      (if (string>? start_col_name end_col_name)
+          (error (format "col name should from small to big[~a]" col_range_str))
+          #t))]
+   [(regexp-match #rx"^[0-9]+-[0-9]+$" col_range_str)
+    (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" col_range_str)]
+           [start_col_index (second items)]
+           [end_col_index (third items)])
+      (if (string>? start_col_index end_col_index)
+          (error (format "col index should from small to big[~a]" col_range_str))
+          #t))]
+   [else
+    (error (format "invalid col range! should be like this: A-Z or 1-10[~a]" col_range_str))]
+   ))
+
+(define (check-cell-range cell_range_str)
+  (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" cell_range_str)
+      (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" cell_range_str)]
+             [start_col_name (second items)]
+             [start_col_index (string->number (third items))]
+             [end_col_name (fourth items)]
+             [end_col_index (string->number (fifth items))])
+        (cond
+         [(string<? end_col_name start_col_name)
+          (error (format "col name should from small to big[~a]" cell_range_str))]
+         [(< end_col_index start_col_index)
+          (error (format "col index should from small to big[~a]" cell_range_str))]
+         [else
+          #t]))
+      (error (format "invalid cell range! should be like this: A1-B2[~a]" cell_range_str))))
 
 (define (convert-range range_str)
   (when (check-range range_str)
@@ -210,10 +248,12 @@
            (list-ref sheets sheet_seq))
          
          (define/public (set-data-sheet-col-width! sheet_name col_range width)
-           (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) col_range width))
+           (when (check-col-range col_range)
+                 (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) col_range width)))
 
-         (define/public (set-data-sheet-col-color! sheet_name col_range color)
-           (hash-set! (data-sheet-color_hash (sheet-content (get-sheet-by-name sheet_name))) col_range color))
+         (define/public (set-data-sheet-cell-color! sheet_name cell_range color)
+           (when (check-cell-range cell_range)
+                 (hash-set! (data-sheet-color_hash (sheet-content (get-sheet-by-name sheet_name))) cell_range color)))
 
          (define/public (get-styles-list)
            (let ([style_list '()]

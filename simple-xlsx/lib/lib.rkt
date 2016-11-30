@@ -24,30 +24,20 @@
           [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
           [get-dimension (-> list? string?)]
           [zip-xlsx (-> path-string? path-string? void?)]
-          [struct col-attr ((width number?) (color string?))]
-          [cx-round (-> number? integer? number?)]
           [range-hash-ref (-> hash? string? any/c)]
           ))
-
-(define (cx-round num precise)
-  (let ([factor (expt 10 precise)])
-    (/ (round (* num factor)) factor)))
-
-;; represent a column's attibutes, if not want set a specific attr, set it to #f
-;; example: (col-attr #f "red") means only set color
-(struct col-attr (width color) #:transparent)
 
 (define (format-date the_date)
   (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))
 
 (define (format-complete-time the_date)
   (format "~a~a~a ~a:~a:~a"
-          (string-fill (number->string (date-year the_date)) #\0 4)
-          (string-fill (number->string (date-month the_date)) #\0 2)
-          (string-fill (number->string (date-day the_date)) #\0 2)
-          (string-fill (number->string (date-hour the_date)) #\0 2)
-          (string-fill (number->string (date-minute the_date)) #\0 2)
-          (string-fill (number->string (date-second the_date)) #\0 2)))
+          (~a (date-year the_date) #:min-width 4 #:pad-string "0" #:align 'right)
+          (~a (date-month the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-day the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-hour the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-minute the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-second the_date) #:min-width 2 #:pad-string "0" #:align 'right)))
 
 (define (format-time time_s)
   (let* ([hour_s (* time_s 24)]
@@ -59,9 +49,9 @@
          [second_s (* second_sub 60)]
          [second (round second_s)])
     (format "~a:~a:~a"
-            (string-fill (number->string (inexact->exact hour)) #\0 2)
-            (string-fill (number->string (inexact->exact minute)) #\0 2)
-            (string-fill (number->string (inexact->exact second)) #\0 2))))
+            (~a (inexact->exact hour) #:min-width 2 #:pad-string "0" #:align 'right)
+            (~a (inexact->exact minute) #:min-width 2 #:pad-string "0" #:align 'right)
+            (~a (inexact->exact second) #:min-width 2 #:pad-string "0" #:align 'right))))
 
 (define (xml-get node-name xml-list)
   (let ([xml_value (se-path* (list node-name) xml-list)])
@@ -183,37 +173,17 @@
         [second (string->number (substring time_str 15 17))])
     (seconds->date (find-seconds second minute hour day month year))))
 
-;; "3" -> "03" or "30"
-(define (string-fill str char len #:direction [direction 'left])
-  (let* ([str_len (string-length str)]
-         [distance (- len str_len)])
-
-    (if (> distance 0)
-        (with-output-to-string
-          (lambda ()
-            (when (eq? direction 'right)
-              (printf str))
-
-            (let loop ([count 1])
-              (when (<= count distance)
-                    (printf "~a" char)
-                    (loop (add1 count))))
-
-            (when (eq? direction 'left)
-                  (printf str))))
-        str)))
-
 ;; 2014-12-15T13:24:27+08:00
 (define (format-w3cdtf the_date)
   (format "~a-~a-~aT~a:~a:~a~a~a:00"
-          (date-year the_date)
-          (string-fill (number->string (date-month the_date)) #\0 2)
-          (string-fill (number->string (date-day the_date)) #\0 2)
-          (string-fill (number->string (date-hour the_date)) #\0 2)
-          (string-fill (number->string (date-minute the_date)) #\0 2)
-          (string-fill (number->string (date-second the_date)) #\0 2)
+          (~a (date-year the_date) #:min-width 4 #:pad-string "0" #:align 'right)
+          (~a (date-month the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-day the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-hour the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-minute the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-second the_date) #:min-width 2 #:pad-string "0" #:align 'right)
           (if (>= (date-time-zone-offset the_date) 0) "+" "-")
-          (string-fill (number->string (abs (floor (/ (date-time-zone-offset the_date) 60 60)))) #\0 2)))
+          (~a (abs (floor (/ (date-time-zone-offset the_date) 60 60))) #:min-width 2 #:pad-string "0" #:align 'right)))
 
 ;; create auto sheet name list: Sheet1, Sheet2, ...
 (define (create-sheet-name-list sheet_count)
