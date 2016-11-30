@@ -34,4 +34,3 @@
     #:exists 'replace
     (lambda ()
       (printf "~a" (write-styles style_list)))))
-

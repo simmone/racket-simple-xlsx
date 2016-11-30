@@ -56,21 +56,6 @@
     (check-equal? (abc->range "sdksjdkf-%^%$#") '(1 . 1))
     )
 
-   (test-case
-    "test-get-range-ref"
-    (let ([range_hash (make-hash)])
-      (hash-set! range_hash '(1 . 2) 1)
-      (hash-set! range_hash '(3 . 4) 2)
-      
-      (check-equal? (get-range-ref range_hash 1) 1) 
-      (check-equal? (get-range-ref range_hash 2) 1)
-      (check-equal? (get-range-ref range_hash 3) 2)
-      (check-equal? (get-range-ref range_hash 4) 2)
-      (check-equal? (get-range-ref range_hash 5) #f)
-      (check-equal? (get-range-ref range_hash 0) #f)
-      )
-    )
-
    (test-case 
     "test-number->list"
     (check-equal? (number->list 1) '(1))

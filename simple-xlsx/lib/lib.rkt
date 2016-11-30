@@ -15,7 +15,6 @@
           [abc->number (-> string? number?)]
           [abc->range (-> string? pair?)]
           [number->abc (-> number? string?)]
-          [get-range-ref (-> hash? number? (or/c any/c #f))]
           [number->list (-> number? list?)]
           [format-date (-> date? string?)]
           [format-complete-time (-> date? string?)]
@@ -150,17 +149,6 @@
     (cons (abc->number abc_range) (abc->number abc_range))]
    [else
     (cons 1 1)]))
-
-(define (get-range-ref range_hash index)
-  (let ([result #f])
-    (let loop ([data_list (hash->list range_hash)])
-      (when (not (null? data_list))
-            (let ([range (caar data_list)]
-                  [value (cdar data_list)])
-       (if (and (>= index (car range)) (<= index (cdr range)))
-           (set! result value)
-           (loop (cdr data_list))))))
-    result))
 
 (define (number->abc num)
   (let ([abc ""])

@@ -77,7 +77,7 @@
                 (write-worksheets-rels-file worksheets_rels_dir (get-field sheets xlsx)))
 
               ;; worksheet
-              (write-data-sheet-file worksheets_dir (get-field sheets xlsx))
+              (write-data-sheet-file worksheets_dir (get-field sheets xlsx) (send xlsx get-styles-list) (get-field string_item_map xlsx))
               )
 
 
