@@ -87,6 +87,25 @@
     (check-equal? (get-dimension '(("1" "2") ("1") () ("1" "2" "3" "4")))
                   "D4")
                   )
+   
+   (test-case
+    "test-range-hash-ref"
+    
+    (let ([range_hash (make-hash)])
+      (hash-set! range_hash "A1-A2" 1)
+      (hash-set! range_hash "A3-B4" 2)
+      (hash-set! range_hash "C1-AA10" 3)
+      
+      (check-equal? (range-hash-ref range_hash "A1") 1)
+      (check-equal? (range-hash-ref range_hash "A2") 1)
+
+      (check-equal? (range-hash-ref range_hash "A3") 2)
+      (check-equal? (range-hash-ref range_hash "B3") 2)
+
+      (check-equal? (range-hash-ref range_hash "C8") 3)
+      (check-equal? (range-hash-ref range_hash "Z10") 3)
+      (check-equal? (range-hash-ref range_hash "AA10") 3)
+      ))
     
     ))
 

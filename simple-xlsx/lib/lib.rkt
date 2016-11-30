@@ -12,7 +12,7 @@
           [xml-get-list (-> symbol? xexpr? list?)]
           [xml-get-attr (-> symbol? string? xexpr? string?)]
           [xml-get (-> symbol? xexpr? string?)]
-          [abc->number (-> string? number?)]
+          [abc->number (-> string? exact-nonnegative-integer?)]
           [abc->range (-> string? pair?)]
           [number->abc (-> number? string?)]
           [number->list (-> number? list?)]
@@ -25,7 +25,8 @@
           [get-dimension (-> list? string?)]
           [zip-xlsx (-> path-string? path-string? void?)]
           [struct col-attr ((width number?) (color string?))]
-          [cx-round (-> number? integer? number?)]          
+          [cx-round (-> number? integer? number?)]
+          [range-hash-ref (-> hash? string? any/c)]
           ))
 
 (define (cx-round num precise)
@@ -40,7 +41,7 @@
   (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))
 
 (define (format-complete-time the_date)
-  (format "~a~a~a ~a:~a:~a" 
+  (format "~a~a~a ~a:~a:~a"
           (string-fill (number->string (date-year the_date)) #\0 4)
           (string-fill (number->string (date-month the_date)) #\0 2)
           (string-fill (number->string (date-day the_date)) #\0 2)
@@ -57,7 +58,7 @@
          [second_sub (- minute_s minute)]
          [second_s (* second_sub 60)]
          [second (round second_s)])
-    (format "~a:~a:~a" 
+    (format "~a:~a:~a"
             (string-fill (number->string (inexact->exact hour)) #\0 2)
             (string-fill (number->string (inexact->exact minute)) #\0 2)
             (string-fill (number->string (inexact->exact second)) #\0 2))))
@@ -84,10 +85,10 @@
           (set! temp_dir (make-temporary-file "ziptmp~a" 'directory ".")))
         (lambda ()
           (let ([directory_entries (read-zip-directory zip_file)])
-            (unzip-entry 
+            (unzip-entry
              zip_file
-             directory_entries 
-             (path->zip-path entry_file) 
+             directory_entries
+             (path->zip-path entry_file)
              (make-filesystem-entry-reader #:dest temp_dir #:exists 'replace))
             (do_proc (build-path temp_dir entry_file))))
         (lambda ()
@@ -188,7 +189,7 @@
          [distance (- len str_len)])
 
     (if (> distance 0)
-        (with-output-to-string 
+        (with-output-to-string
           (lambda ()
             (when (eq? direction 'right)
               (printf str))
@@ -204,8 +205,8 @@
 
 ;; 2014-12-15T13:24:27+08:00
 (define (format-w3cdtf the_date)
-  (format "~a-~a-~aT~a:~a:~a~a~a:00" 
-          (date-year the_date) 
+  (format "~a-~a-~aT~a:~a:~a~a~a:00"
+          (date-year the_date)
           (string-fill (number->string (date-month the_date)) #\0 2)
           (string-fill (number->string (date-day the_date)) #\0 2)
           (string-fill (number->string (date-hour the_date)) #\0 2)
@@ -223,7 +224,7 @@
           (set! sheet_name_list `(,@sheet_name_list ,(string-append "Sheet" (number->string count))))
           (loop sheet_name_list (add1 count)))
         sheet_name_list)))
-  
+
 (define (get-dimension data_list)
   (let ([rows (length data_list)]
         [cols 0])
@@ -232,7 +233,7 @@
             (when (> (length (car loop_list)) cols)
                   (set! cols (length (car loop_list))))
             (loop (cdr loop_list))))
-    
+
     (string-append (number->abc cols) (number->string rows))))
 
 (define (zip-xlsx zip_file content_dir)
@@ -245,3 +246,26 @@
               (zip zip_file "[Content_Types].xml" "_rels" "docProps" "xl")
               (zip (build-path 'up zip_file) "[Content_Types].xml" "_rels" "docProps" "xl")))
         (lambda () (current-directory pwd)))))
+
+(define (range-hash-ref range_hash cell_dimension)
+  (let* ([cell_items (regexp-match #rx"^([A-Z]+)([0-9]+)$" cell_dimension)]
+         [cell_col_index (abc->number (list-ref cell_items 1))]
+         [cell_row_index (string->number (list-ref cell_items 2))])
+    (let loop ([loop_list (hash->list range_hash)])
+      (if (not (null? loop_list))
+          (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" (car (car loop_list)))]
+                 [start_col_index (abc->number (list-ref range_items 1))]
+                 [start_row_index (string->number (list-ref range_items 2))]
+                 [end_col_index (abc->number (list-ref range_items 3))]
+                 [end_row_index (string->number (list-ref range_items 4))])
+            (if (and
+                 (>= cell_col_index start_col_index)
+                 (>= cell_row_index start_row_index)
+                 (<= cell_col_index end_col_index)
+                 (<= cell_row_index end_row_index))
+                (cdr (car loop_list))
+                (loop (cdr loop_list))))
+          #f))))
+
+         
+       
