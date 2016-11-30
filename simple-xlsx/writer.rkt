@@ -69,7 +69,7 @@
             ;; workbook
             (write-workbook-file xl_dir (get-field sheets xlsx))
 
-            ;; styles and worksheets
+            ;; data-sheets
             (let ([worksheets_dir (build-path xl_dir "worksheets")])
               ;; _rels
               (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
@@ -77,8 +77,10 @@
                 (write-worksheets-rels-file worksheets_rels_dir (get-field sheets xlsx)))
 
               ;; worksheet
-              (write-sheet-file worksheets_dir (get-field sheets xlsx))
+              (write-data-sheet-file worksheets_dir (get-field sheets xlsx))
               )
+
+
             )
           ))
     (zip-xlsx xlsx_file_name tmp_dir)))

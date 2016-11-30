@@ -4,11 +4,15 @@
 (require "../../../xlsx.rkt")
 
 (provide (contract-out
-          [write-sheet (-> list? string? void?)]
-          [write-sheet-file (-> path-string? list? void?)]
+          [write-data-sheet (-> list? string? void?)]
+          [write-data-sheet-file (-> path-string? list? void?)]
           ))
 
-(define (write-sheet sheet_list) 
+(define (write-data-sheet sheet_list) 
+  (let ([string_index_map (make-hash)])
+    (let loop ([loop_list (send
+    (for-each
+     (lambda (string)
   (with-output-to-string
     (lambda ()
       ;; only data sheet
@@ -18,36 +22,27 @@
                     (let* ([sheet (car loop_list)]
                            [data_sheet (sheet-content sheet)]
                            [rows (data-sheet-rows sheet)]
+                           [col_count (length (car rows))]
                            [width_hash (data-sheet-width_hash sheet)]
-                           [dimension (if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension data_sheet)))]
+                           [dimension (if (= (length rows) 0) "A1" (string-append "A1:" (get-dimension rows)))]
                            [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
                            [active_cell (if (null? data_sheet) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")])
+
                       (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
                       (printf "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"~a\"/><sheetViews><sheetView ~a workbookViewId=\"0\">~a</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"13.5\"/>" dimension is_active active_cell)
 
-              (printf "<cols>")
+                      (when (> (hash-count width_hash) 0)
+                            (printf "<cols>")
+                            
+                            (hash-for-each
+                             width_hash
+                             (lambda (col_range width)
+                               (let* ([items (regexp-match* #rx"([A-Z]+)" col_range)]
+                                      [start_index (abc->number (first items))]
+                                      [end_index (abc->number (second items))])
 
-              (let loop-col ([loop_cols 
-              (when (not (null? loop_cols))
-                    (let* ([col (car loop_cols)]
-                           [col_index_range (abc->range (car col))]
-                           [col_attr (cdr col)]
-                           [col_width (col-attr-width col_attr)]
-                           [col_color (col-attr-color col_attr)]
-                           [col_style_index (if (hash-has-key? color_style_map col_color) (hash-ref color_style_map col_color) #f)])
-                      (printf "<col min=\"~a\" max=\"~a\" width=\"~a\" ~a/>"
-                              (car col_index_range)
-                              (cdr col_index_range)
-                              (exact->inexact (cx-round (/ col_width 8) 2))
-                              (if col_style_index 
-                                  (begin
-                                    (hash-set! col_style_map col_index_range col_style_index)
-                                    (string-append "style=\"" (number->string col_style_index)"\""))
-                                  "")
-                              ))
-                    (loop-col (cdr loop_cols))))
-            (printf "</cols>"))
-
+                                 (printf "<col min=\"~a\" max=\"~a\" width=\"~a\"/>" start_index end_index width))))
+                            (printf "</cols>"))
             
                       (printf "<sheetData>")
     
@@ -76,9 +71,9 @@
               (loop-row (cdr loop_rows) (add1 row_seq)))))))|</sheetData><phoneticPr fontId="1" type="noConversion"/><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" horizontalDpi="200" verticalDpi="200" r:id="rId1"/></worksheet>
 })
 
-(define (write-sheet-file dir sheet_list)
+(define (write-data-sheet-file dir sheet_list)
   (with-output-to-file (build-path dir (string-append "sheet" (number->string sheet_index) ".xml"))
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-sheet sheet_list)))))
+      (printf "~a" (write-data-sheet sheet_list)))))
   
