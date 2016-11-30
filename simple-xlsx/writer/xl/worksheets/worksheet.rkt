@@ -14,18 +14,16 @@
       ;; only data sheet
       (let loop ([loop_list sheet_list])
         (when (not (null? loop_list))
-          (let* ([sheet (car loop_list)]
-                 [data_sheet (sheet-content sheet)]
-                 [rows (data-sheet-rows sheet)]
-                 [dimension (if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension sheet_data_list)))]
-                 [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
-                 [active_cell (if (null? sheet_data_list) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")])
-            (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
-            (printf "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"~a\"/><sheetViews><sheetView ~a workbookViewId=\"0\">~a</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"13.5\"/>" dimension is_active active_cell)
-            
-            (let ([col_style_map (make-hash)]
-                  [width_hash (data-sheet-width_hash data_sheet)]
-                  [color_hash (data-sheet-color_hash data_sheet)])
+              (when (eq? (sheet-type (car loop_list)) 'data)
+                    (let* ([sheet (car loop_list)]
+                           [data_sheet (sheet-content sheet)]
+                           [rows (data-sheet-rows sheet)]
+                           [width_hash (data-sheet-width_hash sheet)]
+                           [dimension (if (null? sheet_data_list) "A1" (string-append "A1:" (get-dimension data_sheet)))]
+                           [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
+                           [active_cell (if (null? data_sheet) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")])
+                      (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
+                      (printf "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"~a\"/><sheetViews><sheetView ~a workbookViewId=\"0\">~a</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"13.5\"/>" dimension is_active active_cell)
 
               (printf "<cols>")
 
@@ -50,21 +48,22 @@
                     (loop-col (cdr loop_cols))))
             (printf "</cols>"))
 
-      (printf "<sheetData>")
+            
+                      (printf "<sheetData>")
     
-      (let loop-row ([loop_rows sheet_data_list]
-                     [row_seq 1])
-        (when (not (null? loop_rows))
-              (printf "<row r=\"~a\">" row_seq)
-              (let ([item_list (car loop_rows)])
-                (when (not (null? item_list))
-                      (let loop-col ([loop_cols item_list]
-                                     [col_seq 1])
-                        (when (not (null? loop_cols))
-                              (let* ([cell (car loop_cols)]
-                                     [dimension (string-append (number->abc col_seq) (number->string row_seq))]
-                                     [style_index (get-range-ref col_style_map col_seq)]
-                                     [style (if style_index (string-append "s=\"" (number->string style_index) "\"") "")])
+                      (let loop-row ([loop_rows data_sheet]
+                                     [row_seq 1])
+                        (when (not (null? loop_rows))
+                              (printf "<row r=\"~a\">" row_seq)
+                              (let ([item_list (car loop_rows)])
+                                (when (not (null? item_list))
+                                      (let loop-col ([loop_cols item_list]
+                                                     [col_seq 1])
+                                        (when (not (null? loop_cols))
+                                              (let* ([cell (car loop_cols)]
+                                                     [dimension (string-append (number->abc col_seq) (number->string row_seq))]
+                                                     [style_index (get-range-ref col_style_map col_seq)]
+                                                     [style (if style_index (string-append "s=\"" (number->string style_index) "\"") "")])
                                 (cond
                                  [(string? cell)
                                   (printf "<c r=\"~a\" ~a t=\"s\"><v>~a</v></c>" dimension style (hash-ref string_index_map cell))]

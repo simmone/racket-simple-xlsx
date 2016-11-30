@@ -8,7 +8,7 @@
 
 (provide (contract-out
           [write-styles (-> list? string?)]
-          [write-styles-file (-> path-string? hash? hash?)]
+          [write-styles-file (-> path-string? list? hash?)]
           ))
 
 (define S string-append)
@@ -29,26 +29,9 @@
           (loop (cdr loop_list) (add1 index))))))|</cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/></styleSheet>
 })
 
-(define (write-styles-file dir sheet_attr_map)
-  (let ([color_style_map (make-hash)])
-    (with-output-to-file (build-path dir "styles.xml")
-      #:exists 'replace
-      (lambda ()
-        (let ([style_list '()]
-              [style_index 1])
-          (hash-for-each
-           sheet_attr_map
-           (lambda (sheet_index col_attr_map)
-             (hash-for-each
-              col_attr_map
-              (lambda (col_name col_attr)
-                (let ([color (col-attr-color col_attr)])
-                  (when (not (string=? color ""))
-                        (when (not (hash-has-key? color_style_map color))
-                              (hash-set! color_style_map color style_index)
-                              (set! style_list `(,@style_list (,color)))
-                              (set! style_index (add1 style_index)))))))))
-
-          (printf "~a" (write-styles style_list)))))
-    color_style_map))
+(define (write-styles-file dir style_list)
+  (with-output-to-file (build-path dir "styles.xml")
+    #:exists 'replace
+    (lambda ()
+      (printf "~a" (write-styles style_list)))))
 

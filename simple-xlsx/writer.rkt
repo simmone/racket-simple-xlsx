@@ -64,7 +64,7 @@
             (write-shared-strings-file xl_dir (get-field string_item_map xlsx))
 
             ;; styles
-            (write-styles-file xl_dir (get-field sheeets xlsx))
+            (write-styles-file xl_dir (send xlsx get-styles-list))
 
             ;; workbook
             (write-workbook-file xl_dir (get-field sheets xlsx))
