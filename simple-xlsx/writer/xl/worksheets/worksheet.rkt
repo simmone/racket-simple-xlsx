@@ -4,11 +4,11 @@
 (require "../../../xlsx.rkt")
 
 (provide (contract-out
-          [write-data-sheet (-> list? list? hash? string? void?)]
-          [write-data-sheet-file (-> path-string? list? list? hash? void?)]
+          [write-data-sheet (-> string? (is-a?/c xlsx%) string?)]
+          [write-data-sheet-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
-(define (write-data-sheet sheet_list color_list string_item_map)
+(define (write-data-sheet sheet_name xlsx)
   (let ([color_style_map (make-hash)])
     (let loop ([loop_list color_list]
                [index 1])
@@ -80,9 +80,15 @@
 
         (printf "</sheetData><phoneticPr fontId=\"1\" type=\"noConversion\"/><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><pageSetup paperSize=\"9\" orientation=\"portrait\" horizontalDpi=\"200\" verticalDpi=\"200\" r:id=\"rId1\"/></worksheet>")))))
 
-(define (write-data-sheet-file dir sheet_list color_list string_item_map)
-  (with-output-to-file (build-path dir (string-append "sheet" (number->string sheet_index) ".xml"))
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (write-data-sheet sheet_list color_list string_item_map)))))
+(define (write-data-sheet-file dir xlsx)
+  (make-directory* dir)
+
+  (let ([loop_list (get-field sheets xlsx)])
+    (when (not (null? loop_list))
+          (when (eq? (sheet-type (car loop_list)) 'data)
+                (with-output-to-file (build-path dir (string-append "sheet" (number->string (sheet-typeSeq (car loop_list))) ".xml"))
+                  #:exists 'replace
+                  (lambda ()
+                    (printf "~a" (write-data-sheet sheet_name xlsx)))))
+          (loop (cdr loop_list)))))
   

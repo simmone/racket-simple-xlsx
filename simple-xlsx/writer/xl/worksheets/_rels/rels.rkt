@@ -3,11 +3,13 @@
 (require "../../../xlsx.rkt")
 
 (provide (contract-out
-          [write-worksheets-rels-file (-> path-string? list? void?)]
+          [write-worksheets-rels-file (-> path-string? xlsx? void?)]
           ))
 
-(define (write-worksheets-rels-file dir sheet_list)
-  (let loop ([loop_list sheet_list])
+(define (write-worksheets-rels-file dir xlsx)
+  (make-directory* dir)
+
+  (let loop ([loop_list (get-field sheets xlsx)])
     (when (not (null? loop_list))
           (when (eq? (sheet-type (car loop_list)) 'data)
                 (let ([type_seq (number->string (sheet-typeSeq (car loop_list)))])

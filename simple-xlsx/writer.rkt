@@ -58,16 +58,9 @@
           ;; workbook
           (write-workbook-file (build-path tmp_dir "xl") xlsx)
 
-            ;; data-sheets
-            (let ([worksheets_dir (build-path xl_dir "worksheets")])
-              ;; _rels
-              (let ([worksheets_rels_dir (build-path worksheets_dir "_rels")])
-                (make-directory* worksheets_rels_dir)
-                (write-worksheets-rels-file worksheets_rels_dir (get-field sheets xlsx)))
-
-              ;; worksheet
-              (write-data-sheet-file worksheets_dir (get-field sheets xlsx) (send xlsx get-styles-list) (get-field string_item_map xlsx))
-              )
+          ;; data-sheets
+          (write-worksheets-rels-file (build-path tmp_dir "xl" "worksheets" "_rels") xlsx)
+          (write-data-sheet-file (build-path tmp_dir "xl" "worksheets") xlsx)
 
             ;; charts
             (let ([chart_dir (build-path xl_dir "charts")])
