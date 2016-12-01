@@ -173,10 +173,26 @@
 
       (send xlsx set-data-sheet-cell-color! "测试1" "B1-B4" "blue")
       
-      (check-equal? (send xlsx get-styles-list) '("blue" "red"))
+      (check-equal? (send xlsx get-color-list) '("blue" "red"))
       )
 
       )
+
+   (test-case
+    "test-get-string-index-map"
+
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet "测试1" '(("C" "D" "B") ("B" "Z" "A")))
+      
+      (let ([string_index_map (send xlsx get-string-index-map)])
+        (check-equal? (hash-count string_index_map) 5)
+        (check-equal? (hash-ref string_index_map "A") 0)
+        (check-equal? (hash-ref string_index_map "B") 1)
+        (check-equal? (hash-ref string_index_map "C") 2)
+        (check-equal? (hash-ref string_index_map "D") 3)
+        (check-equal? (hash-ref string_index_map "Z") 4)
+      )
+      ))
 
    ))
 

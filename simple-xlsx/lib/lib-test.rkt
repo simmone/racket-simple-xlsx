@@ -84,9 +84,9 @@
 
    (test-case
     "test-get-dimension"
-    (check-equal? (get-dimension '(("1" "2") ("1") () ("1" "2" "3" "4")))
-                  "D4")
-                  )
+    (check-equal? (get-dimension '(("1" "2") ("1") () ("1" "2" "3" "4"))) "D4")
+    (check-equal? (get-dimension '(("1" "2" "3" "4") ("3" "4" "5" "6"))) "D2")
+    )
    
    (test-case
     "test-range-hash-ref"

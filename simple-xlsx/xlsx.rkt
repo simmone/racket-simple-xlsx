@@ -255,7 +255,19 @@
            (when (check-cell-range cell_range)
                  (hash-set! (data-sheet-color_hash (sheet-content (get-sheet-by-name sheet_name))) cell_range color)))
 
-         (define/public (get-styles-list)
+         (define/public (get-string-item-list)
+           (sort (hash-keys string_item_map) string<?))
+
+         (define/public (get-string-index-map)
+           (let ([string_index_map (make-hash)])
+             (let loop ([loop_list (get-string-item-list)]
+                        [index 0])
+               (when (not (null? loop_list))
+                     (hash-set! string_index_map (car loop_list) index)
+                     (loop (cdr loop_list) (add1 index))))
+             string_index_map))
+
+         (define/public (get-color-list)
            (let ([style_list '()]
                  [tmp_hash (make-hash)])
              (let loop ([loop_list sheets])

@@ -17,11 +17,11 @@
 
 (define S string-append)
 
-(define (write-shared-strings string_item_map) @S{
+(define (write-shared-strings string_item_list) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="@|(number->string (hash-count string_item_map))|" uniqueCount="@|(number->string (hash-count string_item_map))|">@|(with-output-to-string
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="@|(number->string (length string_item_list))|" uniqueCount="@|(number->string (length string_item_list))|">@|(with-output-to-string
     (lambda () 
-      (let loop ([strings (sort (hash-keys string_item_map) string<?)])
+      (let loop ([strings string_item_list])
         (when (not (null? strings))
           (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (filter-string (car strings)))
           (loop (cdr strings))))))|</sst>
@@ -46,4 +46,4 @@
   (with-output-to-file (build-path dir "sharedStrings.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-shared-strings (get-field string_item_map xlsx))))))
+      (printf "~a" (write-shared-strings (send xlsx get-string-item-list))))))
