@@ -20,6 +20,7 @@
 (require "writer/xl/workbook.rkt")
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
+(require "writer/xl/charts/chart.rkt")
 
 (define (write-xlsx-file xlsx xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -80,6 +81,11 @@
               (write-data-sheet-file worksheets_dir (get-field sheets xlsx) (send xlsx get-styles-list) (get-field string_item_map xlsx))
               )
 
+            ;; charts
+            (let ([chart_dir (build-path xl_dir "charts")])
+              (make-directory* chart_dir)
+
+              (write-chart-file chart_dir xlsx))
             )
           ))
     (zip-xlsx xlsx_file_name tmp_dir)))
