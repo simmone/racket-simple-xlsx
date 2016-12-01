@@ -10,6 +10,8 @@
 (define S string-append)
 
 (define (write-theme-file dir)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "theme1.xml")
     #:exists 'replace
     (lambda ()

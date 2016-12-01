@@ -1,8 +1,12 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/class)
+(require racket/file)
 (require racket/list)
 (require racket/contract)
+
+(require "../../xlsx.rkt")
 
 ;; strings list convert to (string . place) hash
 (provide (contract-out
@@ -36,8 +40,10 @@
     "\\&lt;")
    )
 
-(define (write-shared-strings-file dir string_item_map)
+(define (write-shared-strings-file dir xlsx)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "sharedStrings.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-shared-strings string_item_map)))))
+      (printf "~a" (write-shared-strings (get-field string_item_map xlsx))))))

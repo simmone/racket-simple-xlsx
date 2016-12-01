@@ -1,14 +1,17 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/file)
+(require racket/class)
 (require racket/list)
 (require racket/contract)
 
 (require "../../lib/lib.rkt")
+(require "../../xlsx.rkt")
 
 (provide (contract-out
           [write-styles (-> list? string?)]
-          [write-styles-file (-> path-string? list? hash?)]
+          [write-styles-file (-> path-string? (is-a?/c xlsx%) hash?)]
           ))
 
 (define S string-append)
@@ -29,8 +32,10 @@
           (loop (cdr loop_list) (add1 index))))))|</cellXfs><cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/></styleSheet>
 })
 
-(define (write-styles-file dir style_list)
+(define (write-styles-file dir xlsx)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "styles.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-styles style_list)))))
+      (printf "~a" (write-styles (send xlsx get-styles-list))))))

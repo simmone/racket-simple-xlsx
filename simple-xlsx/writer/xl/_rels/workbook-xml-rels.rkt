@@ -1,6 +1,8 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/file)
+(require racket/class)
 (require racket/list)
 (require racket/contract)
 
@@ -8,7 +10,7 @@
 
 (provide (contract-out
           [write-workbook-xml-rels (-> list? string?)]
-          [write-workbook-xml-rels-file (-> path-string? list? void?)]
+          [write-workbook-xml-rels-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define S string-append)
@@ -43,9 +45,11 @@
               seq))))|</Relationships>
 })
 
-(define (write-workbook-xml-rels-file dir sheet_list)
+(define (write-workbook-xml-rels-file dir xlsx)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "workbook.xml.rels")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-workbook-xml-rels sheet_list)))))
+      (printf "~a" (write-workbook-xml-rels (get-field sheets xlsx))))))
 

@@ -1,11 +1,15 @@
 #lang racket
 
+(require "../../xlsx.rkt")
+
 (provide (contract-out
-          [create-printer-settings (-> path-string? list? void?)]
+          [create-printer-settings (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
-(define (create-printer-settings dir sheet_list)
-  (let loop ([loop_list sheet_list])
+(define (create-printer-settings dir xlsx)
+  (make-directory* dir)
+
+  (let loop ([loop_list (get-field sheets xlsx)])
     (when (not (null? loop_list))
           (when (eq? (sheet-type (car loop_list)) 'data)
                 (with-output-to-file (build-path dir (string-append "printerSettings" (number->string (sheet-typeSeq (car loop_list)))) ".bin"))

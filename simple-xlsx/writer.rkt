@@ -41,30 +41,22 @@
           (write-docprops-core-file (build-path tmp_dir "docProps") (current-date))
                 
           ;; xl
-          (let ([xl_dir (build-path tmp_dir "xl")])
-            ;; _rels
-            (let ([rels_dir (build-path xl_dir "_rels")])
-              (make-directory* rels_dir)
-              (write-workbook-xml-rels-file rels_dir (get-field sheets xlsx)))
+          (write-workbook-xml-rels-file (build-path tmp_dir "xl" "_rels") xlsx)
+
+          ;; printerSettings
+          (create-printer-settings (build-path tmp_dir "xl" "printerSettings") xlsx)
                   
-            ;; printerSettings
-            (let ([printer_settings_dir (build-path xl_dir "printerSettings")])
-              (make-directory* printer_settings_dir)
-              (create-printer-settings printer_settings_dir (get-field sheets xlsx)))
+          ;; theme
+          (write-theme-file (build-path tmp_dir "xl" "theme"))
 
-            ;; theme
-            (let ([theme_dir (build-path xl_dir "theme")])
-              (make-directory* theme_dir)
-              (write-theme-file theme_dir))
+          ;; sharedStrings
+          (write-shared-strings-file (build-path tmp_dir "xl") xlsx)
 
-            ;; sharedStrings
-            (write-shared-strings-file xl_dir (get-field string_item_map xlsx))
+          ;; styles
+          (write-styles-file (build-path tmp_dir "xl") xlsx)
 
-            ;; styles
-            (write-styles-file xl_dir (send xlsx get-styles-list))
-
-            ;; workbook
-            (write-workbook-file xl_dir (get-field sheets xlsx))
+          ;; workbook
+          (write-workbook-file (build-path tmp_dir "xl") xlsx)
 
             ;; data-sheets
             (let ([worksheets_dir (build-path xl_dir "worksheets")])

@@ -1,14 +1,16 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/file)
+(require racket/class)
 (require racket/list)
 (require racket/contract)
 
-(require "../../define.rkt")
+(require "../../xlsx.rkt")
 
 (provide (contract-out
           [write-workbook (-> list? string?)]
-          [write-workbook-file (-> path-string? list? void?)]
+          [write-workbook-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define S string-append)
@@ -20,13 +22,15 @@
   (let loop ([loop_list sheet_list])
     (when (not (null? loop_list))
           (let ([sheet (car loop_list)])
-            (printf "<sheet name=\"~a\" sheetId=\"~a\" r:id=\"rId~a\"/>" (sheetData-name sheet) (sheetData-seq sheet) (sheetData-seq sheet)))
+            (printf "<sheet name=\"~a\" sheetId=\"~a\" r:id=\"rId~a\"/>" (sheet-name sheet) (sheet-seq sheet) (sheet-seq sheet)))
           (loop (cdr loop_list))))))|</sheets><calcPr calcId="124519"/></workbook>
 })
 
-(define (write-workbook-file dir sheet_list)
+(define (write-workbook-file dir xlsx)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "workbook.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-workbook sheet_list)))))
+      (printf "~a" (write-workbook (get-field sheets xlsx))))))
 
