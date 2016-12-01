@@ -31,18 +31,14 @@
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
         (lambda ()
           ;; [Content_Types].xml
-          (write-content-type-file tmp_dir (get-field sheets xlsx))
+          (write-content-type-file tmp_dir xlsx)
 
           ;; _rels
-          (let ([rels_dir (build-path tmp_dir "_rels")])
-            (make-directory* rels_dir)
-            (write-rels-file rels_dir))
+          (write-rels-file (build-path tmp_dir "_rels"))
 
           ;; docProps
-          (let ([doc_props_dir (build-path tmp_dir "docProps")])
-            (make-directory* doc_props_dir)
-            (write-docprops-app-file doc_props_dir (get-field sheets xlsx))
-            (write-docprops-core-file doc_props_dir (current-date)))
+          (write-docprops-app-file (build-path tmp_dir "docProps") xlsx)
+          (write-docprops-core-file (build-path tmp_dir "docProps") (current-date))
                 
           ;; xl
           (let ([xl_dir (build-path tmp_dir "xl")])

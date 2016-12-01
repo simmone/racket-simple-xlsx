@@ -1,6 +1,7 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/file)
 (require racket/list)
 (require racket/contract)
 
@@ -17,6 +18,8 @@
 })
 
 (define (write-rels-file dir)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir ".rels")
     #:exists 'replace
     (lambda ()

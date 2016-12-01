@@ -1,6 +1,7 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/class)
 (require racket/list)
 (require racket/contract)
 
@@ -8,7 +9,7 @@
 
 (provide (contract-out
           [write-content-type (-> list? string?)]
-          [write-content-type-file (-> path-string? list? void?)]
+          [write-content-type-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define S string-append)
@@ -44,8 +45,8 @@
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings"/><Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>@|(sheets->content-type sheet_list)|<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>
 })
 
-(define (write-content-type-file dir sheet_list)
+(define (write-content-type-file dir xlsx)
   (with-output-to-file (build-path dir "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-content-type sheet_list)))))
+      (printf "~a" (write-content-type (get-field sheets xlsx))))))

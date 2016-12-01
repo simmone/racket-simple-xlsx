@@ -1,6 +1,8 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/class)
+(require racket/file)
 (require racket/list)
 (require racket/contract)
 
@@ -8,7 +10,7 @@
 
 (provide (contract-out
           [write-docprops-app (-> list? string?)]
-          [write-docprops-app-file (-> path-string? list? void?)]
+          [write-docprops-app-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define S string-append)
@@ -42,9 +44,11 @@
       sheet_list)))|</vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
 })
 
-(define (write-docprops-app-file dir sheet_name_list)
+(define (write-docprops-app-file dir xlsx)
+  (make-directory* dir)
+
   (with-output-to-file (build-path dir "app.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-docprops-app sheet_name_list)))))
+      (printf "~a" (write-docprops-app (get-field sheets xlsx))))))
 
