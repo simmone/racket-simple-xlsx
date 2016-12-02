@@ -71,7 +71,6 @@
                 (error "data's children's length is not consistent."))
           
           (loop (cdr loop_list) (length (car loop_list)))))
-  
   #t)
 
 (define (check-range range_str)

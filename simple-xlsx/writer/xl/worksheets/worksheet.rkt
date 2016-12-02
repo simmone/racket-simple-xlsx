@@ -11,6 +11,7 @@
 (define (write-data-sheet sheet_name xlsx)
   (let ([color_style_map (make-hash)]
         [string_index_map (send xlsx get-string-index-map)])
+
     (let loop ([loop_list (send xlsx get-color-list)]
                [index 1])
       (when (not (null? loop_list))
@@ -24,6 +25,7 @@
                [data_sheet (sheet-content sheet)]
                [rows (data-sheet-rows data_sheet)]
                [col_count (length (car rows))]
+               [span_str (string-append "1:" (number->string col_count))]
                [width_hash (data-sheet-width_hash data_sheet)]
                [color_hash (data-sheet-color_hash data_sheet)]
                [dimension (if (= (length rows) 0) "A1" (string-append "A1:" (get-dimension rows)))]
@@ -51,7 +53,7 @@
           (let loop-row ([loop_rows (data-sheet-rows data_sheet)]
                          [row_seq 1])
             (when (not (null? loop_rows))
-                  (printf "<row r=\"~a\">" row_seq)
+                  (printf "<row r=\"~a\" spans=\"~a\">" row_seq span_str)
                   (let ([item_list (car loop_rows)])
                     (when (not (null? item_list))
                           (let loop-col ([loop_cols item_list]
@@ -61,14 +63,14 @@
                                          [dimension (string-append (number->abc col_seq) (number->string row_seq))]
                                          [color (range-hash-ref color_hash dimension)]
                                          [color_style
-                                          (if color (string-append "s=\"" (number->string (hash-ref color_style_map color)) "\"") "")])
+                                          (if color (string-append " s=\"" (number->string (hash-ref color_style_map color)) "\"") "")])
                                     (cond
                                      [(string? cell)
-                                      (printf "<c r=\"~a\" ~a t=\"s\"><v>~a</v></c>" 
+                                      (printf "<c r=\"~a\"~a t=\"s\"><v>~a</v></c>" 
                                               dimension color_style (hash-ref string_index_map cell))]
                                      [(number? cell)
-                                      (printf "<c r=\"~a\" ~a><v>~a</v></c>" 
-                                              dimension color_style (number->string (exact->inexact cell)))]
+                                      (printf "<c r=\"~a\"~a><v>~a</v></c>" 
+                                              dimension color_style (number->string (inexact->exact cell)))]
                                      [else
                                       (printf "<c r=\"~a\"><v>0</v></c>" dimension)]))
                                   (loop-col (cdr loop_cols) (add1 col_seq))))))
@@ -88,4 +90,4 @@
                   (lambda ()
                     (printf "~a" (write-data-sheet (sheet-name (car loop_list)) xlsx)))))
           (loop (cdr loop_list)))))
-  
+

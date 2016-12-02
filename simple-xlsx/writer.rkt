@@ -62,13 +62,9 @@
           (write-worksheets-rels-file (build-path tmp_dir "xl" "worksheets" "_rels") xlsx)
           (write-data-sheet-file (build-path tmp_dir "xl" "worksheets") xlsx)
 
-            ;; charts
-            (let ([chart_dir (build-path xl_dir "charts")])
-              (make-directory* chart_dir)
+          ;; charts
+          (write-chart-file (build-path tmp_dir "xl" "charts") xlsx)
 
-              (write-chart-file chart_dir xlsx))
-            )
-          ))
-    (zip-xlsx xlsx_file_name tmp_dir)))
-          (lambda ()
-            (delete-directory/files tmp_dir)))))
+          (zip-xlsx xlsx_file_name tmp_dir))
+        (lambda ()
+          (delete-directory/files tmp_dir)))))

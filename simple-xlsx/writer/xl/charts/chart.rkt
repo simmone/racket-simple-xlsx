@@ -4,7 +4,7 @@
 
 (provide (contract-out
           [write-chart (-> string? (is-a?/c xlsx%) string?)]
-          [write-chart-file (-> path-string? string? (is-a?/c xlsx%) void?)]
+          [write-chart-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define (print-x-data xlsx x_data_range)
@@ -54,9 +54,9 @@
   (with-output-to-string
     (lambda ()
       (let* ([chart_sheet (sheet-content (send xlsx get-sheet-by-name chart_sheet_name))]
-             [topic (line-chart-topic chart_sheet)]
-             [x_data_range (line-chart-x_data_range chart_sheet)]
-             [y_data_range_list (line-chart-y_data_range_list chart_sheet)])
+             [topic (line-chart-sheet-topic chart_sheet)]
+             [x_data_range (line-chart-sheet-x_data_range chart_sheet)]
+             [y_data_range_list (line-chart-sheet-y_data_range_list chart_sheet)])
         (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
         (printf "<c:chartSpace xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><c:lang val=\"zh-CN\"/><c:chart><c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang=\"zh-CN\" altLang=\"en-US\"/><a:t>~a</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title><c:plotArea><c:layout/><c:lineChart><c:grouping val=\"standard\"/>" topic)
         (printf "~a" (print-x-data xlsx x_data_range))
@@ -64,6 +64,8 @@
         (printf "<c:marker val=\"1\"/><c:axId val=\"76367360\"/><c:axId val=\"76368896\"/></c:lineChart><c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76367360\"/><c:crosses val=\"autoZero\"/><c:crossBetween val=\"between\"/></c:valAx></c:plotArea><c:legend><c:legendPos val=\"r\"/><c:layout/></c:legend><c:plotVisOnly val=\"1\"/></c:chart></c:chartSpace>")))))
 
 (define (write-chart-file dir xlsx)
+  (make-directory* dir)
+
   (let loop ([loop_list (get-field sheets xlsx)])
     (when (not (null? loop_list))
           (with-output-to-file (build-path dir (format "chart~a.xml" (sheet-typeSeq (car loop_list))))

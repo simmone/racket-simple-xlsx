@@ -48,7 +48,7 @@
       (send xlsx add-line-chart-y-data! "Chart1" "金额2" "数据页面" "C2-C14")
       (send xlsx add-line-chart-y-data! "Chart1" "金额3" "数据页面" "D2-D14")
 
-      (check-equal? (write-chart-sheet "Chart1" xlsx) (chart-data))
+      (check-equal? (write-chart "Chart1" xlsx) (chart-data))
     ))
    
    ))
