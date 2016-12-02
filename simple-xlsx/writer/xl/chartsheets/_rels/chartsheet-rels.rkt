@@ -1,12 +1,16 @@
 #lang at-exp racket/base
 
 (require racket/port)
+(require racket/class)
+(require racket/file)
 (require racket/list)
 (require racket/contract)
 
+(require "../../../../xlsx.rkt")
+
 (provide (contract-out
           [write-chart-sheet-rels (-> exact-nonnegative-integer? string?)]
-          [write-chart-sheet-rels-file (-> path-string? exact-nonnegative-integer? void?)]
+          [write-chart-sheet-rels-file (-> path-string? (is-a?/c xlsx%) void?)]
           ))
 
 (define S string-append)
@@ -16,9 +20,15 @@
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId@|(number->string typeSeq)|" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing@|(number->string typeSeq)|.xml"/></Relationships>
 })
 
-(define (write-chart-sheet-rels-file dir typeSeq)
-  (with-output-to-file (build-path dir (format "sheet~a.xml.rels" typeSeq))
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (write-chart-sheet-rels typeSeq)))))
+(define (write-chart-sheet-rels-file dir xlsx)
+  (make-directory* dir)
+
+  (let loop ([loop_list (get-field sheets xlsx)])
+    (when (not (null? loop_list))
+          (when (eq? (sheet-type (car loop_list)) 'chart)
+                (with-output-to-file (build-path dir (format "sheet~a.xml.rels" (sheet-typeSeq (car loop_list))))
+                  #:exists 'replace
+                  (lambda ()
+                    (printf "~a" (write-chart-sheet-rels (sheet-typeSeq (car loop_list)))))))
+          (loop (cdr loop_list)))))
 

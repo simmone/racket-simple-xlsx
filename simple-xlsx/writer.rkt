@@ -65,6 +65,14 @@
           ;; charts
           (write-chart-file (build-path tmp_dir "xl" "charts") xlsx)
 
+          ;; chartsheets
+          (write-chart-sheet-rels-file (build-path tmp_dir "xl" "chartsheets" "_rels") xlsx)
+          (write-chart-sheet-file (build-path tmp_dir "xl" "chartsheets") xlsx)
+
+          ;; drawing
+          (write-drawing-rels-file (build-path tmp_dir "xl" "drawing" "_rels") xlsx)
+          (write-drawing-file (build-path tmp_dir "xl" "drawing") xlsx)
+
           (zip-xlsx xlsx_file_name tmp_dir))
         (lambda ()
           (delete-directory/files tmp_dir)))))
