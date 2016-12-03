@@ -21,9 +21,10 @@
       (when (not (null? loop_list))
            (hash-set! sheet_type_count_map (sheet-type (car loop_list)) (add1 (hash-ref sheet_type_count_map (sheet-type (car loop_list)) 0)))
            (loop (cdr loop_list))))
-    
+
     (with-output-to-string
       (lambda ()
+        (printf "<HeadingPairs><vt:vector size=\"~a\" baseType=\"variant\">" (* (hash-count sheet_type_count_map) 2))
         (for-each
          (lambda (type_count)
            (cond
@@ -36,12 +37,12 @@
  
 (define (write-docprops-app sheet_list) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size="@|(number->string (length sheet_list))|" baseType="variant">@|(print-sheet-variant sheet_list)|</vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="@|(number->string (length sheet_list))|" baseType="lpstr">@|(with-output-to-string
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>@|(print-sheet-variant sheet_list)|</vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="@|(number->string (length sheet_list))|" baseType="lpstr">@|(with-output-to-string
   (lambda ()
     (for-each
       (lambda (sheet)
         (printf "<vt:lpstr>~a</vt:lpstr>" (sheet-name sheet)))
-      sheet_list)))|</vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
+     sheet_list)))|</vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
 })
 
 (define (write-docprops-app-file dir xlsx)
