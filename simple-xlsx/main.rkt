@@ -8,11 +8,11 @@
           [get-cell-value (-> string? any/c any)]
           [get-sheet-dimension (-> any/c pair?)]
           [with-row (-> any/c (-> list? any) any)]
-          [xlsx-data% class?]
-          [xlsx-data? any/c]
-          [col-attr any/c]
-          [write-xlsx-file (-> xlsx-data? path-string? void?)]
+          [xlsx% class?]
+          [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
           ))
+
+(require "xlsx.rkt")
 
 (require "reader.rkt")
 

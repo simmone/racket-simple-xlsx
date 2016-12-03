@@ -21,6 +21,10 @@
 (require "writer/xl/worksheets/_rels/rels.rkt")
 (require "writer/xl/worksheets/worksheet.rkt")
 (require "writer/xl/charts/chart.rkt")
+(require "writer/xl/chartsheets/chartsheet.rkt")
+(require "writer/xl/chartsheets/_rels/chartsheet-rels.rkt")
+(require "writer/xl/drawings/drawing.rkt")
+(require "writer/xl/drawings/_rels/drawing-rels.rkt")
 
 (define (write-xlsx-file xlsx xlsx_file_name)
   (when (file-exists? xlsx_file_name)

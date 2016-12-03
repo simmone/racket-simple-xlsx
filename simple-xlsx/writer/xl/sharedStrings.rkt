@@ -10,8 +10,8 @@
 
 ;; strings list convert to (string . place) hash
 (provide (contract-out
-          [write-shared-strings (-> hash? string?)]
-          [write-shared-strings-file (-> path-string? hash? void?)]
+          [write-shared-strings (-> list? string?)]
+          [write-shared-strings-file (-> path-string? (is-a?/c xlsx%) void?)]
           [filter-string (-> string? string?)]
           ))
 

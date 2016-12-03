@@ -2,6 +2,7 @@
 
 (require racket/port)
 (require racket/contract)
+(require racket/file)
 
 (provide (contract-out
           [write-theme-file (-> path-string? void?)]
