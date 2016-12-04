@@ -126,6 +126,8 @@
     
     (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
 
+    (check-equal? (convert-range "C2-Z2 ") "$C$2:$Z$2 ")
+
     (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
     )
    
