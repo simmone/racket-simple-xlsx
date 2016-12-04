@@ -88,14 +88,16 @@
           (set! back_col_name (second items))
           (set! back_col_index (third items)))
         
-        (cond
-         [(not (string=? front_col_name back_col_name))
-          (error (format "range col name not consist[~a][~a]" front_col_name back_col_name))]
-         [(> (string->number front_col_index) (string->number back_col_index))
-          (error (format "range col index is invalid.[~a][~a]" front_col_index back_col_index))]
-         [else
-          #t]))
-      (error (format "range format should like ^[A-Z]+[0-9]+-[A-Z]+[0-9]+$, but get ~a" range_str))))
+         (if (string=? front_col_name back_col_name)
+             (if (> (string->number front_col_index) (string->number back_col_index))
+                 (error (format "range's direction is vertical, index is invalid.[~a][~a]" front_col_index back_col_index))
+                 #t)
+             (if (string=? front_col_index back_col_index)
+                 (if (> (abc->number front_col_name) (abc->number back_col_name))
+                     (error (format "range's direction is horizontal, col name is invalid.[~a][~a]" front_col_name back_col_name))
+                     #t)
+                 (error (format "range's direction confused. should like A1-A20 or A2-Z2, but get ~a" range_str)))))
+      (error (format "range format should like A1-A20 or A2-Z2, but get ~a" range_str))))
 
 (define (check-col-range col_range_str)
   (cond
@@ -206,19 +208,33 @@
          (define/public (get-range-data sheet_name range_str)
            (when (check-data-range-valid this sheet_name range_str)
                  (let* ([data_sheet (get-sheet-by-name sheet_name)]
-                        [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
-                        [col_number (sub1 (abc->number col_name))]
+                        [col_range (regexp-match* #rx"([A-Z]+)" range_str)]
+                        [start_col_name (first col_range)]
+                        [col_start_index (sub1 (abc->number start_col_name))]
+                        [end_col_name (second col_range)]
+                        [col_end_index (sub1 (abc->number end_col_name))]
                         [row_range (regexp-match* #rx"([0-9]+)" range_str)]
                         [row_start_index (string->number (first row_range))]
-                        [row_end_index (string->number (second row_range))])
-                   (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
-                              [row_count 1]
-                              [result_list '()])
-                     (if (not (null? loop_list))
-                         (if (and (>= row_count row_start_index) (<= row_count row_end_index))
-                             (loop (cdr loop_list) (add1 row_count) (cons (list-ref (car loop_list) col_number) result_list))
-                             (loop (cdr loop_list) (add1 row_count) result_list))
-                         (reverse result_list))))))
+                        [row_end_index (string->number (second row_range))]
+                        [direction (if (string=? start_col_name end_col_name) 'vertical 'horizontal)])
+                   (if (eq? direction 'vertical)
+                       (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
+                                  [row_count 1]
+                                  [result_list '()])
+                         (if (not (null? loop_list))
+                             (if (and (>= row_count row_start_index) (<= row_count row_end_index))
+                                 (loop (cdr loop_list) (add1 row_count) 
+                                       (cons (list-ref (car loop_list) col_start_index) result_list))
+                                 (loop (cdr loop_list) (add1 row_count) result_list))
+                             (reverse result_list)))
+                       (let loop ([loop_list (list-ref (data-sheet-rows (sheet-content data_sheet)) (sub1 row_start_index))]
+                                  [col_index 0]
+                                  [result_list '()])
+                         (if (not (null? loop_list))
+                             (if (and (>= col_index col_start_index) (<= col_index col_end_index))
+                                 (loop (cdr loop_list) (add1 col_index) (cons (car loop_list) result_list))
+                                 (loop (cdr loop_list) (add1 col_index) result_list))
+                             (reverse result_list)))))))
 
          (define/public (add-line-chart-sheet sheet_name topic)
            (if (not (hash-has-key? sheet_name_map sheet_name))
@@ -239,7 +255,7 @@
            (when (check-data-range-valid this data_sheet_name data_range)
                  (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range))))
 
-         (define/public (add-line-chart-y-data! line_chart_sheet_name y_topic sheet_name data_range)
+         (define/public (add-line-chart-serial! line_chart_sheet_name y_topic sheet_name data_range)
            (when (check-data-range-valid this sheet_name data_range)
                  (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range))))))
          

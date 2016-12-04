@@ -80,6 +80,9 @@
       (check-equal? (send xlsx get-range-data "测试5" "B1-B3") '(2 5 9))
       (check-equal? (send xlsx get-range-data "测试5" "C1-C3") '(3 6 10))
       (check-equal? (send xlsx get-range-data "测试5" "D1-D3") '(4 7 11))
+      (check-equal? (send xlsx get-range-data "测试5" "A1-D1") '(1 2 3 4))
+      (check-equal? (send xlsx get-range-data "测试5" "A2-D2") '(4 5 6 7))
+      (check-equal? (send xlsx get-range-data "测试5" "A3-D3") '(8 9 10 11))
 
       (let ([sheet (send xlsx sheet-ref 2)])
         (check-equal? (sheet-name sheet) "测试3")
@@ -101,9 +104,9 @@
           (check-equal? (data-range-range_str data_range) "A1-A3")
           (check-equal? (data-range-sheet_name data_range) "测试5"))
         
-        (send xlsx add-line-chart-y-data! "测试4" "折线1" "测试5" "B1-B3")
+        (send xlsx add-line-chart-serial! "测试4" "折线1" "测试5" "B1-B3")
 
-        (send xlsx add-line-chart-y-data! "测试4" "折线2" "测试5" "C1-C3")
+        (send xlsx add-line-chart-serial! "测试4" "折线2" "测试5" "C1-C3")
         
         (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]
@@ -128,6 +131,10 @@
    
    (test-case
     "test-check-range"
+    
+    (check-true (check-range "A2-Z2"))
+
+    (check-exn exn:fail? (lambda () (check-true (check-range "A2-C3"))))
     
     (check-exn exn:fail? (lambda () (check-range "c2")))
     (check-exn exn:fail? (lambda () (check-range "c2-c2")))
