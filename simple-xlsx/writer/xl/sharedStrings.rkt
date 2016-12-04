@@ -41,9 +41,10 @@
    )
 
 (define (write-shared-strings-file dir xlsx)
-  (make-directory* dir)
+  (when (> (hash-count (get-field string_item_map xlsx)) 0)
+        (make-directory* dir)
 
-  (with-output-to-file (build-path dir "sharedStrings.xml")
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (write-shared-strings (send xlsx get-string-item-list))))))
+        (with-output-to-file (build-path dir "sharedStrings.xml")
+          #:exists 'replace
+          (lambda ()
+            (printf "~a" (write-shared-strings (send xlsx get-string-item-list)))))))

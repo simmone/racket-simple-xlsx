@@ -42,7 +42,7 @@
     (for-each
       (lambda (sheet)
         (printf "<vt:lpstr>~a</vt:lpstr>" (sheet-name sheet)))
-     sheet_list)))|</vt:vector></TitlesOfParts><Company></Company><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
+     sheet_list)))|</vt:vector></TitlesOfParts><LinksUpToDate>false</LinksUpToDate><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>12.0000</AppVersion></Properties>
 })
 
 (define (write-docprops-app-file dir xlsx)

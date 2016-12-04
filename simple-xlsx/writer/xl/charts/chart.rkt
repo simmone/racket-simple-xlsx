@@ -64,14 +64,15 @@
         (printf "<c:marker val=\"1\"/><c:axId val=\"76367360\"/><c:axId val=\"76368896\"/></c:lineChart><c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76367360\"/><c:crosses val=\"autoZero\"/><c:crossBetween val=\"between\"/></c:valAx></c:plotArea><c:legend><c:legendPos val=\"r\"/><c:layout/></c:legend><c:plotVisOnly val=\"1\"/></c:chart></c:chartSpace>")))))
 
 (define (write-chart-file dir xlsx)
-  (make-directory* dir)
+  (when (ormap (lambda (rec) (eq? (sheet-type rec) 'chart)) (get-field sheets xlsx))
+        (make-directory* dir)
 
-  (let loop ([loop_list (get-field sheets xlsx)])
-    (when (not (null? loop_list))
-          (when (eq? (sheet-type (car loop_list)) 'chart)
-                (with-output-to-file (build-path dir (format "chart~a.xml" (sheet-typeSeq (car loop_list))))
-                  #:exists 'replace
-                  (lambda ()
-                    (printf "~a" (write-chart (sheet-name (car loop_list)) xlsx)))))
-          (loop (cdr loop_list)))))
+        (let loop ([loop_list (get-field sheets xlsx)])
+          (when (not (null? loop_list))
+                (when (eq? (sheet-type (car loop_list)) 'chart)
+                      (with-output-to-file (build-path dir (format "chart~a.xml" (sheet-typeSeq (car loop_list))))
+                        #:exists 'replace
+                        (lambda ()
+                          (printf "~a" (write-chart (sheet-name (car loop_list)) xlsx)))))
+                (loop (cdr loop_list))))))
 
