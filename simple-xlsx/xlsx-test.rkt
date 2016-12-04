@@ -104,9 +104,9 @@
           (check-equal? (data-range-range_str data_range) "A1-A3")
           (check-equal? (data-range-sheet_name data_range) "测试5"))
         
-        (send xlsx add-line-chart-serial! "测试4" "折线1" "测试5" "B1-B3")
+        (send xlsx add-line-chart-serial! "测试4" "测试5" "折线1" "B1-B3")
 
-        (send xlsx add-line-chart-serial! "测试4" "折线2" "测试5" "C1-C3")
+        (send xlsx add-line-chart-serial! "测试4" "测试5" "折线2" "C1-C3")
         
         (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]

@@ -255,7 +255,7 @@
            (when (check-data-range-valid this data_sheet_name data_range)
                  (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range))))
 
-         (define/public (add-line-chart-serial! line_chart_sheet_name y_topic sheet_name data_range)
+         (define/public (add-line-chart-serial! line_chart_sheet_name sheet_name y_topic data_range)
            (when (check-data-range-valid this sheet_name data_range)
                  (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range))))))
          
