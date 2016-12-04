@@ -26,7 +26,7 @@
         (let loop ([loop_list (get-field sheets xlsx)])
           (when (not (null? loop_list))
                 (when (eq? (sheet-type (car loop_list)) 'chart)
-                      (with-output-to-file (build-path dir (format "sheet~a.xml" (sheet-typeSeq (car loop_list))))
+                      (with-output-to-file (build-path dir (format "drawing~a.xml" (sheet-typeSeq (car loop_list))))
                         #:exists 'replace
                         (lambda ()
                           (printf "~a" (write-drawing)))))

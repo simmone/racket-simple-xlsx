@@ -16,8 +16,8 @@
 (define S string-append)
 
 (define (write-chart-sheet-rels typeSeq) @S{
-                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                                                  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId@|(number->string typeSeq)|" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing@|(number->string typeSeq)|.xml"/></Relationships>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId@|(number->string typeSeq)|" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing@|(number->string typeSeq)|.xml"/></Relationships>
                                                   })
 
 (define (write-chart-sheet-rels-file dir xlsx)

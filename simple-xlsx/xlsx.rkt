@@ -137,11 +137,12 @@
 
 (define (convert-range range_str)
   (when (check-range range_str)
-        (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-[A-Z]+([0-9]+)$" range_str)]
-               [col_name (second items)]
+        (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
+               [start_col_name (second items)]
                [start_index (third items)]
-               [end_index (fourth items)])
-          (string-append "$" col_name "$" start_index ":$" col_name "$" end_index))))
+               [end_col_name (fourth items)]
+               [end_index (fifth items)])
+          (string-append "$" start_col_name "$" start_index ":$" end_col_name "$" end_index))))
 
 (define (range-length range_str)
   (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])

@@ -74,8 +74,8 @@
           (write-chart-sheet-file (build-path tmp_dir "xl" "chartsheets") xlsx)
 
           ;; drawing
-          (write-drawing-rels-file (build-path tmp_dir "xl" "drawing" "_rels") xlsx)
-          (write-drawing-file (build-path tmp_dir "xl" "drawing") xlsx)
+          (write-drawing-rels-file (build-path tmp_dir "xl" "drawings" "_rels") xlsx)
+          (write-drawing-file (build-path tmp_dir "xl" "drawings") xlsx)
 
           (zip-xlsx xlsx_file_name tmp_dir))
         (lambda ()
