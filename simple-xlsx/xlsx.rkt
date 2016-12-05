@@ -75,28 +75,21 @@
 
 (define (check-range range_str)
   (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" range_str)
-      (let* ([range_part (regexp-split #rx"-" range_str)]
-             [front_col_name #f]
-             [front_col_index #f]
-             [back_col_name #f]
-             [back_col_index #f])
-        (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (first range_part))])
-          (set! front_col_name (second items))
-          (set! front_col_index (third items)))
+      (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
+             [start_col_name (second items)]
+             [start_row_index (third items)]
+             [end_col_name (fourth items)]
+             [end_row_index (fifth items)])
 
-        (let ([items (regexp-match #rx"^([A-Z]+)([0-9]+)$" (second range_part))])
-          (set! back_col_name (second items))
-          (set! back_col_index (third items)))
-        
-         (if (string=? front_col_name back_col_name)
-             (if (> (string->number front_col_index) (string->number back_col_index))
-                 (error (format "range's direction is vertical, index is invalid.[~a][~a]" front_col_index back_col_index))
-                 #t)
-             (if (string=? front_col_index back_col_index)
-                 (if (> (abc->number front_col_name) (abc->number back_col_name))
-                     (error (format "range's direction is horizontal, col name is invalid.[~a][~a]" front_col_name back_col_name))
-                     #t)
-                 (error (format "range's direction confused. should like A1-A20 or A2-Z2, but get ~a" range_str)))))
+        (if (string=? start_col_name end_col_name)
+            (if (> (string->number start_row_index) (string->number end_row_index))
+                (error (format "range's direction is vertical, index is invalid.[~a][~a]" start_row_index end_row_index))
+                #t)
+            (if (string=? start_row_index end_row_index)
+                (if (> (abc->number start_col_name) (abc->number end_col_name))
+                    (error (format "range's direction is horizontal, col name is invalid.[~a][~a]" start_col_name end_col_name))
+                    #t)
+                (error (format "range's direction confused. should like A1-A20 or A2-Z2, but get ~a" range_str)))))
       (error (format "range format should like A1-A20 or A2-Z2, but get ~a" range_str))))
 
 (define (check-col-range col_range_str)
@@ -145,8 +138,15 @@
           (string-append "$" start_col_name "$" start_index ":$" end_col_name "$" end_index))))
 
 (define (range-length range_str)
-  (let ([numbers (regexp-match* #rx"([0-9]+)" range_str)])
-    (add1 (- (string->number (second numbers)) (string->number (first numbers))))))
+  (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
+         [start_col_name (second items)]
+         [start_row_index (third items)]
+         [end_col_name (fourth items)]
+         [end_row_index (fifth items)])
+
+         (if (string=? start_col_name end_col_name)
+             (add1 (- (string->number end_row_index) (string->number start_row_index)))
+             (add1 (- (abc->number end_col_name) (abc->number start_col_name))))))
 
 (define (check-data-range-valid xlsx sheet_name range_str)
   (when (check-range range_str)

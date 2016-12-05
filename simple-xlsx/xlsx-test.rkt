@@ -168,8 +168,9 @@
    (test-case
     "test-range-length"
     
-    (check-equal? (range-length "$A$2:$A$20") 19)
-    (check-equal? (range-length "$AB$21:$AB$21") 1)
+    (check-equal? (range-length "A2-A20") 19)
+    (check-equal? (range-length "AB21-AB21") 1)
+    (check-equal? (range-length "A2-D2") 4)
     )
 
    (test-case
