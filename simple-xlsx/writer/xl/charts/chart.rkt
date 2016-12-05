@@ -41,7 +41,7 @@
                 (printf "<c:marker><c:symbol val=\"none\"/></c:marker>")
                 (printf "~a<c:val><c:numRef>" (print-x-data xlsx x_data_range))
                 (printf "<c:f>~a!~a</c:f>" sheet_name (convert-range range_str))
-                (printf "<c:numCache><c:formatCode>General</c:formatCode>")
+                (printf "<c:numCache>")
                 (printf "<c:ptCount val=\"~a\"/>" (range-length range_str))
                 (let y-data-loop ([y_data_loop_list (send xlsx get-range-data sheet_name range_str)]
                                   [idx 0])
