@@ -16,7 +16,7 @@
                                            (100 200 300 400 300 200 100 200 300 400 300 200)
                                            (200 300 400 300 200 100 200 300 400 300 200 100)))
 
-      (send xlsx add-line-chart-sheet "Chart1" "TestChart")
+      (send xlsx add-line-chart-sheet "Chart1" "TestChart" "单位:万元")
       (send xlsx set-line-chart-x-data! "Chart1" "Sheet1" "A1-L1")
       (send xlsx add-line-chart-serial! "Chart1" "Sheet1" "数据1" "A2-L2")
       (send xlsx add-line-chart-serial! "Chart1" "Sheet1" "数据2" "A3-L3")

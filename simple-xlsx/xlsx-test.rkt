@@ -60,12 +60,12 @@
         (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
-      (send xlsx add-line-chart-sheet "测试3" "图表1")
+      (send xlsx add-line-chart-sheet "测试3" "图表1" "")
 
-      (send xlsx add-line-chart-sheet "测试4" "图表2")
+      (send xlsx add-line-chart-sheet "测试4" "图表2" "万元")
 
       (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
-      (check-exn exn:fail? (lambda () (send xlsx add-line-chart-sheet "测试4" "test")))
+      (check-exn exn:fail? (lambda () (send xlsx add-line-chart-sheet "测试4" "test" "")))
 
       (send xlsx add-data-sheet "测试5" '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
 
@@ -98,11 +98,14 @@
         (check-equal? (sheet-typeSeq sheet) 2)
 
         (check-equal? (line-chart-sheet-topic (sheet-content sheet)) "图表2")
+        (check-equal? (line-chart-sheet-unit_topic (sheet-content sheet)) "万元")
 
         (send xlsx set-line-chart-x-data! "测试4" "测试5" "A1-A3")
         (let ([data_range (line-chart-sheet-x_data_range (sheet-content sheet))])
+
           (check-equal? (data-range-range_str data_range) "A1-A3")
-          (check-equal? (data-range-sheet_name data_range) "测试5"))
+          (check-equal? (data-range-sheet_name data_range) "测试5")
+          )
         
         (send xlsx add-line-chart-serial! "测试4" "测试5" "折线1" "B1-B3")
 
