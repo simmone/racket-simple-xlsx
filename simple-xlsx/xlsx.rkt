@@ -21,7 +21,7 @@
           [struct line-chart-sheet
                   (
                    (topic string?)
-                   (unit_topic string?)
+                   (x_topic string?)
                    (x_data_range data-range?)
                    (y_data_range_list list?)
                    )]
@@ -49,7 +49,7 @@
 (struct data-sheet ([rows #:mutable] [width_hash #:mutable] [color_hash #:mutable]))
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
 
-(struct line-chart-sheet ([topic #:mutable] [unit_topic #:mutable] [x_data_range #:mutable] [y_data_range_list #:mutable]))
+(struct line-chart-sheet ([topic #:mutable] [x_topic #:mutable] [x_data_range #:mutable] [y_data_range_list #:mutable]))
 (struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
 (struct data-serial ([topic #:mutable] [data_range #:mutable]))
 
@@ -176,7 +176,7 @@
           [string_item_map (make-hash)]
           )
          
-         (define/public (add-data-sheet sheet_name sheet_data)
+         (define/public (add-data-sheet #:sheet_name sheet_name #:sheet_data sheet_data)
            (when (check-data-list sheet_data)
                  (if (not (hash-has-key? sheet_name_map sheet_name))
                      (let* ([sheet_length (length sheets)]
@@ -238,7 +238,7 @@
                                  (loop (cdr loop_list) (add1 col_index) result_list))
                              (reverse result_list)))))))
 
-         (define/public (add-line-chart-sheet sheet_name topic unit_topic)
+         (define/public (add-line-chart-sheet #:sheet_name sheet_name #:topic [topic ""] #:x_topic [x_topic ""])
            (if (not (hash-has-key? sheet_name_map sheet_name))
                (let* ([sheet_length (length sheets)]
                       [seq (add1 sheet_length)]
@@ -249,17 +249,18 @@
                                   seq
                                   'chart
                                   type_seq
-                                  (line-chart-sheet topic unit_topic (data-range "" "") '()))))
+                                  (line-chart-sheet topic x_topic (data-range "" "") '()))))
                  (hash-set! sheet_name_map sheet_name (sub1 seq)))
                (error (format "duplicate sheet name[~a]" sheet_name))))
                  
-         (define/public (set-line-chart-x-data! line_chart_sheet_name data_sheet_name data_range)
+         (define/public (set-line-chart-x-data! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range)
            (when (check-data-range-valid this data_sheet_name data_range)
-                 (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name line_chart_sheet_name)) (data-range data_sheet_name data_range))))
+                 (set-line-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name sheet_name)) (data-range data_sheet_name data_range))))
 
-         (define/public (add-line-chart-serial! line_chart_sheet_name sheet_name y_topic data_range)
-           (when (check-data-range-valid this sheet_name data_range)
-                 (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name line_chart_sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name line_chart_sheet_name))) ,(data-serial y_topic (data-range sheet_name data_range))))))
+         (define/public 
+           (add-line-chart-serial! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range #:y_topic [y_topic ""])
+           (when (check-data-range-valid this data_sheet_name data_range)
+                 (set-line-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name sheet_name)) `(,@(line-chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name sheet_name))) ,(data-serial y_topic (data-range data_sheet_name data_range))))))
          
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))

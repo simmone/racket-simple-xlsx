@@ -56,7 +56,7 @@
     (lambda ()
       (let* ([chart_sheet (sheet-content (send xlsx get-sheet-by-name chart_sheet_name))]
              [topic (line-chart-sheet-topic chart_sheet)]
-             [x_topic (line-chart-sheet-unit_topic chart_sheet)]
+             [x_topic (line-chart-sheet-x_topic chart_sheet)]
              [x_data_range (line-chart-sheet-x_data_range chart_sheet)]
              [y_data_range_list (line-chart-sheet-y_data_range_list chart_sheet)])
         (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
