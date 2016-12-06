@@ -17,9 +17,9 @@
       (send xlsx add-data-sheet "数据页面" '((1)))
       (send xlsx add-data-sheet "Sheet3" '((1)))
       (send xlsx add-data-sheet "Sheet2" '((1)))
-      (send xlsx add-line-chart-sheet "Chart1" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart4" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart5" "Chart1")
+      (send xlsx add-line-chart-sheet "Chart1" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart4" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart5" "Chart1" "")
 
       (check-equal? (write-workbook-xml-rels xlsx)
                     (string-append
@@ -30,9 +30,9 @@
       (send xlsx add-data-sheet "数据页面" '(("1")))
       (send xlsx add-data-sheet "Sheet3" '((1)))
       (send xlsx add-data-sheet "Sheet2" '((1)))
-      (send xlsx add-line-chart-sheet "Chart1" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart4" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart5" "Chart1")
+      (send xlsx add-line-chart-sheet "Chart1" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart4" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart5" "Chart1" "")
 
       (check-equal? (write-workbook-xml-rels xlsx)
                     (string-append

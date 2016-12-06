@@ -17,9 +17,9 @@
       (send xlsx add-data-sheet "Sheet1" '((1)))
       (send xlsx add-data-sheet "Sheet2" '((1)))
       (send xlsx add-data-sheet "Sheet3" '((1)))
-      (send xlsx add-line-chart-sheet "Chart1" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart2" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart3" "Chart1")
+      (send xlsx add-line-chart-sheet "Chart1" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart2" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart3" "Chart1" "")
 
       (check-equal? (write-workbook (get-field sheets xlsx))
                     (string-append

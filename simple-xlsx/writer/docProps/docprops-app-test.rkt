@@ -16,8 +16,8 @@
       (send xlsx add-data-sheet "数据页面" '((1)))
       (send xlsx add-data-sheet "Sheet2" '((1)))
       (send xlsx add-data-sheet "Sheet3" '((1)))
-      (send xlsx add-line-chart-sheet "Chart1" "Chart1")
-      (send xlsx add-line-chart-sheet "Chart4" "Chart1")
+      (send xlsx add-line-chart-sheet "Chart1" "Chart1" "")
+      (send xlsx add-line-chart-sheet "Chart4" "Chart1" "")
 
     (check-equal? (write-docprops-app (get-field sheets xlsx))
                   (string-append
