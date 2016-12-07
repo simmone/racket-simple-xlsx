@@ -62,9 +62,11 @@
         (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
         (printf "<c:chartSpace xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><c:lang val=\"zh-CN\"/><c:chart>")
         (printf "<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang=\"zh-CN\" altLang=\"en-US\"/><a:t>~a</a:t></a:r><a:endParaRPr lang=\"en-US\" altLang=\"zh-CN\"/></a:p></c:rich></c:tx><c:layout/></c:title>" topic)
-        (printf "<c:plotArea><c:layout/><c:lineChart><c:grouping val=\"standard\"/>")
+        (printf "<c:plotArea><c:layout/>")
+        (printf "<c:lineChart><c:grouping val=\"standard\"/>")
         (printf "~a" (print-data-list xlsx x_data_range y_data_range_list))
-        (printf "<c:marker val=\"1\"/><c:axId val=\"76367360\"/><c:axId val=\"76368896\"/></c:lineChart><c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/>")
+        (printf "<c:marker val=\"1\"/><c:axId val=\"76367360\"/><c:axId val=\"76368896\"/></c:lineChart>")
+        (printf "<c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/>")
         (printf "<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang=\"zh-CN\" altLang=\"en-US\"/><a:t>~a</a:t></a:r><a:endParaRPr lang=\"en-US\" altLang=\"zh-CN\"/></a:p></c:rich></c:tx><c:layout/></c:title>" x_topic)
         (printf "<c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76367360\"/><c:crosses val=\"autoZero\"/><c:crossBetween val=\"between\"/></c:valAx></c:plotArea><c:legend><c:legendPos val=\"r\"/><c:layout/></c:legend><c:plotVisOnly val=\"1\"/></c:chart></c:chartSpace>")))))
 
