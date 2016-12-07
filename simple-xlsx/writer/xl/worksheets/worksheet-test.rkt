@@ -14,7 +14,7 @@
     "test-write-data-sheet"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "Sheet1" '(("month1" "month2" "month3" "month4") (201601 100 110 1110)))
+      (send xlsx add-data-sheet #:sheet_name "Sheet1" #:sheet_data '(("month1" "month2" "month3" "month4") (201601 100 110 1110)))
 
       (check-equal? (write-data-sheet "Sheet1" xlsx)
                     (string-append

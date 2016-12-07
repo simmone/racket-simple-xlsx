@@ -14,12 +14,13 @@
     "test-workbook-xml-rels"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "数据页面" '((1)))
-      (send xlsx add-data-sheet "Sheet3" '((1)))
-      (send xlsx add-data-sheet "Sheet2" '((1)))
-      (send xlsx add-chart-sheet "Chart1" "Chart1" "")
-      (send xlsx add-chart-sheet "Chart4" "Chart1" "")
-      (send xlsx add-chart-sheet "Chart5" "Chart1" "")
+      (send xlsx add-data-sheet #:sheet_name "数据页面" #:sheet_data '((1)))
+      (send xlsx add-data-sheet #:sheet_name "Sheet3" #:sheet_data '((1)))
+      (send xlsx add-data-sheet #:sheet_name "Sheet2" #:sheet_data '((1)))
+      (send xlsx add-chart-sheet #:sheet_name "Chart1" #:topic "Chart1" #:x_topic "")
+      (send xlsx add-chart-sheet #:sheet_name "Chart4" #:topic "Chart1" #:x_topic "")
+      (send xlsx add-chart-sheet #:sheet_name "Chart5" #:topic "Chart1" #:x_topic "")
+
 
       (check-equal? (write-workbook-xml-rels xlsx)
                     (string-append
@@ -27,12 +28,12 @@
                      "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet2.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet3.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet\" Target=\"chartsheets/sheet1.xml\"/><Relationship Id=\"rId5\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet\" Target=\"chartsheets/sheet2.xml\"/><Relationship Id=\"rId6\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet\" Target=\"chartsheets/sheet3.xml\"/><Relationship Id=\"rId7\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId8\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/></Relationships>")))
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "数据页面" '(("1")))
-      (send xlsx add-data-sheet "Sheet3" '((1)))
-      (send xlsx add-data-sheet "Sheet2" '((1)))
-      (send xlsx add-chart-sheet "Chart1" "Chart1" "")
-      (send xlsx add-chart-sheet "Chart4" "Chart1" "")
-      (send xlsx add-chart-sheet "Chart5" "Chart1" "")
+      (send xlsx add-data-sheet #:sheet_name "数据页面" #:sheet_data '(("1")))
+      (send xlsx add-data-sheet #:sheet_name "Sheet3" #:sheet_data '((1)))
+      (send xlsx add-data-sheet #:sheet_name "Sheet2" #:sheet_data '((1)))
+      (send xlsx add-chart-sheet #:sheet_name "Chart1" #:topic "Chart1" #:x_topic "")
+      (send xlsx add-chart-sheet #:sheet_name "Chart4" #:topic "Chart1" #:x_topic "")
+      (send xlsx add-chart-sheet #:sheet_name "Chart5" #:topic "Chart1" #:x_topic "")
 
       (check-equal? (write-workbook-xml-rels xlsx)
                     (string-append
