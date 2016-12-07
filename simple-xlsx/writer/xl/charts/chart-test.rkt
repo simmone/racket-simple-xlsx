@@ -30,12 +30,12 @@
               ("201601" 100 110 1110)
               ("201602" 200 210 1210)
               ))
-      (send xlsx add-line-chart-sheet "Chart1" "测试图表" "金额")
+      (send xlsx add-chart-sheet "Chart1" "测试图表" "金额")
       
-      (send xlsx set-line-chart-x-data! "Chart1" "数据页面" "A2-A3")
-      (send xlsx add-line-chart-serial! "Chart1" "数据页面" "金额1" "B2-B3")
-      (send xlsx add-line-chart-serial! "Chart1" "数据页面" "金额2" "C2-C3")
-      (send xlsx add-line-chart-serial! "Chart1" "数据页面" "金额3" "D2-D3")
+      (send xlsx set-chart-x-data! "Chart1" "数据页面" "A2-A3")
+      (send xlsx add-chart-serial! "Chart1" "数据页面" "金额1" "B2-B3")
+      (send xlsx add-chart-serial! "Chart1" "数据页面" "金额2" "C2-C3")
+      (send xlsx add-chart-serial! "Chart1" "数据页面" "金额3" "D2-D3")
 
       (check-equal? (write-chart "Chart1" xlsx) (chart-data))
     ))

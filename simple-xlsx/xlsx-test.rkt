@@ -60,12 +60,12 @@
         (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
-      (send xlsx add-line-chart-sheet "测试3" "图表1" "")
+      (send xlsx add-chart-sheet "测试3" "图表1" "")
 
-      (send xlsx add-line-chart-sheet "测试4" "图表2" "万元")
+      (send xlsx add-chart-sheet "测试4" "图表2" "万元")
 
       (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
-      (check-exn exn:fail? (lambda () (send xlsx add-line-chart-sheet "测试4" "test" "")))
+      (check-exn exn:fail? (lambda () (send xlsx add-chart-sheet "测试4" "test" "")))
 
       (send xlsx add-data-sheet "测试5" '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
 
@@ -97,21 +97,21 @@
         (check-equal? (sheet-type sheet) 'chart)
         (check-equal? (sheet-typeSeq sheet) 2)
 
-        (check-equal? (line-chart-sheet-topic (sheet-content sheet)) "图表2")
-        (check-equal? (line-chart-sheet-unit_topic (sheet-content sheet)) "万元")
+        (check-equal? (chart-sheet-topic (sheet-content sheet)) "图表2")
+        (check-equal? (chart-sheet-unit_topic (sheet-content sheet)) "万元")
 
-        (send xlsx set-line-chart-x-data! "测试4" "测试5" "A1-A3")
-        (let ([data_range (line-chart-sheet-x_data_range (sheet-content sheet))])
+        (send xlsx set-chart-x-data! "测试4" "测试5" "A1-A3")
+        (let ([data_range (chart-sheet-x_data_range (sheet-content sheet))])
 
           (check-equal? (data-range-range_str data_range) "A1-A3")
           (check-equal? (data-range-sheet_name data_range) "测试5")
           )
         
-        (send xlsx add-line-chart-serial! "测试4" "测试5" "折线1" "B1-B3")
+        (send xlsx add-chart-serial! "测试4" "测试5" "折线1" "B1-B3")
 
-        (send xlsx add-line-chart-serial! "测试4" "测试5" "折线2" "C1-C3")
+        (send xlsx add-chart-serial! "测试4" "测试5" "折线2" "C1-C3")
         
-        (let* ([y_data_list (line-chart-sheet-y_data_range_list (sheet-content sheet))]
+        (let* ([y_data_list (chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]
                [y_data2 (second y_data_list)])
           (check-equal? (data-serial-topic y_data1) "折线1")

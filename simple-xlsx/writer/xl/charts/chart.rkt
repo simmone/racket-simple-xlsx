@@ -55,10 +55,10 @@
   (with-output-to-string
     (lambda ()
       (let* ([chart_sheet (sheet-content (send xlsx get-sheet-by-name chart_sheet_name))]
-             [topic (line-chart-sheet-topic chart_sheet)]
-             [x_topic (line-chart-sheet-x_topic chart_sheet)]
-             [x_data_range (line-chart-sheet-x_data_range chart_sheet)]
-             [y_data_range_list (line-chart-sheet-y_data_range_list chart_sheet)])
+             [topic (chart-sheet-topic chart_sheet)]
+             [x_topic (chart-sheet-x_topic chart_sheet)]
+             [x_data_range (chart-sheet-x_data_range chart_sheet)]
+             [y_data_range_list (chart-sheet-y_data_range_list chart_sheet)])
         (printf "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n")
         (printf "<c:chartSpace xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><c:lang val=\"zh-CN\"/><c:chart>")
         (printf "<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr/></a:pPr><a:r><a:rPr lang=\"zh-CN\" altLang=\"en-US\"/><a:t>~a</a:t></a:r><a:endParaRPr lang=\"en-US\" altLang=\"zh-CN\"/></a:p></c:rich></c:tx><c:layout/></c:title>" topic)
