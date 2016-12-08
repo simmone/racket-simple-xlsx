@@ -38,6 +38,10 @@
       (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B3-D3" #:y_topic "Puma")
       (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B4-D4" #:y_topic "Brooks")
 
+      (send xlsx add-chart-sheet #:sheet_name "PieChart" #:chart_type 'pie #:topic "PieChart" #:x_topic "Kg")
+      (send xlsx set-chart-x-data! #:sheet_name "PieChart" #:data_sheet_name "Sheet1" #:data_range "B1-D1" )
+      (send xlsx add-chart-serial! #:sheet_name "PieChart" #:data_sheet_name "Sheet1" #:data_range "B2-D2" #:y_topic "CAT")
+
       (write-xlsx-file xlsx "test1.xlsx")
       ))
    ))
