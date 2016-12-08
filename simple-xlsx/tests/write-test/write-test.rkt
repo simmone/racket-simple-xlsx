@@ -32,6 +32,12 @@
       (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "Sheet1" #:data_range "C2-C4" #:y_topic "201602")
       (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "Sheet1" #:data_range "D2-D4" #:y_topic "201603")
 
+      (send xlsx add-chart-sheet #:sheet_name "BarChart" #:chart_type 'bar #:topic "BarChart" #:x_topic "Kg")
+      (send xlsx set-chart-x-data! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B1-D1" )
+      (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B2-D2" #:y_topic "CAT")
+      (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B3-D3" #:y_topic "Puma")
+      (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "Sheet1" #:data_range "B4-D4" #:y_topic "Brooks")
+
       (write-xlsx-file xlsx "test1.xlsx")
       ))
    ))

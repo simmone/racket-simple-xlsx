@@ -3,6 +3,7 @@
 (require "../../../xlsx.rkt")
 
 (require "line-chart.rkt")
+(require "bar-chart.rkt")
 
 (provide (contract-out
           [write-chart (-> string? (is-a?/c xlsx%) string?)]
@@ -23,6 +24,8 @@
         (cond
          [(eq? chart_type 'line)
           (printf "~a" (print-line-chart chart_sheet_name xlsx))]
+         [(eq? chart_type 'bar)
+          (printf "~a" (print-bar-chart chart_sheet_name xlsx))]
          [else
           ""])
         (printf "<c:catAx><c:axId val=\"76367360\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"b\"/><c:numFmt formatCode=\"General\" sourceLinked=\"1\"/><c:majorTickMark val=\"none\"/><c:tickLblPos val=\"nextTo\"/><c:crossAx val=\"76368896\"/><c:crosses val=\"autoZero\"/><c:auto val=\"1\"/><c:lblAlgn val=\"ctr\"/><c:lblOffset val=\"100\"/></c:catAx><c:valAx><c:axId val=\"76368896\"/><c:scaling><c:orientation val=\"minMax\"/></c:scaling><c:axPos val=\"l\"/><c:majorGridlines/>")
