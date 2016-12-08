@@ -7,7 +7,7 @@
 
 (require "../../../xlsx.rkt")
 
-(require rackunit "chart.rkt")
+(require rackunit "line-chart.rkt")
 
 (define S string-append)
 
@@ -37,7 +37,7 @@
       (send xlsx add-chart-serial! #:sheet_name "Chart1" #:data_sheet_name "数据页面" #:y_topic "金额2" #:data_range "C2-C3")
       (send xlsx add-chart-serial! #:sheet_name "Chart1" #:data_sheet_name "数据页面" #:y_topic "金额3" #:data_range "D2-D3")
 
-      (check-equal? (write-linechart "Chart1" xlsx) (chart-data))
+      (check-equal? (print-line-chart "Chart1" xlsx) (chart-data))
     ))
    
    ))
