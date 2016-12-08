@@ -26,11 +26,18 @@
 
 (define (print-pie-chart chart_name xlsx)
   (let* ([chart_sheet (sheet-content (send xlsx get-sheet-by-name chart_name))]
+         [chart_type (chart-sheet-chart_type chart_sheet)]
+         [chart_type_name
+          (cond
+           [(eq? chart_type 'pie)
+            "pieChart"]
+           [(eq? chart_type 'pie3d)
+            "pie3DChart"])]
          [x_data_range (chart-sheet-x_data_range chart_sheet)]
          [y_data_range_list (chart-sheet-y_data_range_list chart_sheet)])
     (with-output-to-string
       (lambda ()
-        (printf "<c:pieChart><c:varyColors val=\"1\"/>")
+        (printf (format "<c:~a><c:varyColors val=\"1\"/>" chart_type_name))
         (let loop ([loop_list y_data_range_list]
                    [ser_seq 0])
           (when (not (null? loop_list))
@@ -53,6 +60,6 @@
                           (y-data-loop (cdr y_data_loop_list) (add1 idx))))
                   (printf "</c:numCache></c:numRef></c:val></c:ser>"))
                 (loop (cdr loop_list) (add1 ser_seq))))
-        (printf "<c:firstSliceAng val=\"0\"/></c:pieChart>")
+        (printf (format "<c:firstSliceAng val=\"0\"/></c:~a>" chart_type_name))
         ))))
 
