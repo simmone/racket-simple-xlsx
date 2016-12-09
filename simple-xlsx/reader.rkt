@@ -105,57 +105,61 @@
   data_map))
 
 (define (load-sheet sheet_name xlsx)
-  (let ([data_map (make-hash)]
-        [type_map (make-hash)])
-    (with-input-from-file 
-        (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))
-      (lambda ()
-        (let* ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
-               [v_list (xml-get-list 'sheetData xml)]
-               [dimension_list (xml-get-list 'dimension xml)])
-          (for-each
-           (lambda (row_items)
-             (for-each
-              (lambda (cell_item)
-                (when (list? cell_item)
-                      (let ([first_item (car cell_item)])
-                        (when (and (symbol? first_item) (equal? first_item 'c))
-                              (let ([para_part (second cell_item)]
-                                    [para_r ""]
-                                    [para_s ""]
-                                    [para_t ""])
-                                (let loop ([para_list para_part])
-                                  (when (not (null? para_list))
-                                        (let* ([para (car para_list)]
-                                               [key (car para)]
-                                               [value (cadr para)])
-                                          (cond
-                                           [(equal? key 'r)
-                                            (set! para_r value)]
-                                           [(equal? key 's)
-                                            (set! para_s value)]
-                                           [(equal? key 't)
-                                            (set! para_t value)]))
-                                        (loop (cdr para_list))))
-                                (hash-set! type_map para_r (cons para_t para_s))
+  (set-field! dimension xlsx '(0 . 0))
 
-                                (let loop-cell ([cell_list (cdr cell_item)])
-                                  (when (not (null? cell_list))
-                                        (when (equal? (caar cell_list) 'v)
-                                              (hash-set! data_map para_r (caddar cell_list)))
-                                        (loop-cell (cdr cell_list))))
-                                )))))
-              row_items))
-           v_list)
-          
-          (let* ([dimension_str (xml-get-attr 'dimension "ref" xml)]
-                 [dimension_items (regexp-split #rx":" dimension_str)]
-                 [dest_item (list-ref dimension_items (sub1 (length dimension_items)))]
-                 [items (regexp-match (regexp "([A-Z]+)([0-9]+)") dest_item)]
-                 [col_str (cadr items)]
-                 [row_str (caddr items)])
-            (set-field! dimension xlsx (cons (string->number row_str) (abc->number col_str))))
-          )))
+  (let ([data_map (make-hash)]
+        [type_map (make-hash)]
+        [data_sheet_file_name 
+         (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))])
+    (when (string=? (path->string (fourth (explode-path data_sheet_file_name))) "worksheets")
+          (with-input-from-file data_sheet_file_name
+            (lambda ()
+              (let* ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
+                     [v_list (xml-get-list 'sheetData xml)]
+                     [dimension_list (xml-get-list 'dimension xml)])
+                (for-each
+                 (lambda (row_items)
+                   (for-each
+                    (lambda (cell_item)
+                      (when (list? cell_item)
+                            (let ([first_item (car cell_item)])
+                              (when (and (symbol? first_item) (equal? first_item 'c))
+                                    (let ([para_part (second cell_item)]
+                                          [para_r ""]
+                                          [para_s ""]
+                                          [para_t ""])
+                                      (let loop ([para_list para_part])
+                                        (when (not (null? para_list))
+                                              (let* ([para (car para_list)]
+                                                     [key (car para)]
+                                                     [value (cadr para)])
+                                                (cond
+                                                 [(equal? key 'r)
+                                                  (set! para_r value)]
+                                                 [(equal? key 's)
+                                                  (set! para_s value)]
+                                                 [(equal? key 't)
+                                                  (set! para_t value)]))
+                                              (loop (cdr para_list))))
+                                      (hash-set! type_map para_r (cons para_t para_s))
+
+                                      (let loop-cell ([cell_list (cdr cell_item)])
+                                        (when (not (null? cell_list))
+                                              (when (equal? (caar cell_list) 'v)
+                                                    (hash-set! data_map para_r (caddar cell_list)))
+                                              (loop-cell (cdr cell_list))))
+                                      )))))
+                    row_items))
+                 v_list)
+                
+                (let* ([dimension_str (xml-get-attr 'dimension "ref" xml)]
+                       [dimension_items (regexp-split #rx":" dimension_str)]
+                       [dest_item (list-ref dimension_items (sub1 (length dimension_items)))]
+                       [items (regexp-match (regexp "([A-Z]+)([0-9]+)") dest_item)]
+                       [col_str (cadr items)]
+                       [row_str (caddr items)])
+                  (set-field! dimension xlsx (cons (string->number row_str) (abc->number col_str))))
+                ))))
     (set-field! sheet_map xlsx data_map)
     (set-field! data_type_map xlsx type_map)))
 
