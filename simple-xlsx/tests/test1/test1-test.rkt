@@ -1,11 +1,12 @@
 #lang racket
 
+(require rackunit)
 (require rackunit/text-ui)
-
-(require rackunit "../../../main.rkt")
 
 (require racket/runtime-path)
 (define-runtime-path test_file "test1.xlsx")
+
+(require "../../main.rkt")
 
 (define test-test1
   (test-suite

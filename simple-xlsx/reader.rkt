@@ -16,7 +16,13 @@
 
 (define xlsx%
   (class object%
-         (init-field [xlsx_dir ""] [shared_map #f] [sheet_map #f] [sheet_name_map #f] [relation_name_map #f] [data_type_map #f] [dimension #f])
+         (init-field [xlsx_dir ""] 
+                     [shared_map #f] 
+                     [sheet_map #f] 
+                     [sheet_name_map #f] 
+                     [relation_name_map #f] 
+                     [data_type_map #f] 
+                     [dimension #f])
          (super-new)))
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
@@ -24,7 +30,11 @@
    xlsx_file
    (lambda (tmp_dir)
      (let ([xlsx_obj
-            (new xlsx% (xlsx_dir tmp_dir) (shared_map (get-shared-string tmp_dir)) (sheet_name_map (get-sheet-name-map tmp_dir)) (relation_name_map (get-relation-name-map tmp_dir)))])
+            (new xlsx% 
+                 (xlsx_dir tmp_dir) 
+                 (shared_map (get-shared-string tmp_dir)) 
+                 (sheet_name_map (get-sheet-name-map tmp_dir)) 
+                 (relation_name_map (get-relation-name-map tmp_dir)))])
        (user_proc xlsx_obj)))))
 
 (define (get-sheet-name-map xlsx_dir)

@@ -2,7 +2,9 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "../../../main.rkt")
+(require rackunit)
+
+(require "../../main.rkt")
 
 (require racket/runtime-path)
 (define-runtime-path test_file "test5.xlsx")

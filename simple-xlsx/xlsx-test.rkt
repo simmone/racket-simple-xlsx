@@ -22,7 +22,7 @@
     "test-add-data-sheet-string-item-map"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "测试1" '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
+      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
       
       (let ([string_item_map (get-field string_item_map xlsx)])
         (check-equal? (hash-count string_item_map) 4)
@@ -34,11 +34,11 @@
     (let ([xlsx (new xlsx%)])
       (check-equal? (get-field sheets xlsx) '())
       
-      (send xlsx add-data-sheet "测试1" '((1)))
+      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1)))
 
-      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
+      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '())))
 
-      (send xlsx add-data-sheet "测试2" '((1)))
+      (send xlsx add-data-sheet #:sheet_name "测试2" #:sheet_data '((1)))
       
       (let ([sheet (send xlsx sheet-ref 0)])
         (check-equal? (sheet-name sheet) "测试1")
@@ -60,14 +60,14 @@
         (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
-      (send xlsx add-chart-sheet "测试3" "图表1" "")
+      (send xlsx add-chart-sheet #:sheet_name "测试3" #:topic "图表1")
 
-      (send xlsx add-chart-sheet "测试4" "图表2" "万元")
+      (send xlsx add-chart-sheet #:sheet_name "测试4" #:topic "图表2" #:x_topic "万元")
 
-      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet "测试1" '())))
-      (check-exn exn:fail? (lambda () (send xlsx add-chart-sheet "测试4" "test" "")))
+      (check-exn exn:fail? (lambda () (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '())))
+      (check-exn exn:fail? (lambda () (send xlsx add-chart-sheet #:sheet_name "测试4" #:topic "test")))
 
-      (send xlsx add-data-sheet "测试5" '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
+      (send xlsx add-data-sheet #:sheet_name "测试5" #:sheet_data '((1 2 3 4) (4 5 6 7) (8 9 10 11)))
 
       (let ([sheet (send xlsx get-sheet-by-name "测试3")])
         (check-equal? (sheet-name sheet) "测试3"))
@@ -98,18 +98,18 @@
         (check-equal? (sheet-typeSeq sheet) 2)
 
         (check-equal? (chart-sheet-topic (sheet-content sheet)) "图表2")
-        (check-equal? (chart-sheet-unit_topic (sheet-content sheet)) "万元")
+        (check-equal? (chart-sheet-x_topic (sheet-content sheet)) "万元")
 
-        (send xlsx set-chart-x-data! "测试4" "测试5" "A1-A3")
+        (send xlsx set-chart-x-data! #:sheet_name "测试4" #:data_sheet_name "测试5" #:data_range "A1-A3")
         (let ([data_range (chart-sheet-x_data_range (sheet-content sheet))])
 
           (check-equal? (data-range-range_str data_range) "A1-A3")
           (check-equal? (data-range-sheet_name data_range) "测试5")
           )
         
-        (send xlsx add-chart-serial! "测试4" "测试5" "折线1" "B1-B3")
+        (send xlsx add-chart-serial! #:sheet_name "测试4" #:data_sheet_name "测试5" #:y_topic "折线1" #:data_range "B1-B3")
 
-        (send xlsx add-chart-serial! "测试4" "测试5" "折线2" "C1-C3")
+        (send xlsx add-chart-serial! #:sheet_name "测试4" #:data_sheet_name "测试5" #:y_topic "折线2" #:data_range "C1-C3")
         
         (let* ([y_data_list (chart-sheet-y_data_range_list (sheet-content sheet))]
                [y_data1 (first y_data_list)]
@@ -180,7 +180,7 @@
     "test-set-data-sheet-cell-color-and-get-style-list"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "测试1" '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
+      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
 
       (send xlsx set-data-sheet-cell-color! "测试1" "A1-A4" "red")
 
@@ -195,7 +195,7 @@
     "test-get-string-index-map"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet "测试1" '(("C" "D" "B") ("B" "Z" "A")))
+      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '(("C" "D" "B") ("B" "Z" "A")))
       
       (let ([string_index_map (send xlsx get-string-index-map)])
         (check-equal? (hash-count string_index_map) 5)
