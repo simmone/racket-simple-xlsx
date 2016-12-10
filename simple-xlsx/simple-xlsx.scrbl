@@ -6,7 +6,8 @@
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
-simple-xlsx package is a package to read and write .xlsx format file.@linebreak{}
+simple-xlsx package is a package to read and write .xlsx format file.
+
 .xlsx file is a open xml format file.
 
 @table-of-contents[]
@@ -17,7 +18,8 @@ raco pkg install simple-xlsx
 
 @section{Read}
 
-read from a .xlsx file.@linebreak{}
+read from a .xlsx file.
+
 you can get a specific cell's value or loop for the whole sheet's rows.
 
 @defmodule[simple-xlsx]
@@ -36,29 +38,29 @@ there is also a complete read and write example on github:@link["https://github.
            [sheet_name (string?)]
            [xlsx_handler (xlsx_handler)])
            void?]{
-  load specified sheet by sheet name.@linebreak{}
+  load specified sheet by sheet name.
   must first called before other func, because any other func is based on specified sheet.
 }
 
 @defproc[(get-sheet-names
             [xlsx_handler (xlsx_handler)])
             list?]{
-  get sheet names.@linebreak{}
+  get sheet names.
 }
 
 @defproc[(get-cell-value
             [cell_axis (string?)]
             [xlsx_handler (xlsx_handler)])
             any]{
-  get cell value through cell's axis.@linebreak{}
+  get cell value through cell's axis.
   cell axis: A1 B2 C3...
 }
 
 @defproc[(get-sheet-dimension
             [xlsx_handler (xlsx_handler)])
-            string?]{
-  get current sheet's dimension.@linebreak{}
-  like A1:C5
+            pair?]{
+  get current sheet's dimension, (cons row col)
+  like (1 . 4)
 }
 
 @defproc[(with-row
@@ -70,129 +72,168 @@ there is also a complete read and write example on github:@link["https://github.
 
 @section{Write}
 
-write a xlsx file means instance a xlsx-data% class.@linebreak{}
-use add-sheet to fill a xlsx-data% instance and write it to file.
+write a xlsx file use xlsx% class.
 
-@subsection{xlsx-data%}
+use add-data-sheet method to add data type sheet to xlsx.
 
-xlsx-data% class represent a whole xlsx file's data.@linebreak{}
-it contains sheet data and col attibutes.@linebreak{}
-xlsx-data% have only one method: add-sheet.@linebreak{}
-sheet data just a list: (list (list cell ...) (list cell ...)...).@linebreak{}
+use add-chart-sheet method to add chart type sheet to xlsx.
 
-this is a simple xlsx-data% example without col attributes:@linebreak{}
+@subsection{xlsx%}
+
+xlsx% class represent a whole xlsx file's data.
+
+it contains data sheet or chart sheet.
+
+@subsection{Data Sheet}
+
+data sheet is a sheet contains data only.
+
+@subsubsection{add data sheet}
+
+sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
 
 @verbatim{
-  (let ([xlsx (new xlsx-data%)])
-    (send xlsx add-sheet '(("chenxiao" "cx") (1 2 34 100 456.34)) "Sheet1")
+  (let ([xlsx (new xlsx%)])
+    (send xlsx add-data-sheet #:sheet_name "Sheet1" #:sheet_data '(("chenxiao" "cx") (1 2)))
 }
 
-@subsection{col-attribute}
+@subsubsection{set col width}
 
-col-attribute used to specify column's attribute.@linebreak{}
-you can set column's width, color by now.@linebreak{}
+use set-data-sheet-col-width! method to set col's width
 
-col-attribute is a hash.@linebreak{}
-hash's key is column's dimension, value is a struct named:col-attr.@linebreak{}
-
-for example:@linebreak{}
+for example:
 @verbatim{
-  ;; set column A width: 100, color: FF0000
-  (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
-  (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
-  (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
-  (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
-  (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
+  ;; set column A, B width: 50
+  (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
 }
 
-@subsection{func}
+@subsubsection{set cell background color}
+
+use set-data-sheet-cell-color! method to set cell's background color
+
+for example:
+@verbatim{
+  ;; set B2 to C3, 2X2, total 4 cells's color to FF0000(red)
+  (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "B2-C3" #:color "FF0000")
+}
+
+@subsection{Chart Sheet}
+
+chart sheet is a sheet contains chart only.
+
+chart sheet use data sheet's data to constuct chart.
+
+chart type now can have: linechart, linechart3d, barchart, barchart3d, piechart, piechart3d
+
+@subsubsection{add chart sheet}
+
+default chart_type is linechart or set chart type
+
+chart type is one of these: line, line3d, bar, bar3d, pie, pie3d
+
+@verbatim{
+  (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
+
+  (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:chart_type 'bar #:topic "Horizontal Data" #:x_topic "Kg")
+}
+
+@subsubsection{set-chart-x-data! and add-chart-serail!}
+
+use this two methods to set chart's x axis data and y axis data
+
+only one x axis data and multiple y axis data
+
+@verbatim{
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+}
+
+@subsection{write file}
 
 @defproc[(write-xlsx-file
-            [xlsx-data (xlsx-data%)]
+            [xlsx (xlsx%)]
             [path (path-string?)])
             void?]{
-  write xlsx-data% to xlsx file.
+  write xlsx% to xlsx file.
 }
 
-@section{Example}
+@section{Complete Example}
 
 @verbatim{
-  #lang racket
+#lang racket
 
-  (require simple-xlsx)
+(require simple-xlsx)
 
-  ;; write a xlsx file, with multiple sheets, set the column attributes(width, color)
-  (let ([xlsx (new xlsx-data%)]
-        [col_attr_hash (make-hash)])
-      (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
-      (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
-      (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
-      (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
-      (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
-  
-      (send xlsx add-sheet '(("Jane Birkin" "Leonard Cohen" "Matthew McConaughey") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
-      (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
-      (send xlsx add-sheet '(("a" "b")) "Sheet3")
-      (send xlsx add-sheet '(("a" "b")) "Sheet4" #:col_attr_hash col_attr_hash)
-      (send xlsx add-sheet '(("")) "Sheet5" #:col_attr_hash col_attr_hash)
-      (write-xlsx-file xlsx "test1.xlsx"))
-  
-  ;; write a xlsx file and read it back
-  (let ([xlsx (new xlsx-data%)])
-    (send xlsx add-sheet '(("chenxiao" "cx") (1 2 34 100 456.34)) "Sheet1")
-    (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
-    (send xlsx add-sheet '(("")) "Sheet3")
-    (write-xlsx-file xlsx "test2.xlsx")
-  
-    ;; read specific cell
-    (with-input-from-xlsx-file
-     "test2.xlsx"
-     (lambda (xlsx)
-       (printf "~a\n" (get-sheet-names xlsx)) ;(Sheet1 Sheet2 Sheet3)
-       
-       (load-sheet "Sheet1" xlsx)
-  
-       (printf "~a\n" (get-sheet-dimension xlsx)) ; (2 . 5)
-       (printf "~a\n" (get-cell-value "A1" xlsx)) ; "chenxiao"
-       (printf "~a\n" (get-cell-value "B1" xlsx)) ; "cx"
-       (printf "~a\n" (get-cell-value "E2" xlsx)))) ; 456.34
-  
-    ;; loop for row
-    (with-input-from-xlsx-file
-      "test2.xlsx"
-      (lambda (xlsx)
-        (load-sheet "Sheet1" xlsx)
-        (with-row xlsx
-                  (lambda (row)
-                    (printf "~a\n" (first row))))))) ;; chenxiao 1
-}  
-            
-@section{FAQ}
+(let ([xlsx (new xlsx%)])
+  (send xlsx add-data-sheet 
+        #:sheet_name "DataSheet" 
+        #:sheet_data '(("month/brand" "201601" "201602" "201603")
+                       ("CAT" 100 300 200)
+                       ("Puma" 200 400 300)
+                       ("Brooks" 300 500 400)
+                       ))
+  (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
+  (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "B2-C3" #:color "FF0000")
+  (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "C4-D4" #:color "0000FF")
 
-@subsection{Why simple-xlsx'writer is so slow when I have much more rows?}
+  (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
 
-No, simple-xlsx's write is not slow(not so fast, perhaps).
+  (send xlsx add-chart-sheet #:sheet_name "LineChart2" #:topic "Vertical Data" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "A2-A4" )
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "B2-B4" #:y_topic "201601")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "C2-C4" #:y_topic "201602")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "D2-D4" #:y_topic "201603")
 
-If you find it turns slow when you have much rows, it perhaphs you prepare rows like below:
+  (send xlsx add-chart-sheet #:sheet_name "LineChart3D" #:chart_type 'line3d #:topic "LineChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "A2-A4" )
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-B4" #:y_topic "201601")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "C2-C4" #:y_topic "201602")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "D2-D4" #:y_topic "201603")
 
-@racketblock[
-  (let ([rows '()])
-    (set! rows `(,@rows ,row))
- or (set! rows (append rows row)))
-]
+  (send xlsx add-chart-sheet #:sheet_name "BarChart" #:chart_type 'bar #:topic "BarChart" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
 
-When rows's count is small, its ok, but when you have thousands rows, it's getting too slow to complete.
+  (send xlsx add-chart-sheet #:sheet_name "BarChart3D" #:chart_type 'bar3d #:topic "BarChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
 
-When work on big data, you should do like this:
+  (send xlsx add-chart-sheet #:sheet_name "PieChart" #:chart_type 'pie #:topic "PieChart" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "PieChart" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "PieChart" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
 
-@racketblock[
-  (let loop ([rows '()]
-             [line (read-line)])
-                 
-      (if (not (eof-object? line))
-          (loop (cons (list (regexp-replace* #rx"\n|\r" line "")) rows) (read-line) (add1 count)))
-          (send xlsx add-sheet (reverse rows) "Sheet1"))
-]
+  (send xlsx add-chart-sheet #:sheet_name "PieChart3D" #:chart_type 'pie3d #:topic "PieChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
 
-Please notice you should use reverse list order when use cons to chain a list up.
-           
+  (write-xlsx-file xlsx "test.xlsx")
+
+  (with-input-from-xlsx-file
+   "test.xlsx"
+   (lambda (xlsx)
+     (printf "~a\n" (get-sheet-names xlsx)) 
+     ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
+
+     (load-sheet "DataSheet" xlsx)
+     (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 4)
+
+     (printf "~a\n" (get-cell-value "A2") ;201601
+
+     (with-row xlsx
+       (lambda (row)
+         (printf "~a\n" row)))
+     ; ("month/brand" "201601" "201602" "201603")
+     ; ("CAT" 100 300 200)
+     ; ("Puma" 200 400 300)
+     ; ("Brooks" 300 500 400)
+   )))
+  )
+}

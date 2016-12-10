@@ -7,53 +7,88 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 # Basic Usage
 ```racket
 
-  (require simple-xlsx)
-  
-  ;; write a xlsx file, with multiple sheets, set the column attributes(width, color)
-  (let ([xlsx (new xlsx-data%)]
-        [col_attr_hash (make-hash)])
-      (hash-set! col_attr_hash "A" (col-attr 100 "FF0000"))
-      (hash-set! col_attr_hash "B" (col-attr 200 "00FF00"))
-      (hash-set! col_attr_hash "C" (col-attr 200 "EF9595"))
-      (hash-set! col_attr_hash "D-F" (col-attr 100 "0000FF"))
-      (hash-set! col_attr_hash "7-10" (col-attr 100 "EE89CD"))
-  
-      (send xlsx add-sheet '(("Jane Birkin" "Leonard Cohen" "Matthew McConaughey") (1 2 34 100 456.34)) "Sheet1" #:col_attr_hash col_attr_hash)
-      (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
-      (send xlsx add-sheet '(("a" "b")) "Sheet3")
-      (send xlsx add-sheet '(("a" "b")) "Sheet4" #:col_attr_hash col_attr_hash)
-      (send xlsx add-sheet '(("")) "Sheet5" #:col_attr_hash col_attr_hash)
-      (write-xlsx-file xlsx "test1.xlsx"))
-  
-  ;; write a xlsx file and read it back
-  (let ([xlsx (new xlsx-data%)])
-    (send xlsx add-sheet '(("chenxiao" "cx") (1 2 34 100 456.34)) "Sheet1")
-    (send xlsx add-sheet '((1 2 3 4)) "Sheet2")
-    (send xlsx add-sheet '(("")) "Sheet3")
-    (write-xlsx-file xlsx "test2.xlsx")
-  
-    ;; read specific cell
-    (with-input-from-xlsx-file
-     "test2.xlsx"
-     (lambda (xlsx)
-       (printf "~a\n" (get-sheet-names xlsx)) ;(Sheet1 Sheet2 Sheet3)
-       
-       (load-sheet "Sheet1" xlsx)
-  
-       (printf "~a\n" (get-sheet-dimension xlsx)) ; (2 . 5)
-       (printf "~a\n" (get-cell-value "A1" xlsx)) ; "chenxiao"
-       (printf "~a\n" (get-cell-value "B1" xlsx)) ; "cx"
-       (printf "~a\n" (get-cell-value "E2" xlsx)))) ; 456.34
-  
-    ;; loop for row
-    (with-input-from-xlsx-file
-      "test2.xlsx"
-      (lambda (xlsx)
-        (load-sheet-ref 0 xlsx)
-        (with-row xlsx
-                  (lambda (row)
-                    (printf "~a\n" (first row))))))) ;; chenxiao 1
+(require simple-xlsx)
+
+(let ([xlsx (new xlsx%)])
+  (send xlsx add-data-sheet 
+        #:sheet_name "DataSheet" 
+        #:sheet_data '(("month/brand" "201601" "201602" "201603")
+                       ("CAT" 100 300 200)
+                       ("Puma" 200 400 300)
+                       ("Brooks" 300 500 400)
+                       ))
+  (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
+  (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "B2-C3" #:color "FF0000")
+  (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "C4-D4" #:color "0000FF")
+
+  (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
+
+  (send xlsx add-chart-sheet #:sheet_name "LineChart2" #:topic "Vertical Data" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "A2-A4" )
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "B2-B4" #:y_topic "201601")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "C2-C4" #:y_topic "201602")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart2" #:data_sheet_name "DataSheet" #:data_range "D2-D4" #:y_topic "201603")
+
+  (send xlsx add-chart-sheet #:sheet_name "LineChart3D" #:chart_type 'line3d #:topic "LineChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "A2-A4" )
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-B4" #:y_topic "201601")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "C2-C4" #:y_topic "201602")
+  (send xlsx add-chart-serial! #:sheet_name "LineChart3D" #:data_sheet_name "DataSheet" #:data_range "D2-D4" #:y_topic "201603")
+
+  (send xlsx add-chart-sheet #:sheet_name "BarChart" #:chart_type 'bar #:topic "BarChart" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
+
+  (send xlsx add-chart-sheet #:sheet_name "BarChart3D" #:chart_type 'bar3d #:topic "BarChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B3-D3" #:y_topic "Puma")
+  (send xlsx add-chart-serial! #:sheet_name "BarChart3D" #:data_sheet_name "DataSheet" #:data_range "B4-D4" #:y_topic "Brooks")
+
+  (send xlsx add-chart-sheet #:sheet_name "PieChart" #:chart_type 'pie #:topic "PieChart" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "PieChart" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "PieChart" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+
+  (send xlsx add-chart-sheet #:sheet_name "PieChart3D" #:chart_type 'pie3d #:topic "PieChart3D" #:x_topic "Kg")
+  (send xlsx set-chart-x-data! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
+  (send xlsx add-chart-serial! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
+
+  (write-xlsx-file xlsx "test.xlsx")
+
+  (with-input-from-xlsx-file
+   "test.xlsx"
+   (lambda (xlsx)
+     (printf "~a\n" (get-sheet-names xlsx)) 
+     ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
+
+     (load-sheet "DataSheet" xlsx)
+     (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 4)
+
+     (printf "~a\n" (get-cell-value "A2") ;201601
+
+     (with-row xlsx
+       (lambda (row)
+         (printf "~a\n" row)))
+     ; ("month/brand" "201601" "201602" "201603")
+     ; ("CAT" 100 300 200)
+     ; ("Puma" 200 400 300)
+     ; ("Brooks" 300 500 400)
+   )))
+  )
   
 ```
 
-![ScreenShot](simple-xlsx/example/example.png)
+![ScreenShot](simple-xlsx/example/datasheet.jpg)
+![ScreenShot](simple-xlsx/example/linechart1.jpg)
+![ScreenShot](simple-xlsx/example/linechart2.jpg)
+![ScreenShot](simple-xlsx/example/linechart3d.jpg)
+![ScreenShot](simple-xlsx/example/barchart.jpg)
+![ScreenShot](simple-xlsx/example/barchart3d.jpg)
+![ScreenShot](simple-xlsx/example/piechart.jpg)
+![ScreenShot](simple-xlsx/example/piechart3d.jpg)
