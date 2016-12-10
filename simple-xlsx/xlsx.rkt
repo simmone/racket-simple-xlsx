@@ -266,11 +266,11 @@
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
          
-         (define/public (set-data-sheet-col-width! sheet_name col_range width)
+         (define/public (set-data-sheet-col-width! #:sheet_name sheet_name #:col_range col_range #:width width)
            (when (check-col-range col_range)
                  (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) col_range width)))
 
-         (define/public (set-data-sheet-cell-color! sheet_name cell_range color)
+         (define/public (set-data-sheet-cell-color! #:sheet_name sheet_name #:cell_range cell_range #:color color)
            (when (check-cell-range cell_range)
                  (hash-set! (data-sheet-color_hash (sheet-content (get-sheet-by-name sheet_name))) cell_range color)))
 

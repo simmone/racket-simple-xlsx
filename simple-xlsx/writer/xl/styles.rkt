@@ -22,7 +22,7 @@
   (lambda ()
     (for-each
      (lambda (style_rec)
-       (printf "<fill><patternFill patternType=\"solid\"><fgColor rgb=\"~a\"/><bgColor indexed=\"64\"/></patternFill></fill>" (first style_rec)))
+       (printf "<fill><patternFill patternType=\"solid\"><fgColor rgb=\"~a\"/><bgColor indexed=\"64\"/></patternFill></fill>" style_rec))
      color_list)))|</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"><alignment vertical="center"/></xf></cellStyleXfs><cellXfs count="@|(number->string (add1 (length color_list)))|"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>@|(with-output-to-string
 (lambda ()
   (let loop ([loop_list color_list]

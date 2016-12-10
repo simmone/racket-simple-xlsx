@@ -53,10 +53,10 @@
         (check-equal? (sheet-type sheet) 'data)
         (check-equal? (sheet-typeSeq sheet) 2)
 
-        (send xlsx set-data-sheet-col-width! "测试2" "A-C" 100)
+        (send xlsx set-data-sheet-col-width! #:sheet_name "测试2" #:col_range "A-C" #:width 100)
         (check-equal? (hash-ref (data-sheet-width_hash (sheet-content sheet)) "A-C") 100)
 
-        (send xlsx set-data-sheet-cell-color! "测试2" "A1-C2" "red")
+        (send xlsx set-data-sheet-cell-color! #:sheet_name "测试2" #:cell_range "A1-C2" #:color "red")
         (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
@@ -182,9 +182,11 @@
     (let ([xlsx (new xlsx%)])
       (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
 
-      (send xlsx set-data-sheet-cell-color! "测试1" "A1-A4" "red")
+      (send xlsx set-data-sheet-cell-color! #:sheet_name "测试1" #:cell_range "A1-A4" #:color "red")
 
-      (send xlsx set-data-sheet-cell-color! "测试1" "B1-B4" "blue")
+      (check-equal? (send xlsx get-color-list) '("red"))
+
+      (send xlsx set-data-sheet-cell-color! #:sheet_name "测试1" #:cell_range "B1-B4" #:color "blue")
       
       (check-equal? (send xlsx get-color-list) '("blue" "red"))
       )

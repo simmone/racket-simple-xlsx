@@ -16,7 +16,7 @@
                [index 1])
       (when (not (null? loop_list))
             (hash-set! color_style_map (car loop_list) index)
-            (loop (cdr loop_list))))
+            (loop (cdr loop_list) (add1 index))))
 
     (with-output-to-string
       (lambda ()
