@@ -7,6 +7,8 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 # Basic Usage
 ```racket
 
+#lang racket
+
 (require simple-xlsx)
 
 (let ([xlsx (new xlsx%)])
@@ -64,13 +66,13 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
   (with-input-from-xlsx-file
    "test.xlsx"
    (lambda (xlsx)
-     (printf "~a\n" (get-sheet-names xlsx)) 
+     (printf "~a\n" (get-sheet-names xlsx))
      ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
 
      (load-sheet "DataSheet" xlsx)
      (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 4)
 
-     (printf "~a\n" (get-cell-value "A2") ;201601
+     (printf "~a\n" (get-cell-value "A2" xlsx)) ;201601
 
      (with-row xlsx
        (lambda (row)
@@ -80,10 +82,8 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
      ; ("Puma" 200 400 300)
      ; ("Brooks" 300 500 400)
    )))
-  )
   
 ```
-
 ![ScreenShot](simple-xlsx/example/datasheet.jpg)
 ![ScreenShot](simple-xlsx/example/linechart1.jpg)
 ![ScreenShot](simple-xlsx/example/linechart2.jpg)

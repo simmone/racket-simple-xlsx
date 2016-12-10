@@ -57,13 +57,13 @@
   (with-input-from-xlsx-file
    "test.xlsx"
    (lambda (xlsx)
-     (printf "~a\n" (get-sheet-names xlsx)) 
+     (printf "~a\n" (get-sheet-names xlsx))
      ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
 
      (load-sheet "DataSheet" xlsx)
      (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 4)
 
-     (printf "~a\n" (get-cell-value "A2") ;201601
+     (printf "~a\n" (get-cell-value "A2" xlsx)) ;201601
 
      (with-row xlsx
        (lambda (row)
@@ -73,4 +73,3 @@
      ; ("Puma" 200 400 300)
      ; ("Brooks" 300 500 400)
    )))
-  )
