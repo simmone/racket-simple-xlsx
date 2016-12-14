@@ -74,14 +74,15 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 
      (printf "~a\n" (get-cell-value "A2" xlsx)) ;201601
 
-     (with-row xlsx
-       (lambda (row)
-         (printf "~a\n" row)))
-     ; ("month/brand" "201601" "201602" "201603")
-     ; ("CAT" 100 300 200)
-     ; ("Puma" 200 400 300)
-     ; ("Brooks" 300 500 400)
-   )))
+     (printf "~a\n" (get-sheet-rows xlsx))))
+     ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
+  )
+
+  (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))
+  ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
+
+  (printf "~a\n" (sheet-ref-rows "test.xlsx" 0))
+  ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
   
 ```
 ![ScreenShot](simple-xlsx/example/datasheet.jpg)

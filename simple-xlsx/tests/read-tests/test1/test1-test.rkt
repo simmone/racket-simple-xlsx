@@ -72,7 +72,7 @@
 
       (test-case
        "test-sheet-ref-rows"
-       (let ([rows (sheet-name-rows test_file 0)])
+       (let ([rows (sheet-ref-rows test_file 0)])
          (check-equal? (first (list-ref rows 0)) "chenxiao")
          (check-equal? (second (list-ref rows 0)) "love")
          (check-equal? (third (list-ref rows 0)) "chensiheng")

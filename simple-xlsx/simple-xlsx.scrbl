@@ -63,11 +63,28 @@ there is also a complete read and write example on github:@link["https://github.
   like (1 . 4)
 }
 
-@defproc[(with-row
-            [xlsx_handler (xlsx_handler)]
-            [user_proc (-> list? any)])
-            any]{
-  with-row is like for-each, deal a line one time.
+@defproc[(get-sheet-rows
+            [xlsx_handler (xlsx_handler)])
+            list?]{
+  get-sheet-rows get all rows from current loaded sheet
+}
+
+@defproc[(sheet-name-rows
+            [xlsx_file_path (path-string?)]
+            [sheet_name (string?)]
+            )
+            list?]{
+  if, only if just want get a specific sheet name's data, no other operations on the xlsx file.
+
+  this is the most simple func to get xlsx data.
+}
+
+@defproc[(sheet-ref-rows
+            [xlsx_file_path (path-string?)]
+            [sheet_index (exact-nonnegative-integer?)]
+            )
+            list?]{
+  same as sheet-name-rows, use sheet index to specify sheet.
 }
 
 @section{Write}
@@ -162,7 +179,7 @@ only one x axis data and multiple y axis data
 @verbatim{
 #lang racket
 
-(require simple-xlsx)
+(require "../main.rkt")
 
 (let ([xlsx (new xlsx%)])
   (send xlsx add-data-sheet 
@@ -219,21 +236,21 @@ only one x axis data and multiple y axis data
   (with-input-from-xlsx-file
    "test.xlsx"
    (lambda (xlsx)
-     (printf "~a\n" (get-sheet-names xlsx)) 
+     (printf "~a\n" (get-sheet-names xlsx))
      ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
 
      (load-sheet "DataSheet" xlsx)
      (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 4)
 
-     (printf "~a\n" (get-cell-value "A2") ;201601
+     (printf "~a\n" (get-cell-value "A2" xlsx)) ;201601
 
-     (with-row xlsx
-       (lambda (row)
-         (printf "~a\n" row)))
-     ; ("month/brand" "201601" "201602" "201603")
-     ; ("CAT" 100 300 200)
-     ; ("Puma" 200 400 300)
-     ; ("Brooks" 300 500 400)
-   )))
+     (printf "~a\n" (get-sheet-rows xlsx))))
+     ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
   )
+
+  (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))
+  ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
+
+  (printf "~a\n" (sheet-ref-rows "test.xlsx" 0))
+  ; ((month/brand 201601 201602 201603) (CAT 100 300 200) (Puma 200 400 300) (Brooks 300 500 400))
 }

@@ -47,34 +47,27 @@
        )
 
       (test-case
-       "test-with-row"
-       (let ([row_index 1])
-         (with-row xlsx
-          (lambda (row)
-            (when (= row_index 1)
-                (check-equal? (list-ref row 0) "chenxiao ")
-                (check-equal? (list-ref row 1) "")
-                (check-equal? (list-ref row 2) "xiaomin")
-                (check-equal? (list-ref row 3) ""))
+       "test-get-sheet-rows"
+       (let ([rows (get-sheet-rows xlsx)])
+         (check-equal? (list-ref (list-ref rows 0) 0) "chenxiao ")
+         (check-equal? (list-ref (list-ref rows 0) 1) "")
+         (check-equal? (list-ref (list-ref rows 0) 2) "xiaomin")
+         (check-equal? (list-ref (list-ref rows 0) 3) "")
 
-            (when (= row_index 2)
-                (check-equal? (list-ref row 0) "")
-                (check-equal? (list-ref row 1) "")
-                (check-equal? (list-ref row 2) "")
-                (check-equal? (list-ref row 3) "haha"))
+         (check-equal? (list-ref (list-ref rows 1) 0) "")
+         (check-equal? (list-ref (list-ref rows 1) 1) "")
+         (check-equal? (list-ref (list-ref rows 1) 2) "")
+         (check-equal? (list-ref (list-ref rows 1) 3) "haha")
 
-            (when (= row_index 3)
-                (check-equal? (list-ref row 0) "")
-                (check-equal? (list-ref row 1) "")
-                (check-equal? (list-ref row 2) "")
-                (check-equal? (list-ref row 3) ""))
+         (check-equal? (list-ref (list-ref rows 2) 0) "")
+         (check-equal? (list-ref (list-ref rows 2) 1) "")
+         (check-equal? (list-ref (list-ref rows 2) 2) "")
+         (check-equal? (list-ref (list-ref rows 2) 3) "")
 
-            (when (= row_index 4)
-                (check-equal? (list-ref row 0) "陈晓")
-                (check-equal? (list-ref row 1) "爱")
-                (check-equal? (list-ref row 2) "陈思衡")
-                (check-equal? (list-ref row 3) ""))
-         (set! row_index (add1 row_index))))))
-      ))))
+         (check-equal? (list-ref (list-ref rows 3) 0) "陈晓")
+         (check-equal? (list-ref (list-ref rows 3) 1) "爱")
+         (check-equal? (list-ref (list-ref rows 3) 2) "陈思衡")
+         (check-equal? (list-ref (list-ref rows 3) 3) "")
+      ))))))
 
 (run-tests test-test2)
