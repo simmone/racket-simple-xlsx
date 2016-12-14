@@ -1,45 +1,48 @@
 #lang racket
 
-(provide (contract-out 
-          [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]
-          [get-sheet-names (-> any/c list?)]
-          [get-cell-value (-> string? any/c any)]
-          [load-sheet (-> string? any/c void?)]
-          [load-sheet-ref (-> exact-nonnegative-integer? any/c void?)]          
-          [get-sheet-dimension (-> any/c pair?)]
-          [with-row (-> any/c (-> list? any) any)]
+(provide (contract-out
+          [read-xlsx% class?]
+          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
+          [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
+          [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
+          [get-sheet-dimension (-> (is-a?/c read-xlsx%) pair?)]
+          [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
+          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]
+          [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
+          [sheet-name-rows (-> path-string? string? list?)]
+          [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
           ))
 
 (require xml)
 
 (require "lib/lib.rkt")
 
-(define xlsx%
+(define read-xlsx%
   (class object%
-         (init-field [xlsx_dir ""] 
-                     [shared_map #f] 
-                     [sheet_map #f] 
-                     [sheet_name_map #f] 
-                     [relation_name_map #f] 
-                     [data_type_map #f] 
+         (init-field [xlsx_dir ""]
+                     [shared_map #f]
+                     [sheet_map #f]
+                     [sheet_name_map #f]
+                     [relation_name_map #f]
+                     [data_type_map #f]
                      [dimension #f])
          (super-new)))
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
-  (with-unzip 
+  (with-unzip
    xlsx_file
    (lambda (tmp_dir)
      (let ([xlsx_obj
-            (new xlsx% 
-                 (xlsx_dir tmp_dir) 
-                 (shared_map (get-shared-string tmp_dir)) 
-                 (sheet_name_map (get-sheet-name-map tmp_dir)) 
+            (new read-xlsx%
+                 (xlsx_dir tmp_dir)
+                 (shared_map (get-shared-string tmp_dir))
+                 (sheet_name_map (get-sheet-name-map tmp_dir))
                  (relation_name_map (get-relation-name-map tmp_dir)))])
        (user_proc xlsx_obj)))))
 
 (define (get-sheet-name-map xlsx_dir)
   (let ([data_map (make-hash)])
-    (with-input-from-file 
+    (with-input-from-file
         (build-path xlsx_dir "xl" "workbook.xml")
       (lambda ()
         (let ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
@@ -65,7 +68,7 @@
 
 (define (get-relation-name-map xlsx_dir)
   (let ([data_map (make-hash)])
-    (with-input-from-file 
+    (with-input-from-file
         (build-path xlsx_dir "xl" "_rels" "workbook.xml.rels")
       (lambda ()
         (let ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
@@ -97,7 +100,7 @@
 
 (define (get-shared-string xlsx_dir)
   (let ([data_map (make-hash)])
-    (with-input-from-file 
+    (with-input-from-file
         (build-path xlsx_dir "xl" "sharedStrings.xml")
       (lambda ()
         (let ([xml_str (port->string (current-input-port))])
@@ -108,8 +111,8 @@
                     (when (> (length split_items2) 1)
                           (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
                                  [v_list (xml-get-list 't xml)])
-                            (hash-set! data_map 
-                                       (number->string index) 
+                            (hash-set! data_map
+                                       (number->string index)
                                        (regexp-replace* #rx" " (foldr (lambda (a b) (string-append a b)) "" v_list) " ")))))
                   (loop2 (cdr split_items1) (add1 index)))))))
   data_map))
@@ -121,7 +124,7 @@
         [type_map (make-hash)]
         [dimension ""]
         [rows #f]
-        [data_sheet_file_name 
+        [data_sheet_file_name
          (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))])
 
     (when (string=? (path->string (fourth (explode-path data_sheet_file_name))) "worksheets")
@@ -132,7 +135,7 @@
                              [result_list '()])
                     (if (not (null? loop_list))
                         (if (regexp-match #rx"</row>" (car loop_list))
-                            (loop 
+                            (loop
                              (cdr loop_list)
                              (cons (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list)))))) result_list))
                             (if (regexp-match #rx"<dimension ref=\"[A-Z]+[0-9]+:[A-Z]+[0-9]+\"/>" (car loop_list))
@@ -204,14 +207,36 @@
 
 (define (get-sheet-dimension xlsx)
   (get-field dimension xlsx))
-  
-(define (with-row xlsx proc)
+
+(define (get-sheet-rows xlsx)
   (let ([rows (car (get-field dimension xlsx))]
         [cols (cdr (get-field dimension xlsx))])
-    (let loop ([row_index 1])
-      (when (<= row_index rows)
-            (proc (map
-                   (lambda (col)
-                     (get-cell-value (string-append (number->abc col) (number->string row_index)) xlsx))
-                   (number->list cols)))
-            (loop (add1 row_index))))))
+    (let loop ([row_index 1]
+               [result_list '()])
+      (if (<= row_index rows)
+          (loop 
+           (add1 row_index)
+           (cons 
+            (map
+             (lambda (col)
+               (get-cell-value (string-append (number->abc col) (number->string row_index)) xlsx))
+             (number->list cols))
+            result_list))
+          (reverse result_list)))))
+
+(define (sheet-name-rows xlsx_file_path sheet_name)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet sheet_name xlsx)
+     
+     (get-sheet-rows xlsx))))
+
+(define (sheet-ref-rows xlsx_file_path sheet_index)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet-ref sheet_index xlsx)
+     
+     (get-sheet-rows xlsx))))
+

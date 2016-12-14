@@ -1,13 +1,16 @@
 #lang racket
 
 (provide (contract-out 
-          [with-input-from-xlsx-file (-> path-string? (-> any/c void?) void?)]
-          [load-sheet (-> string? any/c void?)]
-          [load-sheet-ref (-> exact-nonnegative-integer? any/c void?)]                    
-          [get-sheet-names (-> any/c list?)]
-          [get-cell-value (-> string? any/c any)]
-          [get-sheet-dimension (-> any/c pair?)]
-          [with-row (-> any/c (-> list? any) any)]
+          [sheet-name-rows (-> path-string? string? list?)]
+          [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
+          [read-xlsx% class?]
+          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
+          [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
+          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]                    
+          [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
+          [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
+          [get-sheet-dimension (-> (is-a?/c read-xlsx%) pair?)]
+          [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
           [xlsx% class?]
           [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
           ))

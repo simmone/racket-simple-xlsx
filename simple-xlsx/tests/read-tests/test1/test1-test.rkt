@@ -49,21 +49,37 @@
        )
 
       (test-case
-       "test-with-row"
-       (let ([row_index 1])
-         (with-row xlsx
-          (lambda (row)
-            (when (= row_index 1)
-                (check-equal? (first row) "chenxiao")
-                (check-equal? (second row) "love")
-                (check-equal? (third row) "chensiheng"))
-            (when (= row_index 2)
-                (check-equal? (first row) 2)
-                (check-equal? (second row) 5)
-                (check-equal? (third row) 7))
-            
-            (set! row_index (add1 row_index))
-            ))))
+       "test-get-sheet-rows"
+       (let ([rows (get-sheet-rows xlsx)])
+         (check-equal? (first (list-ref rows 0)) "chenxiao")
+         (check-equal? (second (list-ref rows 0)) "love")
+         (check-equal? (third (list-ref rows 0)) "chensiheng")
+         (check-equal? (first (list-ref rows 1)) 2)
+         (check-equal? (second (list-ref rows 1)) 5)
+         (check-equal? (third (list-ref rows 1)) 7)
+         ))
+
+      (test-case
+       "test-sheet-name-rows"
+       (let ([rows (sheet-name-rows test_file "Sheet1")])
+         (check-equal? (first (list-ref rows 0)) "chenxiao")
+         (check-equal? (second (list-ref rows 0)) "love")
+         (check-equal? (third (list-ref rows 0)) "chensiheng")
+         (check-equal? (first (list-ref rows 1)) 2)
+         (check-equal? (second (list-ref rows 1)) 5)
+         (check-equal? (third (list-ref rows 1)) 7)
+         ))
+
+      (test-case
+       "test-sheet-ref-rows"
+       (let ([rows (sheet-name-rows test_file 0)])
+         (check-equal? (first (list-ref rows 0)) "chenxiao")
+         (check-equal? (second (list-ref rows 0)) "love")
+         (check-equal? (third (list-ref rows 0)) "chensiheng")
+         (check-equal? (first (list-ref rows 1)) 2)
+         (check-equal? (second (list-ref rows 1)) 5)
+         (check-equal? (third (list-ref rows 1)) 7)
+         ))
 
       ))))
 
