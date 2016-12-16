@@ -68,9 +68,12 @@
                                      [(string? cell)
                                       (printf "<c r=\"~a\"~a t=\"s\"><v>~a</v></c>" 
                                               dimension color_style (hash-ref string_index_map cell))]
-                                     [(number? cell)
+                                     [(exact-integer? cell)
                                       (printf "<c r=\"~a\"~a><v>~a</v></c>" 
                                               dimension color_style (number->string (inexact->exact cell)))]
+                                     [(number? cell)
+                                      (printf "<c r=\"~a\"~a><v>~a</v></c>" 
+                                              dimension color_style (number->string (exact->inexact cell)))]
                                      [else
                                       (printf "<c r=\"~a\"><v>0</v></c>" dimension)]))
                                   (loop-col (cdr loop_cols) (add1 col_seq))))))

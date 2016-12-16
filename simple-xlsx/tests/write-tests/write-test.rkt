@@ -17,10 +17,10 @@
           (let ([xlsx (new xlsx%)])
             (send xlsx add-data-sheet 
                   #:sheet_name "DataSheet" 
-                  #:sheet_data '(("month/brand" "201601" "201602" "201603")
-                                 ("CAT" 100 300 200)
-                                 ("Puma" 200 400 300)
-                                 ("Brooks" 300 500 400)
+                  #:sheet_data '(("month/brand" "201601" "201602" "201603" "201604")
+                                 ("CAT" 100 300 200 6.9)
+                                 ("Puma" 200 400 300 13.89)
+                                 ("Brooks" 300 500 400 23.34)
                                  ))
             (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
             (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "B2-C3" #:color "FF0000")
@@ -73,7 +73,8 @@
              (check-equal? (get-sheet-names xlsx) '("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
 
              (load-sheet "DataSheet" xlsx)
-             (check-equal? (get-sheet-dimension xlsx) '(4 . 4))
+             (check-equal? (get-sheet-dimension xlsx) '(4 . 5))
+             (check-equal? (get-cell-value "E2" xlsx) 6.9)
 
              (load-sheet "LineChart1" xlsx)
              (check-equal? (get-sheet-dimension xlsx) '(0 . 0))
