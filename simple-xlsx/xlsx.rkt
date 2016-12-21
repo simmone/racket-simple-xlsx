@@ -27,7 +27,7 @@
                    (y_data_range_list list?)
                    )]
           [check-range (-> string? boolean?)]
-          [check-col-range (-> string? boolean?)]
+          [check-col-range (-> string? string?)]
           [check-cell-range (-> string? boolean?)]
           [check-data-range-valid (-> (is-a?/c xlsx%) string? string? boolean?)]
           [check-data-list (-> any/c boolean?)]
@@ -96,22 +96,32 @@
 
 (define (check-col-range col_range_str)
   (cond
+   [(regexp-match #rx"^[A-Z]+$" col_range_str)
+    (let* ([items (regexp-match #rx"^([A-Z]+)$" col_range_str)]
+           [start_col_name (second items)]
+           [end_col_name start_col_name])
+      (string-append start_col_name "-" end_col_name))]
+   [(regexp-match #rx"^[0-9]+$" col_range_str)
+    (let* ([items (regexp-match #rx"^([0-9]+)$" col_range_str)]
+           [start_col_index (second items)]
+           [end_col_index start_col_index])
+      (string-append start_col_index "-" end_col_index))]
    [(regexp-match #rx"^[A-Z]+-[A-Z]+$" col_range_str)
     (let* ([items (regexp-match #rx"^([A-Z]+)-([A-Z]+)$" col_range_str)]
            [start_col_name (second items)]
            [end_col_name (third items)])
       (if (string>? start_col_name end_col_name)
           (error (format "col name should from small to big[~a]" col_range_str))
-          #t))]
+          (string-append start_col_name "-" end_col_name)))]
    [(regexp-match #rx"^[0-9]+-[0-9]+$" col_range_str)
     (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" col_range_str)]
            [start_col_index (second items)]
            [end_col_index (third items)])
       (if (string>? start_col_index end_col_index)
           (error (format "col index should from small to big[~a]" col_range_str))
-          #t))]
+          (string-append start_col_index "-" end_col_index)))]
    [else
-    (error (format "invalid col range! should be like this: A-Z or 1-10[~a]" col_range_str))]
+    (error (format "invalid col range! should be like this: A-Z or 1-10 or A or 1 but is [~a]" col_range_str))]
    ))
 
 (define (check-cell-range cell_range_str)
@@ -267,8 +277,8 @@
            (list-ref sheets sheet_seq))
          
          (define/public (set-data-sheet-col-width! #:sheet_name sheet_name #:col_range col_range #:width width)
-           (when (check-col-range col_range)
-                 (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) col_range width)))
+           (let ([converted_col_range (check-col-range col_range)])
+                 (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) converted_col_range width)))
 
          (define/public (set-data-sheet-cell-color! #:sheet_name sheet_name #:cell_range cell_range #:color color)
            (when (check-cell-range cell_range)

@@ -151,7 +151,11 @@
    (test-case
     "test-check-col-range"
     
-    (check-col-range "A-Z")
+    (check-equal? (check-col-range "A-Z") "A-Z")
+
+    (check-equal? (check-col-range "A") "A-A")
+
+    (check-equal? (check-col-range "10") "10-10")
     
     (check-exn exn:fail? (lambda () (check-col-range "B-A")))
 
