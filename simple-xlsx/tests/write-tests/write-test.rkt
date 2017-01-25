@@ -77,7 +77,7 @@
              (check-equal? (get-cell-value "E2" xlsx) 6.9)
 
              (load-sheet "LineChart1" xlsx)
-             (check-equal? (get-sheet-dimension xlsx) '(0 . 0))
+             (check-equal? (get-sheet-dimension xlsx) '(4 . 5))
 
              ))
           )
