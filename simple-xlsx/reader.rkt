@@ -99,32 +99,34 @@
    (sort #:key cdr (hash->list (get-field sheet_name_map xlsx)) string<?)))
 
 (define (get-shared-string xlsx_dir)
-  (let ([data_map (make-hash)])
-    (with-input-from-file
-        (build-path xlsx_dir "xl" "sharedStrings.xml")
-      (lambda ()
-        (let ([xml_str (port->string (current-input-port))])
-          (let loop2 ([split_items1 (regexp-split #rx"</si>" xml_str)]
-                      [index 0])
-            (when (not (null? split_items1))
-                  (let ([split_items2 (regexp-split #rx"<si>" (car split_items1))])
-                    (when (> (length split_items2) 1)
-                          (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
-                                 [v_list (xml-get-list 't xml)]
-                                 [ignore_rPh_map (make-hash)])
+  (let ([data_map (make-hash)]
+        [shared_strings_file_name (build-path xlsx_dir "xl" "sharedStrings.xml")])
+    (when (file-exists? shared_strings_file_name)
+          (with-input-from-file
+              (build-path xlsx_dir "xl" "sharedStrings.xml")
+            (lambda ()
+              (let ([xml_str (port->string (current-input-port))])
+                (let loop2 ([split_items1 (regexp-split #rx"</si>" xml_str)]
+                            [index 0])
+                  (when (not (null? split_items1))
+                        (let ([split_items2 (regexp-split #rx"<si>" (car split_items1))])
+                          (when (> (length split_items2) 1)
+                                (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
+                                       [v_list (xml-get-list 't xml)]
+                                       [ignore_rPh_map (make-hash)])
 
-                            (for-each
-                             (lambda (rPh_rec)
-                               (hash-set! ignore_rPh_map (third rPh_rec) ""))
-                             (xml-get-list 'rPh xml))
-                                 
-                            (hash-set! data_map
-                                       (number->string index)
-                                       (regexp-replace* #rx" " 
-                                                        (foldr (lambda (a b) (string-append a b)) "" 
-                                                               (filter (lambda (item) (not (hash-has-key? ignore_rPh_map item))) v_list))
-                                                        " ")))))
-                  (loop2 (cdr split_items1) (add1 index)))))))
+                                  (for-each
+                                   (lambda (rPh_rec)
+                                     (hash-set! ignore_rPh_map (third rPh_rec) ""))
+                                   (xml-get-list 'rPh xml))
+                                  
+                                  (hash-set! data_map
+                                             (number->string index)
+                                             (regexp-replace* #rx" " 
+                                                              (foldr (lambda (a b) (string-append a b)) "" 
+                                                                     (filter (lambda (item) (not (hash-has-key? ignore_rPh_map item))) v_list))
+                                                              " ")))))
+                        (loop2 (cdr split_items1) (add1 index))))))))
   data_map))
 
 (define (load-sheet sheet_name xlsx)
