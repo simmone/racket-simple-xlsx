@@ -137,7 +137,7 @@
         [rows #f]
         [data_sheet_file_name
          (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))])
-
+    
     (when (string=? (path->string (fourth (explode-path data_sheet_file_name))) "worksheets")
           (let ([file_str (file->string data_sheet_file_name)])
             (set! rows
@@ -146,34 +146,35 @@
                              [result_list '()]
                              [index 1])
                     (if (not (null? loop_list))
-                        (if (regexp-match #rx"</row>" (car loop_list))
-                            (let ([row_index (second (regexp-match #rx" r=\"([0-9]+)\" " (car loop_list)))]
-                                  [col_info (regexp-match* #rx" r=\"([A-Z]+)[0-9]+\" " (car loop_list))])
-                              (if (= (string->number row_index) index)
-                                  (let ([row (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list))))))])
-                                    (when (not (null? col_info))
-                                          (let ([max_col_index (abc->number (car (reverse 
-                                                                                  (map 
-                                                                                   (lambda (item)
-                                                                                     (second (regexp-match #rx"([A-Z]+)" item)))
-                                                                                   col_info))))])
-                                            (when (> max_col_index dimension_col)
-                                                  (set! dimension_col max_col_index))))
+                        (begin
+                          (if (regexp-match #rx"</row>" (car loop_list))
+                              (let ([row_index (second (regexp-match #rx" r=\"([0-9]+)\" " (car loop_list)))]
+                                    [col_info (regexp-match* #rx" r=\"([A-Z]+)[0-9]+\" *" (car loop_list))])
+                                (if (= (string->number row_index) index)
+                                    (let ([row (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list))))))])
+                                      (when (not (null? col_info))
+                                            (let ([max_col_index (abc->number (car (reverse 
+                                                                                    (map 
+                                                                                     (lambda (item)
+                                                                                       (second (regexp-match #rx"([A-Z]+)" item)))
+                                                                                     col_info))))])
+                                              (when (> max_col_index dimension_col)
+                                                    (set! dimension_col max_col_index))))
+                                      (loop
+                                       (cdr loop_list)
+                                       (cons
+                                        (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list)))))) 
+                                        result_list)
+                                       (add1 index)))
                                     (loop
-                                     (cdr loop_list)
-                                     (cons
-                                      (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list)))))) 
-                                      result_list)
-                                     (add1 index)))
-                                  (loop
-                                   loop_list
-                                   (cons null result_list)
-                                   (add1 index))))
-                            (loop (cdr loop_list) result_list index))
+                                     loop_list
+                                     (cons null result_list)
+                                     (add1 index))))
+                              (loop (cdr loop_list) result_list index)))
                         (reverse result_list)))))
           
           (set-field! dimension xlsx (cons (length rows) dimension_col))
-                    
+          
           (for-each
            (lambda (row_xml)
              (when (not (null? row_xml))
