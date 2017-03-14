@@ -198,7 +198,8 @@
                                                  [(equal? key 's)
                                                   (set! para_s value)]
                                                  [(equal? key 't)
-                                                  (set! para_t value)]))
+                                                  (set! para_t value)]
+                                                 ))
                                               (loop (cdr para_list))))
                                       (hash-set! type_map para_r (cons para_t para_s))
 
@@ -232,9 +233,7 @@
           (cond
            [(string=? type_t "s")
             (hash-ref shared_map value)]
-           [(string=? type_s "5")
-            (format-time (string->number value))]
-           [(or (string=? type_t "") (string=? type_s "2"))
+           [(string=? type_t "")
             (string->number value)]))
         "")))
 

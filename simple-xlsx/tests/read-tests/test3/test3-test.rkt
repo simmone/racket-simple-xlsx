@@ -39,8 +39,6 @@
 
        (check-equal? (get-cell-value "I1" xlsx) 2343.3)
 
-       (check-equal? (get-cell-value "J1" xlsx) "13:20:45")
-
        )
 
       ))))
