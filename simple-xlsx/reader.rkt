@@ -127,7 +127,7 @@
                                 (let* ([xml (xml->xexpr (document-element (read-xml (open-input-string (string-append "<si>" (second split_items2) "</si>")))))]
                                        [v_list (xml-get-list 't xml)]
                                        [ignore_rPh_map (make-hash)])
-
+                                  
                                   (for-each
                                    (lambda (rPh_rec)
                                      (hash-set! ignore_rPh_map (third rPh_rec) ""))
@@ -135,10 +135,23 @@
                                   
                                   (hash-set! data_map
                                              (number->string index)
-                                             (regexp-replace* #rx" " 
-                                                              (foldr (lambda (a b) (string-append a b)) "" 
-                                                                     (filter (lambda (item) (not (hash-has-key? ignore_rPh_map item))) v_list))
-                                                              " ")))))
+                                             (regexp-replace* 
+                                              #rx" " 
+                                              (foldr (lambda (a b) (string-append a b)) "" 
+                                                     (filter 
+                                                      (lambda (item) 
+                                                        (not (hash-has-key? ignore_rPh_map item))) 
+                                                      (map
+                                                       (lambda (v)
+                                                         (cond
+                                                          [(string? v)
+                                                           v]
+                                                          [(integer? v)
+                                                           (string (integer->char v))]
+                                                          [else
+                                                           ""]))
+                                                         v_list)))
+                                              " ")))))
                         (loop2 (cdr split_items1) (add1 index))))))))
   data_map))
 
