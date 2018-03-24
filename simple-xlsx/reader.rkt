@@ -32,13 +32,23 @@
   (with-unzip
    xlsx_file
    (lambda (tmp_dir)
-     (let ([xlsx_obj
-            (new read-xlsx%
+     (let ([new_shared_map #f]
+           [new_sheet_name_map #f]
+           [new_relation_name_map #f]
+           [xlsx_obj #f])
+     (set! new_shared_map (get-shared-string tmp_dir))
+
+     (set! new_sheet_name_map (get-sheet-name-map tmp_dir))
+
+     (set! new_relation_name_map (get-relation-name-map tmp_dir))
+
+     (set! xlsx_obj
+           (new read-xlsx%
                  (xlsx_dir tmp_dir)
-                 (shared_map (get-shared-string tmp_dir))
-                 (sheet_name_map (get-sheet-name-map tmp_dir))
-                 (relation_name_map (get-relation-name-map tmp_dir)))])
-       (user_proc xlsx_obj)))))
+                 (shared_map new_shared_map)
+                 (sheet_name_map new_sheet_name_map)
+                 (relation_name_map new_relation_name_map)))
+     (user_proc xlsx_obj)))))
 
 (define (get-sheet-name-map xlsx_dir)
   (let ([data_map (make-hash)])
@@ -73,24 +83,27 @@
       (lambda ()
         (let ([xml (xml->xexpr (document-element (read-xml (current-input-port))))]
               [sheet_list '()])
-          (for-each
-           (lambda (sheet)
-             (let ([attr_list (cadr sheet)]
-                   [sheet_name ""]
-                   [sheet_id ""])
-               (for-each
-                (lambda (attr_pair)
-                  (let ([name (car attr_pair)]
-                        [value (cadr attr_pair)])
-                    (cond
-                     [(equal? name 'Id)
-                      (set! sheet_name value)]
-                     [(equal? name 'Target)
-                      (set! sheet_id value)])))
-                attr_list)
-               (hash-set! data_map sheet_name sheet_id)))
-           (xml-get-list 'Relationships xml)))))
-    data_map))
+          (let loop ([loop_list 
+                      (xml-get-list 'Relationships xml)])
+            (when (not (null? loop_list))
+                  (if (not (list? (car loop_list)))
+                      (loop (cdr loop_list))
+                      (let ([attr_list (cadr (car loop_list))]
+                            [sheet_name ""]
+                            [sheet_id ""])
+                        (for-each
+                         (lambda (attr_pair)
+                           (let ([name (car attr_pair)]
+                                 [value (cadr attr_pair)])
+                             (cond
+                              [(equal? name 'Id)
+                               (set! sheet_name value)]
+                              [(equal? name 'Target)
+                               (set! sheet_id value)])))
+                         attr_list)
+                        (hash-set! data_map sheet_name sheet_id)))
+                      (loop (cdr loop_list)))))))
+      data_map))
 
 (define (get-sheet-names xlsx)
   (map
