@@ -20,8 +20,9 @@
      (lambda (xlsx)
        (load-sheet-ref 0 xlsx)
        (check-equal? (get-cell-value "A2" xlsx) "20000000040931")
+       (check-equal? (get-cell-value "D2" xlsx) 123456)
        (load-sheet-ref 1 xlsx)
-       (check-equal? (get-cell-value "A1" xlsx) "ep3Q2H7kd7PwsUPTaEg2Zrbvcx3eC4sZ\nChenxiao")
+       (check-equal? (get-cell-value "A1" xlsx) "ep3Q2H7kd7PwsUPTaEg2Zrbvcx3eC4sZ\n")
        )))
     ))
 

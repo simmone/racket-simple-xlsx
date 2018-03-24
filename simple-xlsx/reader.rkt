@@ -259,6 +259,8 @@
           (cond
            [(string=? type_t "s")
             (hash-ref shared_map value)]
+           [(string=? type_t "n")
+            (string->number value)]
            [(string=? type_t "")
             (string->number value)]))
         "")))
