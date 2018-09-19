@@ -8,6 +8,26 @@
 (define test-lib
   (test-suite
    "test-lib"
+   
+   (test-case
+    "test-check-lines1"
+    (call-with-input-string 
+     "abc"
+     (lambda (expected_port)
+       (call-with-input-string
+        "abc"
+        (lambda (test_port)
+          (check-lines? expected_port test_port))))))
+
+   (test-case
+    "test-check-lines2"
+    (call-with-input-string 
+     "abc\n11"
+     (lambda (expected_port)
+       (call-with-input-string
+        "abc\n11"
+        (lambda (test_port)
+          (check-lines? expected_port test_port))))))
 
    (test-case 
     "test-AZ-NUMBER"
@@ -89,24 +109,106 @@
     )
    
    (test-case
-    "test-range-hash-ref"
+    "test-range-to-cell-hash"
     
-    (let ([range_hash (make-hash)])
-      (hash-set! range_hash "A1-A2" 1)
-      (hash-set! range_hash "A3-B4" 2)
-      (hash-set! range_hash "C1-AA10" 3)
+    (let* ([range1_hash (range-to-cell-hash "A1-A2" 1)]
+           [range2_hash (range-to-cell-hash "A3-B4" 2)])
+
+      (check-equal? (hash-count range1_hash) 2)
+      (check-equal? (hash-count range2_hash) 4)
       
-      (check-equal? (range-hash-ref range_hash "A1") 1)
-      (check-equal? (range-hash-ref range_hash "A2") 1)
+      (check-equal? (hash-ref range1_hash "A1") 1)
+      (check-equal? (hash-ref range1_hash "A2") 1)
+      (check-equal? (hash-ref range2_hash "A3") 2)
+      (check-equal? (hash-ref range2_hash "A4") 2)
+      (check-equal? (hash-ref range2_hash "B3") 2)
+      (check-equal? (hash-ref range2_hash "B4") 2))
 
-      (check-equal? (range-hash-ref range_hash "A3") 2)
-      (check-equal? (range-hash-ref range_hash "B3") 2)
+    (let* ([range1_hash (range-to-cell-hash "A2-A1" 1)]
+           [range2_hash (range-to-cell-hash "A5-E14" 2)])
+      
+      (check-equal? (hash-count range1_hash) 0)
+      (check-equal? (hash-count range2_hash) 50)
 
-      (check-equal? (range-hash-ref range_hash "C8") 3)
-      (check-equal? (range-hash-ref range_hash "Z10") 3)
-      (check-equal? (range-hash-ref range_hash "AA10") 3)
-      ))
-    
+      (check-equal? (hash-ref range2_hash "A5") 2)
+      (check-equal? (hash-ref range2_hash "B10") 2)
+      (check-equal? (hash-ref range2_hash "E14") 2)
+      )
+
+    )
+
+   (test-case
+    "test-combine-hash-in-hash"
+
+    (let* ([range1_hash (range-to-cell-hash "A1-C3" (make-hash '((a . 1))))]
+           [range2_hash (range-to-cell-hash "A3-B4" (make-hash '((a . 2) (b . 1))))]
+           [range3_hash (range-to-cell-hash "B3-D5" (make-hash '((c . 3))))]
+           [result_map (combine-hash-in-hash (list range1_hash range2_hash range3_hash))])
+      
+      (check-equal? (hash-count range1_hash) 9)
+      (check-equal? (hash-count range2_hash) 4)
+      (check-equal? (hash-count range3_hash) 9)
+      (check-equal? (hash-count result_map) 17)
+      
+      (check-equal? (hash-ref result_map "A1") (make-hash '((a . 1))))
+      (check-equal? (hash-ref result_map "C2") (make-hash '((a . 1))))
+
+      (check-equal? (hash-ref result_map "A3") (make-hash '((a . 2) (b . 1))))
+      (check-equal? (hash-ref result_map "A4") (make-hash '((a . 2) (b . 1))))
+
+      (check-equal? (hash-ref result_map "B3") (make-hash '((a . 2) (b . 1) (c . 3))))
+      (check-equal? (hash-ref result_map "B4") (make-hash '((a . 2) (b . 1) (c . 3))))
+      (check-equal? (hash-ref result_map "C3") (make-hash '((a . 1) (c . 3))))
+      (check-equal? (hash-ref result_map "D5") (make-hash '((c . 3))))
+
     ))
+
+   (test-case
+    "test-prefix-each-line"
+    
+    (let ([str "kkd\nskdfk\n\nksjdkf\n\n"])
+      (check-equal? (prefix-each-line str "  ")
+                    "  kkd\n  skdfk\n\n  ksjdkf\n\n"))
+
+    (let ([str "kkd\nskdfk\n\nksjdkf"])
+      (check-equal? (prefix-each-line str "  ")
+                    "  kkd\n  skdfk\n\n  ksjdkf"))
+
+    (let ([str "kkd\nskdfk\n\nksjdkf\n"])
+      (check-equal? (prefix-each-line str "  ")
+                    "  kkd\n  skdfk\n\n  ksjdkf\n"))
+
+    (let ([str ""])
+      (check-equal? (prefix-each-line str "  ") ""))
+
+    (let ([str "\n"])
+      (check-equal? (prefix-each-line str "  ") "\n"))
+
+    (let ([str "\n\n\n"])
+      (check-equal? (prefix-each-line str "  ") "\n\n\n"))
+
+    (let ([str "\nsskd\n\n"])
+      (check-equal? (prefix-each-line str "  ") "\n  sskd\n\n"))
+    )
+
+   (test-case
+    "test-date->oadate"
+    
+    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 17 9 2018))) 43360)
+
+    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 16 9 2018))) 43359)
+    )
+
+   (test-case
+    "test-oadate->date"
+    
+    (check-equal? (oa_date_number->date 43360) (seconds->date (find-seconds 0 0 0 17 9 2018)))
+
+    (check-equal? (oa_date_number->date 43359) (seconds->date (find-seconds 0 0 0 16 9 2018)))
+
+    (check-equal? (oa_date_number->date 43359.1212121) (seconds->date (find-seconds 0 0 0 16 9 2018)))
+    )
+    
+  ))
 
 (run-tests test-lib)

@@ -1,6 +1,7 @@
 #lang racket
 
-(require "../../../xlsx.rkt")
+(require "../../../xlsx/xlsx.rkt")
+(require "../../../xlsx/sheet.rkt")
 
 (require "line-chart.rkt")
 (require "bar-chart.rkt")

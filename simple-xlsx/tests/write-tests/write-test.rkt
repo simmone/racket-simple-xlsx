@@ -1,8 +1,13 @@
 #lang racket
 
 (require rackunit/text-ui)
-
 (require rackunit "../../main.rkt")
+(require racket/date)
+
+(require (only-in "../../lib/lib.rkt" format-date))
+
+(require racket/runtime-path)
+(define-runtime-path test_file "test.xlsx")
 
 (define write-test
   (test-suite
@@ -14,17 +19,31 @@
     (dynamic-wind
         (lambda () (void))
         (lambda ()
-          (let ([xlsx (new xlsx%)])
-            (send xlsx add-data-sheet 
-                  #:sheet_name "DataSheet" 
-                  #:sheet_data '(("month/brand" "201601" "201602" "201603" "201604")
-                                 ("CAT" 100 300 200 6.9)
-                                 ("Puma" 200 400 300 13.89)
-                                 ("Brooks" 300 500 400 23.34)
-                                 ))
+          (let ([xlsx (new xlsx%)]
+                [sheet_data (list
+                             (list "month/brand" "201601" "201602" "201603" "201604" "201605")
+                             (list "CAT" 100 300 200 0.6934 (seconds->date (find-seconds 0 0 0 17 9 2018)))
+                             (list "Puma" 200 400 300 139999.89223 (seconds->date (find-seconds 0 0 0 18 9 2018)))
+                             (list "Asics" 300 500 400 23.34 (seconds->date (find-seconds 0 0 0 19 9 2018)))
+                             )])
+
+            (send xlsx add-data-sheet #:sheet_name "DataSheet" #:sheet_data sheet_data)
             (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
-            (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "B2-C3" #:color "FF0000")
-            (send xlsx set-data-sheet-cell-color! #:sheet_name "DataSheet" #:cell_range "C4-D4" #:color "0000FF")
+
+            (send xlsx add-data-sheet #:sheet_name "DataSheetWithStyle" #:sheet_data sheet_data)
+            (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheetWithStyle" #:col_range "A-B" #:width 50)
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "A2-B3" #:style '( (backgroundColor . "00C851") ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "C3-D4" #:style '( (backgroundColor . "AA66CC") ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "B3-C4" #:style '( (fontSize . 20) (fontName . "Impact")))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "B1-C3" #:style '( (fontColor . "FF8800") ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "E2-E2" #:style '( (numberPercent . #t) ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "E3-E3" 
+                  #:style '( (numberPrecision . 2) (numberThousands . #t)))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "E4-E4" #:style '( (numberPrecision . 0) ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "B2-C4" #:style '( (borderStyle . dashed) (borderColor . "blue")))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "F2-F2" #:style '( (dateFormat . "yyyy-mm-dd") ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "F3-F3" #:style '( (dateFormat . "yyyy/mm/dd") ))
+            (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle" #:cell_range "F4-F4" #:style '( (dateFormat . "yyyy年mm月dd日") ))
 
             (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
             (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")
@@ -64,21 +83,32 @@
             (send xlsx set-chart-x-data! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B1-D1" )
             (send xlsx add-chart-serial! #:sheet_name "PieChart3D" #:data_sheet_name "DataSheet" #:data_range "B2-D2" #:y_topic "CAT")
 
-            (write-xlsx-file xlsx "test.xlsx")
+            (write-xlsx-file xlsx test_file)
             )
 
           (with-input-from-xlsx-file
-           "test.xlsx"
+           test_file
            (lambda (xlsx)
-             (check-equal? (get-sheet-names xlsx) '("DataSheet" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
+             (check-equal? 
+              (get-sheet-names xlsx) 
+              '("DataSheet" "DataSheetWithStyle" "LineChart1" "LineChart2" "LineChart3D" "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
 
              (load-sheet "DataSheet" xlsx)
-             (check-equal? (get-sheet-dimension xlsx) '(4 . 5))
-             (check-equal? (get-cell-value "E2" xlsx) 6.9)
+             (check-equal? (get-sheet-dimension xlsx) '(4 . 6))
+             (check-equal? (get-cell-value "E2" xlsx) 0.6934)
+
+             (let* ([t_date (oa_date_number->date (get-cell-value "F2" xlsx))]
+                    [date_str (format-date t_date)])
+               (check-equal? date_str "20180917"))
+             (let* ([t_date (oa_date_number->date (get-cell-value "F3" xlsx))]
+                    [date_str (format-date t_date)])
+               (check-equal? date_str "20180918"))
+             (let* ([t_date (oa_date_number->date (get-cell-value "F4" xlsx))]
+                    [date_str (format-date t_date)])
+               (check-equal? date_str "20180919"))
 
              (load-sheet "LineChart1" xlsx)
-             (check-equal? (get-sheet-dimension xlsx) '(4 . 5))
-
+             (check-equal? (get-sheet-dimension xlsx) '(4 . 6))
              ))
           )
         (lambda () 

@@ -6,7 +6,7 @@
 (require racket/list)
 (require racket/contract)
 
-(require "../../xlsx.rkt")
+(require "../../xlsx/xlsx.rkt")
 
 ;; strings list convert to (string . place) hash
 (provide (contract-out

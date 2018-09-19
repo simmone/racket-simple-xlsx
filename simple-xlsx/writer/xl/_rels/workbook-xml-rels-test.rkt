@@ -2,7 +2,7 @@
 
 (require rackunit/text-ui)
 
-(require "../../../xlsx.rkt")
+(require "../../../xlsx/xlsx.rkt")
 
 (require rackunit "workbook-xml-rels.rkt")
 

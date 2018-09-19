@@ -3,7 +3,7 @@
 (require rackunit/text-ui)
 (require rackunit "docprops-app.rkt")
 
-(require "../../xlsx.rkt")
+(require "../../xlsx/xlsx.rkt")
 
 (define test-docprops-app
   (test-suite

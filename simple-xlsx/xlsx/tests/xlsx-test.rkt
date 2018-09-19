@@ -1,32 +1,44 @@
 #lang racket
 
 (require rackunit/text-ui)
+(require racket/date)
 
-(require rackunit "xlsx.rkt")
+(require rackunit "../xlsx.rkt")
+(require rackunit "../sheet.rkt")
 
 (define test-xlsx
   (test-suite
    "test-xlsx"
    
    (test-case
-    "test-check-data-list"
-    
-    (check-exn exn:fail? (lambda () (check-equal? (check-data-list '()) #f)))
-    (check-exn exn:fail? (lambda () ((check-data-list '((1) 4)))))
-    (check-exn exn:fail? (lambda () (check-data-list '((1) (1 2)))))
-    
-    (check-true (check-data-list '((1 2) (3 4))))
-    )
-
-   (test-case
     "test-add-data-sheet-string-item-map"
 
     (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
+      (send xlsx add-data-sheet 
+            #:sheet_name "测试1" 
+            #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
       
       (let ([string_item_map (get-field string_item_map xlsx)])
         (check-equal? (hash-count string_item_map) 4)
         (check-true (hash-has-key? string_item_map "xx")))))
+
+   (test-case
+    "test-add-data-sheet-date-type"
+
+    (let ([xlsx (new xlsx%)])
+      (send xlsx add-data-sheet 
+            #:sheet_name "测试1" 
+            #:sheet_data (list
+                          (list 1 (seconds->date (find-seconds 0 0 0 17 9 2018)))
+                          (list 2 (seconds->date (find-seconds 0 0 0 18 9 2018)))
+                          (list 3 (seconds->date (find-seconds 0 0 0 19 9 2018)))
+                          ))
+      
+      (let* ([sheets (get-field sheets xlsx)]
+             [data_sheet (data-sheet-rows (sheet-content (first sheets)))])
+        (check-equal? (second (list-ref data_sheet 0)) 43360)
+        (check-equal? (second (list-ref data_sheet 1)) 43361)
+        (check-equal? (second (list-ref data_sheet 2)) 43362))))
 
    (test-case
     "test-xlsx"
@@ -55,9 +67,6 @@
 
         (send xlsx set-data-sheet-col-width! #:sheet_name "测试2" #:col_range "A-C" #:width 100)
         (check-equal? (hash-ref (data-sheet-width_hash (sheet-content sheet)) "A-C") 100)
-
-        (send xlsx set-data-sheet-cell-color! #:sheet_name "测试2" #:cell_range "A1-C2" #:color "red")
-        (check-equal? (hash-ref (data-sheet-color_hash (sheet-content sheet)) "A1-C2") "red")
         )
 
       (send xlsx add-chart-sheet #:sheet_name "测试3" #:topic "图表1")
@@ -72,9 +81,9 @@
       (let ([sheet (send xlsx get-sheet-by-name "测试3")])
         (check-equal? (sheet-name sheet) "测试3"))
 
-      (check-exn exn:fail? (lambda () (check-data-range-valid xlsx "测试5" "E1-E3")))
+      (check-exn exn:fail? (lambda () (send xlsx check-data-range-valid #:sheet_name "测试5" #:range_str "E1-E3")))
 
-      (check-exn exn:fail? (lambda () (check-data-range-valid xlsx "测试5" "C1-C4")))
+      (check-exn exn:fail? (lambda () (send xlsx check-data-range-valid #:sheet_name "测试5" #:range_str "C1-C4")))
 
       (check-equal? (send xlsx get-range-data "测试5" "A1-A3") '(1 4 8))
       (check-equal? (send xlsx get-range-data "测试5" "B1-B3") '(2 5 9))
@@ -123,79 +132,6 @@
           (check-equal? (data-range-range_str (data-serial-data_range y_data2)) "C1-C3")
         ))
       ))
-
-   (test-case
-    "test-convert-range"
-    
-    (check-equal? (convert-range "C2-C10") "$C$2:$C$10")
-
-    (check-equal? (convert-range "C2-Z2") "$C$2:$Z$2")
-
-    (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
-    )
-   
-   (test-case
-    "test-check-range"
-    
-    (check-true (check-range "A2-Z2"))
-
-    (check-exn exn:fail? (lambda () (check-true (check-range "A2-C3"))))
-    
-    (check-exn exn:fail? (lambda () (check-range "c2")))
-    (check-exn exn:fail? (lambda () (check-range "c2-c2")))
-
-    (check-exn exn:fail? (lambda () (check-range "A2-A1")))
-    (check-exn exn:fail? (lambda () (check-range "A2-B3")))
-    )
-   
-   (test-case
-    "test-check-col-range"
-    
-    (check-equal? (check-col-range "A-Z") "A-Z")
-
-    (check-equal? (check-col-range "A") "A-A")
-
-    (check-equal? (check-col-range "10") "10-10")
-    
-    (check-exn exn:fail? (lambda () (check-col-range "B-A")))
-
-    (check-exn exn:fail? (lambda () (check-col-range "A1-A")))
-    )
-
-   (test-case
-    "test-check-cell-range"
-    
-    (check-cell-range "A1-B2")
-
-    (check-exn exn:fail? (lambda () (check-cell-range "A10-B9")))
-
-    (check-exn exn:fail? (lambda () (check-cell-range "B1-A1")))
-    )
-
-   (test-case
-    "test-range-length"
-    
-    (check-equal? (range-length "A2-A20") 19)
-    (check-equal? (range-length "AB21-AB21") 1)
-    (check-equal? (range-length "A2-D2") 4)
-    )
-
-   (test-case
-    "test-set-data-sheet-cell-color-and-get-style-list"
-
-    (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet #:sheet_name "测试1" #:sheet_data '((1 2 "chenxiao") (3 4 "xiaomin") (5 6 "chenxiao") (1 "xx" "simmone")))
-
-      (send xlsx set-data-sheet-cell-color! #:sheet_name "测试1" #:cell_range "A1-A4" #:color "red")
-
-      (check-equal? (send xlsx get-color-list) '("red"))
-
-      (send xlsx set-data-sheet-cell-color! #:sheet_name "测试1" #:cell_range "B1-B4" #:color "blue")
-      
-      (check-equal? (send xlsx get-color-list) '("blue" "red"))
-      )
-
-      )
 
    (test-case
     "test-get-string-index-map"

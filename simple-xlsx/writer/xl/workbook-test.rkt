@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../../xlsx.rkt")
+(require "../../xlsx/xlsx.rkt")
 
 (require rackunit/text-ui)
 

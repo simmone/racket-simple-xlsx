@@ -6,7 +6,8 @@
 (require racket/list)
 (require racket/contract)
 
-(require "../../../../xlsx.rkt")
+(require "../../../../xlsx/xlsx.rkt")
+(require "../../../../xlsx/sheet.rkt")
 
 (provide (contract-out
           [write-chart-sheet-rels (-> exact-nonnegative-integer? string?)]

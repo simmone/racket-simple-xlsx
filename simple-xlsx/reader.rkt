@@ -179,11 +179,12 @@
                                 (if (= (string->number row_index) index)
                                     (let ([row (xml->xexpr (document-element (read-xml (open-input-string (string-append "<row" (car loop_list))))))])
                                       (when (not (null? col_info))
-                                            (let ([max_col_index (abc->number (car (reverse 
-                                                                                    (map 
-                                                                                     (lambda (item)
-                                                                                       (second (regexp-match #rx"([A-Z]+)" item)))
-                                                                                     col_info))))])
+                                            (let ([max_col_index (abc->number 
+                                                                  (car (reverse 
+                                                                        (map 
+                                                                         (lambda (item)
+                                                                           (second (regexp-match #rx"([A-Z]+)" item)))
+                                                                         col_info))))])
                                               (when (> max_col_index dimension_col)
                                                     (set! dimension_col max_col_index))))
                                       (loop

@@ -1,6 +1,7 @@
 #lang racket
 
-(require "../../../../xlsx.rkt")
+(require "../../../../xlsx/xlsx.rkt")
+(require "../../../../xlsx/sheet.rkt")
 
 (provide (contract-out
           [write-worksheets-rels-file (-> path-string? (is-a?/c xlsx%) void?)]

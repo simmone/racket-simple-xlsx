@@ -5,7 +5,7 @@
 (require racket/list)
 (require rackunit/text-ui)
 
-(require "../../../xlsx.rkt")
+(require "../../../xlsx/xlsx.rkt")
 
 (require rackunit "line-chart.rkt")
 

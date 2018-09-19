@@ -1,6 +1,8 @@
 #lang racket
 
-(require "../../../xlsx.rkt")
+(require "../../../xlsx/xlsx.rkt")
+(require "../../../xlsx/sheet.rkt")
+(require "../../../xlsx/xlsx-lib.rkt")
 
 (provide (contract-out
           [print-line-chart (-> string? (is-a?/c xlsx%) string?)]

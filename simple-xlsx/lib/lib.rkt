@@ -5,6 +5,7 @@
 (require xml)
 (require xml/path)
 (require racket/date)
+(require rackunit)
 
 (provide (contract-out
           [with-unzip-entry (-> path-string? path-string? (-> path-string? any) any)]
@@ -24,11 +25,32 @@
           [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
           [get-dimension (-> list? string?)]
           [zip-xlsx (-> path-string? path-string? void?)]
-          [range-hash-ref (-> hash? string? any/c)]
+          [range-to-cell-hash (-> string? any/c hash?)]
+          [combine-hash-in-hash (-> (listof hash?) hash?)]
+          [check-lines? (-> input-port? input-port? void?)]
+          [prefix-each-line (-> string? string? string?)]
+          [date->oa_date_number (-> date? number?)]
+          [oa_date_number->date (-> number? date?)]
           ))
 
+(define-check (check-lines? expected_port test_port)
+  (let* ([expected_lines (port->lines expected_port)]
+         [test_lines (port->lines test_port)]
+         [test_length (sub1 (length test_lines))])
+    (let loop ([loop_lines expected_lines]
+               [line_no 0])
+      (when (not (null? loop_lines))
+            (when (or
+                   (> line_no test_length)
+                   (not (string=? (car loop_lines) (list-ref test_lines line_no))))
+                  (fail-check (format "error! line[~a] expected:[~a] actual:[~a]" (add1 line_no) (car loop_lines) (list-ref test_lines line_no))))
+            (loop (cdr loop_lines) (add1 line_no))))))
+
 (define (format-date the_date)
-  (format "~a-~a-~a" (date-year the_date) (date-month the_date) (date-day the_date)))
+  (format "~a~a~a"
+          (~a (date-year the_date) #:min-width 4 #:pad-string "0" #:align 'right)
+          (~a (date-month the_date) #:min-width 2 #:pad-string "0" #:align 'right)
+          (~a (date-day the_date) #:min-width 2 #:pad-string "0" #:align 'right)))
 
 (define (format-complete-time the_date)
   (format "~a~a~a ~a:~a:~a"
@@ -217,25 +239,72 @@
               (zip (build-path 'up zip_file) "[Content_Types].xml" "_rels" "docProps" "xl")))
         (lambda () (current-directory pwd)))))
 
-(define (range-hash-ref range_hash cell_dimension)
-  (let* ([cell_items (regexp-match #rx"^([A-Z]+)([0-9]+)$" cell_dimension)]
-         [cell_col_index (abc->number (list-ref cell_items 1))]
-         [cell_row_index (string->number (list-ref cell_items 2))])
-    (let loop ([loop_list (hash->list range_hash)])
-      (if (not (null? loop_list))
-          (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" (car (car loop_list)))]
+(define (range-to-cell-hash range_str val)
+  (let ([flat_map (make-hash)])
+    (when (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)
+          (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
                  [start_col_index (abc->number (list-ref range_items 1))]
                  [start_row_index (string->number (list-ref range_items 2))]
                  [end_col_index (abc->number (list-ref range_items 3))]
                  [end_row_index (string->number (list-ref range_items 4))])
-            (if (and
-                 (>= cell_col_index start_col_index)
-                 (>= cell_row_index start_row_index)
-                 (<= cell_col_index end_col_index)
-                 (<= cell_row_index end_row_index))
-                (cdr (car loop_list))
-                (loop (cdr loop_list))))
-          #f))))
+            (let range-loop ([loop_col_index start_col_index]
+                             [loop_row_index start_row_index])
+              (when (and
+                     (<= loop_col_index end_col_index)
+                     (<= loop_row_index end_row_index))
+                    (hash-set! flat_map 
+                               (string-append (number->abc loop_col_index) (number->string loop_row_index))
+                               val)
+                    (cond
+                     [(< loop_col_index end_col_index)
+                      (range-loop (add1 loop_col_index) loop_row_index)]
+                     [(< loop_row_index end_row_index)
+                      (range-loop start_col_index (add1 loop_row_index))])))))
+    flat_map))
 
-         
-       
+(define (combine-hash-in-hash hash_list)
+  (let ([result_map (make-hash)])
+    (let outer-hash-loop ([hashes hash_list])
+      (when (not (null? hashes))
+            (hash-for-each
+             (car hashes)
+             (lambda (cell_name style_hash)
+               (if (hash-has-key? result_map cell_name)
+                   (let ([old_hash (hash-copy (hash-ref result_map cell_name))])
+
+                     (hash-for-each
+                      style_hash
+                      (lambda (ik iv)
+                        (hash-set! old_hash ik iv)))
+                       (hash-set! result_map cell_name old_hash))
+                     (hash-set! result_map cell_name style_hash))))
+            (outer-hash-loop (cdr hashes))))
+    result_map))
+
+(define (prefix-each-line str prefix)
+  (with-output-to-string
+    (lambda ()
+      (let loop ([chars (string->list str)]
+                 [is_prefix #t])
+          (when (not (null? chars))
+                (when (and is_prefix (not (char=? (car chars) #\newline)))
+                      (printf "~a" prefix))
+                
+                (printf "~a" (car chars))
+
+                (if (char=? (car chars) #\newline)
+                    (loop (cdr chars) #t)
+                    (loop (cdr chars) #f)))))))
+
+(define (date->oa_date_number t_date)
+  (let ([epoch (* -1 (find-seconds 0 0 0 30 12 1899))]
+        [date_seconds (date->seconds t_date)])
+    (inexact->exact (floor (* (/ (+ date_seconds epoch) 86400000) 1000)))))
+
+(define (oa_date_number->date oa_date_number)
+  (let* ([epoch (* -1 (find-seconds 0 0 0 30 12 1899))]
+         [date_seconds
+          (inexact->exact (floor (- (* (/ (floor oa_date_number) 1000) 86400000) epoch)))]
+         [actual_date (seconds->date (+ date_seconds (* 24 60 60)))])
+    (seconds->date (find-seconds 0 0 0 (date-day actual_date) (date-month actual_date) (date-year actual_date)))))
+

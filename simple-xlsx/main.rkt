@@ -13,9 +13,12 @@
           [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
           [xlsx% class?]
           [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
+          [oa_date_number->date (-> number? date?)]
           ))
 
-(require "xlsx.rkt")
+(require "xlsx/xlsx.rkt")
+
+(require "lib/lib.rkt")
 
 (require "reader.rkt")
 
