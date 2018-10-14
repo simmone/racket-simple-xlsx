@@ -29,8 +29,8 @@
           [combine-hash-in-hash (-> (listof hash?) hash?)]
           [check-lines? (-> input-port? input-port? void?)]
           [prefix-each-line (-> string? string? string?)]
-          [date->oa_date_number (-> date? number?)]
-          [oa_date_number->date (-> number? date?)]
+          [date->oa_date_number (->* (date?) (boolean?) number?)]
+          [oa_date_number->date (->* (number?) (boolean?) date?)]
           ))
 
 (define-check (check-lines? expected_port test_port)
@@ -296,15 +296,15 @@
                     (loop (cdr chars) #t)
                     (loop (cdr chars) #f)))))))
 
-(define (date->oa_date_number t_date)
-  (let ([epoch (* -1 (find-seconds 0 0 0 30 12 1899))]
-        [date_seconds (date->seconds t_date)])
+(define (date->oa_date_number t_date [local_time? #t])
+  (let ([epoch (* -1 (find-seconds 0 0 0 30 12 1899 local_time?))]
+        [date_seconds (date->seconds t_date local_time?)])
     (inexact->exact (floor (* (/ (+ date_seconds epoch) 86400000) 1000)))))
 
-(define (oa_date_number->date oa_date_number)
-  (let* ([epoch (* -1 (find-seconds 0 0 0 30 12 1899))]
+(define (oa_date_number->date oa_date_number [local_time? #t])
+  (let* ([epoch (* -1 (find-seconds 0 0 0 30 12 1899 local_time?))]
          [date_seconds
           (inexact->exact (floor (- (* (/ (floor oa_date_number) 1000) 86400000) epoch)))]
-         [actual_date (seconds->date (+ date_seconds (* 24 60 60)))])
-    (seconds->date (find-seconds 0 0 0 (date-day actual_date) (date-month actual_date) (date-year actual_date)))))
+         [actual_date (seconds->date (+ date_seconds (* 24 60 60)) local_time?)])
+    (seconds->date (find-seconds 0 0 0 (date-day actual_date) (date-month actual_date) (date-year actual_date) local_time?))))
 

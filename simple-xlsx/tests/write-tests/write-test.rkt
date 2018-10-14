@@ -112,7 +112,7 @@
              ))
           )
         (lambda () 
-          (delete-file "test.xlsx"))
+          (delete-file test_file))
         ))
    ))
 

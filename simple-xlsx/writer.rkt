@@ -8,7 +8,7 @@
 
 (require "xlsx/xlsx.rkt")
 (require "lib/lib.rkt")
-(require "writer/content-type.rkt")
+(require "writer/content-type/content-type.rkt")
 (require "writer/_rels/rels.rkt")
 (require "writer/docProps/docprops-app.rkt")
 (require "writer/docProps/docprops-core.rkt")

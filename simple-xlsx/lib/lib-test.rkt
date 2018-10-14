@@ -29,6 +29,16 @@
         (lambda (test_port)
           (check-lines? expected_port test_port))))))
 
+   (test-case
+    "test-check-lines3"
+    (call-with-input-string 
+     " a\n\n b\n\nc\n"
+     (lambda (expected_port)
+       (call-with-input-string
+        " a\n\n b\n\nc\n"
+        (lambda (test_port)
+          (check-lines? expected_port test_port))))))
+
    (test-case 
     "test-AZ-NUMBER"
     (check-equal? (abc->number "A") 1)
@@ -194,19 +204,19 @@
    (test-case
     "test-date->oadate"
     
-    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 17 9 2018))) 43360)
+    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 17 9 2018 #f)) #f) 43360)
 
-    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 16 9 2018))) 43359)
+    (check-equal? (date->oa_date_number (seconds->date (find-seconds 0 0 0 16 9 2018 #f)) #f) 43359)
     )
 
    (test-case
     "test-oadate->date"
     
-    (check-equal? (oa_date_number->date 43360) (seconds->date (find-seconds 0 0 0 17 9 2018)))
+    (check-equal? (oa_date_number->date 43360 #f) (seconds->date (find-seconds 0 0 0 18 9 2018 #f)))
 
-    (check-equal? (oa_date_number->date 43359) (seconds->date (find-seconds 0 0 0 16 9 2018)))
+    (check-equal? (oa_date_number->date 43359 #f) (seconds->date (find-seconds 0 0 0 17 9 2018 #f)))
 
-    (check-equal? (oa_date_number->date 43359.1212121) (seconds->date (find-seconds 0 0 0 16 9 2018)))
+    (check-equal? (oa_date_number->date 43359.1212121 #f) (seconds->date (find-seconds 0 0 0 17 9 2018 #f)))
     )
     
   ))
