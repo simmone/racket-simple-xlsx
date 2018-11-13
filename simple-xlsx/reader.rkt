@@ -5,7 +5,7 @@
           [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
           [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
-          [get-cell-formula (-> string? (is-a?/c read-xlsx%) any)]
+          [get-cell-formula (-> string? (is-a?/c read-xlsx%) string?)]
           [get-sheet-dimension (-> (is-a?/c read-xlsx%) pair?)]
           [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
           [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]

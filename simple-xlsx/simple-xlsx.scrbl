@@ -56,6 +56,17 @@ there is also a complete read and write example on github:@link["https://github.
   cell axis: A1 B2 C3...
 }
 
+@defproc[(get-cell-formula
+            [cell_axis (string?)]
+            [xlsx_handler (xlsx_handler)])
+            string?]{
+  get cell formula. If no formula for the cell, will return an empty string
+
+  Limitations: currently does not support array or shared formulae
+
+  cell axis: A1 B2 C3...
+}
+
 @defproc[(oa_date_number->date
             [oa_date_number (number?)])
             date?]{
