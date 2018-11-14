@@ -5,6 +5,7 @@
           [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
           [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
+          [get-cell-formula (-> string? (is-a?/c read-xlsx%) string?)]
           [get-sheet-dimension (-> (is-a?/c read-xlsx%) pair?)]
           [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
           [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]
@@ -24,6 +25,7 @@
                      [sheet_map #f]
                      [sheet_name_map #f]
                      [relation_name_map #f]
+                     [formula_map #f]
                      [data_type_map #f]
                      [dimension #f])
          (super-new)))
@@ -157,6 +159,7 @@
 
 (define (load-sheet sheet_name xlsx)
   (let ([data_map (make-hash)]
+        [formula_map (make-hash)]
         [type_map (make-hash)]
         [dimension_col 0]
         [dimension ""]
@@ -232,8 +235,12 @@
 
                                       (let loop-cell ([cell_list (cdr cell_item)])
                                         (when (not (null? cell_list))
-                                              (when (equal? (caar cell_list) 'v)
-                                                    (hash-set! data_map para_r (caddar cell_list)))
+                                              (cond 
+                                                [(equal? (caar cell_list) 'v)
+                                                 (hash-set! data_map para_r (caddar cell_list))]
+                                                [(equal? (caar cell_list) 'f)
+                                                 (hash-set! formula_map para_r (caddar cell_list))]
+                                              )
                                               (loop-cell (cdr cell_list))))
                                       )))))
                     row_xml)))
@@ -241,6 +248,7 @@
           )
 
     (set-field! sheet_map xlsx data_map)
+    (set-field! formula_map xlsx formula_map)
     (set-field! data_type_map xlsx type_map)))
 
 (define (load-sheet-ref sheet_index xlsx)
@@ -264,6 +272,12 @@
             (string->number value)]
            [(string=? type_t "")
             (string->number value)]))
+        "")))
+
+(define (get-cell-formula item_name xlsx)
+  (let ([formula_map (get-field formula_map xlsx)])
+    (if (hash-has-key? formula_map item_name)
+        (hash-ref formula_map item_name)
         "")))
 
 (define (get-sheet-dimension xlsx)
