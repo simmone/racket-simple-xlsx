@@ -191,7 +191,7 @@
 })
 
 (define (write-cellStyles) @S{
-<cellStyles count="1"><cellStyle name="常规" xfId="0" builtinId="0"/></cellStyles>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
 })
 
 (define (write-dxfs) @S{
