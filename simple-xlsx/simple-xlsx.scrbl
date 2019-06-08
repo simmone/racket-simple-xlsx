@@ -140,7 +140,7 @@ it contains data sheet or chart sheet.
 
 data sheet is a sheet contains data only.
 
-@subsubsub*section{add data sheet}
+add data sheet:
 
 sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
 
@@ -151,7 +151,7 @@ sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
       #:sheet_data '(("chenxiao" "cx") (1 2))))
 }
 
-@subsubsub*section{set col width}
+set col width:
 
 column width is be set automatically by content's width.
 
@@ -215,7 +215,7 @@ for example:
 }
 the C3's style is '( (background . "0000FF") ).
 
-@subsubsub*section{backgroundColor}
+backgroundColor:
 
 rgb color or color name.
 
@@ -227,7 +227,7 @@ for example:
     #:style '( (backgroundColor . "00C851") ))
 }
 
-@subsubsub*section{fontStyle}
+fontStyle:
 
 fontSize: integer? default is 11.
 
@@ -243,7 +243,7 @@ for example:
     #:style '( (fontSize . 20) (fontName . "Impact") (fontColor . "FF8800") ))
 }
 
-@subsubsub*section{numberFormat}
+numberFormat:
 
 numberPrecision: non-exact-integer?
 
@@ -263,7 +263,7 @@ for example:
               ))
 }
 
-@subsubsub*section{borderStyle}
+borderStyle:
 
 borderDirection: @verbatim{'left 'right 'top 'bottom 'all}
 
@@ -288,7 +288,7 @@ for example:
     #:style '( (borderStyle . dashed) (borderColor . "blue")))
 }
 
-@subsubsub*section{dateFormat}
+dateFormat:
 
 year: yyyy, month: mm, day: dd
 
@@ -313,7 +313,7 @@ chart sheet use data sheet's data to constuct chart.
 
 chart type now can have: linechart, linechart3d, barchart, barchart3d, piechart, piechart3d
 
-@subsubsub*section{add chart sheet}
+add chart sheet:
 
 default chart_type is linechart or set chart type
 
@@ -332,7 +332,7 @@ chart type is one of these: line, line3d, bar, bar3d, pie, pie3d
     #:x_topic "Kg")
 }
 
-@subsubsub*section{set-chart-x-data! and add-chart-serail!}
+set-chart-x-data! and add-chart-serail!:
 
 use this two methods to set chart's x axis data and y axis data
 
