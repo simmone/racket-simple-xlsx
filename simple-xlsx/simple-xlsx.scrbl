@@ -1,6 +1,7 @@
 #lang scribble/manual
 
 @(require (for-label racket))
+@(require (for-label simple-xlsx))
 
 @title{Simple-Xlsx: Open Xml Spreadsheet(.xlsx) Reader and Writer}
 
@@ -16,41 +17,47 @@ simple-xlsx package is a package to read and write .xlsx format file.
 
 raco pkg install simple-xlsx
 
-@section{Read}
+@section{Usage}
+
+@defmodule[simple-xlsx]
+
+@subsection{Read}
 
 read from a .xlsx file.
 
 you can get a specific cell's value or loop for the whole sheet's rows.
 
-@defmodule[simple-xlsx]
-@(require (for-label simple-xlsx))
 
 there is also a complete read and write example on github:@link["https://github.com/simmone/racket-simple-xlsx/blob/master/simple-xlsx/example/example.rkt"]{includedin the source}.
 
 @defproc[(with-input-from-xlsx-file
               [xlsx_file_path (path-string?)]
-              [user-proc (-> xlsx_handler void?)])
+              [user-proc (-> xlsx_handler void?)]
+              )
             void?]{
   read xlsx's main outer func, all read assosiated action is include in user-proc.
 }
 
 @defproc[(load-sheet
            [sheet_name (string?)]
-           [xlsx_handler (xlsx_handler)])
+           [xlsx_handler (xlsx_handler)]
+           )
            void?]{
   load specified sheet by sheet name.
   must first called before other func, because any other func is based on specified sheet.
 }
 
 @defproc[(get-sheet-names
-            [xlsx_handler (xlsx_handler)])
+            [xlsx_handler (xlsx_handler)]
+            )
             list?]{
   get sheet names.
 }
 
 @defproc[(get-cell-value
             [cell_axis (string?)]
-            [xlsx_handler (xlsx_handler)])
+            [xlsx_handler (xlsx_handler)]
+            )
             any]{
   get cell value through cell's axis.
   cell axis: A1 B2 C3...
@@ -58,7 +65,8 @@ there is also a complete read and write example on github:@link["https://github.
 
 @defproc[(get-cell-formula
             [cell_axis (string?)]
-            [xlsx_handler (xlsx_handler)])
+            [xlsx_handler (xlsx_handler)]
+            )
             string?]{
   get cell formula. If no formula for the cell, will return an empty string
 
@@ -68,7 +76,8 @@ there is also a complete read and write example on github:@link["https://github.
 }
 
 @defproc[(oa_date_number->date
-            [oa_date_number (number?)])
+            [oa_date_number (number?)]
+            )
             date?]{
   if knows cell's type is date, can use this function to convert to racket date? type.
   if not convert, xlsx's date type just is a number, like 43361.
@@ -79,14 +88,16 @@ there is also a complete read and write example on github:@link["https://github.
 }
 
 @defproc[(get-sheet-dimension
-            [xlsx_handler (xlsx_handler)])
+            [xlsx_handler (xlsx_handler)]
+            )
             pair?]{
   get current sheet's dimension, (cons row col)
   like (1 . 4)
 }
 
 @defproc[(get-sheet-rows
-            [xlsx_handler (xlsx_handler)])
+            [xlsx_handler (xlsx_handler)]
+            )
             list?]{
   get-sheet-rows get all rows from current loaded sheet
 }
@@ -109,7 +120,7 @@ there is also a complete read and write example on github:@link["https://github.
   same as sheet-name-rows, use sheet index to specify sheet.
 }
 
-@section{Write}
+@subsection{Write}
 
 write a xlsx file use xlsx% class.
 
@@ -117,42 +128,44 @@ use add-data-sheet method to add data type sheet to xlsx.
 
 use add-chart-sheet method to add chart type sheet to xlsx.
 
-@subsection{xlsx%}
+@subsubsection{xlsx%}
+
+@defstruct*[xlsx% ()]{}
 
 xlsx% class represent a whole xlsx file's data.
 
 it contains data sheet or chart sheet.
 
-@subsection{Data Sheet}
+@subsubsection{Data Sheet}
 
 data sheet is a sheet contains data only.
 
-@subsubsection{add data sheet}
+@subsubsub*section{add data sheet}
 
 sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
 
-@verbatim{
+@codeblock{
   (let ([xlsx (new xlsx%)])
     (send xlsx add-data-sheet 
       #:sheet_name "Sheet1" 
-      #:sheet_data '(("chenxiao" "cx") (1 2)))
+      #:sheet_data '(("chenxiao" "cx") (1 2))))
 }
 
-@subsubsection{set col width}
+@subsubsub*section{set col width}
 
 column width is be set automatically by content's width.
 
 if you want to set it manually, use set-data-sheet-col-width! method
 
 for example:
-@verbatim{
+@codeblock{
   ;; set column A, B width: 50
   (send xlsx set-data-sheet-col-width! 
     #:sheet_name "DataSheet" 
     #:col_range "A-B" #:width 50)
 }
 
-@subsection{Add Style to Data Sheet}
+@subsubsection{Add Style to Data Sheet}
 
 you can add various style to a data sheet.
 
@@ -167,7 +180,7 @@ for example: @verbatim{'( (background . "FF0000") (fontSize . 20) )}
 you can use add-data-sheet-cell-style multiple times, to a cell, it's a pile effect.
 
 for example: 
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
     #:cell_range "B2-C3" 
@@ -189,7 +202,7 @@ if set a cell the same style property multiple times, the last one works.
 
 for example: 
 
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
     #:cell_range "B2-C3" 
@@ -202,19 +215,19 @@ for example:
 }
 the C3's style is '( (background . "0000FF") ).
 
-@subsubsection{backgroundColor}
+@subsubsub*section{backgroundColor}
 
 rgb color or color name.
 
 for example:
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "A2-B3" 
     #:style '( (backgroundColor . "00C851") ))
 }
 
-@subsubsection{fontStyle}
+@subsubsub*section{fontStyle}
 
 fontSize: integer? default is 11.
 
@@ -223,14 +236,14 @@ fontColor: rgb color or colorname.
 fontName: system font name.
 
 for example:
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "B3-C4" 
     #:style '( (fontSize . 20) (fontName . "Impact") (fontColor . "FF8800") ))
 }
 
-@subsubsection{numberFormat}
+@subsubsub*section{numberFormat}
 
 numberPrecision: non-exact-integer?
 
@@ -239,17 +252,18 @@ numberPercent: boolean?
 numberThousands: boolean?
 
 for example:
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "E2-E2" 
     #:style '( 
               (numberPercent . #t) 
               (numberPrecision . 2) 
-              (numberThousands . #t)))
+              (numberThousands . #t)
+              ))
 }
 
-@subsubsection{borderStyle}
+@subsubsub*section{borderStyle}
 
 borderDirection: @verbatim{'left 'right 'top 'bottom 'all}
 
@@ -267,19 +281,19 @@ boderStyle:
 borderColor: rgb color or color name.
 
 for example:
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "B2-C4" 
     #:style '( (borderStyle . dashed) (borderColor . "blue")))
 }
 
-@subsubsection{dateFormat}
+@subsubsub*section{dateFormat}
 
 year: yyyy, month: mm, day: dd
 
 for example:
-@verbatim{
+@codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "F2-F2" 
@@ -291,7 +305,7 @@ for example:
     #:style '( (dateFormat . "yyyy/mm/dd") ))
 }
 
-@subsection{Chart Sheet}
+@subsubsection{Chart Sheet}
 
 chart sheet is a sheet contains chart only.
 
@@ -299,13 +313,13 @@ chart sheet use data sheet's data to constuct chart.
 
 chart type now can have: linechart, linechart3d, barchart, barchart3d, piechart, piechart3d
 
-@subsubsection{add chart sheet}
+@subsubsub*section{add chart sheet}
 
 default chart_type is linechart or set chart type
 
 chart type is one of these: line, line3d, bar, bar3d, pie, pie3d
 
-@verbatim{
+@codeblock{
   (send xlsx add-chart-sheet 
     #:sheet_name "LineChart1" 
     #:topic "Horizontal Data" 
@@ -318,13 +332,13 @@ chart type is one of these: line, line3d, bar, bar3d, pie, pie3d
     #:x_topic "Kg")
 }
 
-@subsubsection{set-chart-x-data! and add-chart-serail!}
+@subsubsub*section{set-chart-x-data! and add-chart-serail!}
 
 use this two methods to set chart's x axis data and y axis data
 
 only one x axis data and multiple y axis data
 
-@verbatim{
+@codeblock{
   (send xlsx set-chart-x-data! 
     #:sheet_name "LineChart1" 
     #:data_sheet_name "DataSheet" 
@@ -336,7 +350,7 @@ only one x axis data and multiple y axis data
     #:data_range "B2-D2" #:y_topic "CAT")
 }
 
-@subsection{write file}
+@subsubsection{write file}
 
 @defproc[(write-xlsx-file
             [xlsx (xlsx%)]
@@ -345,9 +359,9 @@ only one x axis data and multiple y axis data
   write xlsx% to xlsx file.
 }
 
-@section{Complete Example}
+@subsection{Complete Example}
 
-@verbatim{
+@codeblock{
 #lang racket
 
 (require simple-xlsx)
@@ -588,7 +602,7 @@ only one x axis data and multiple y axis data
    (lambda (xlsx)
      (printf "~a\n" (get-sheet-names xlsx))
      ;("DataSheet" "LineChart1" "LineChart2" "LineChart3D" 
-     ; "BarChart" "BarChart3D" "PieChart" "PieChart3D"))
+     ; "BarChart" "BarChart3D" "PieChart" "PieChart3D")
 
      (load-sheet "DataSheet" xlsx)
      (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 6)
@@ -597,8 +611,8 @@ only one x axis data and multiple y axis data
 
      (let ([date_val (oa_date_number->date (get-cell-value "F2" xlsx))])
        (printf "~a,~a,~a\n" 
-         (date-year date_val) 
-         (date-month date_val) 
+         (date-year date_val)
+         (date-month date_val)
          (date-day date_val)))
      ; 2018,9,17
 
@@ -607,10 +621,9 @@ only one x axis data and multiple y axis data
      ;  (CAT 100 300 200 0.6934 43360) 
      ;  (Puma 200 400 300 139999.89223 43361) 
      ;  (Asics 300 500 400 23.34 43362))
-  )
 
   ; result is same as (get-sheet-rows xlsx)
   (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))
 
-  (printf "~a\n" (sheet-ref-rows "test.xlsx" 0))
+  (printf "~a\n" (sheet-ref-rows "test.xlsx" 0)))
 }
