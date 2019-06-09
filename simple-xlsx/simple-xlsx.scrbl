@@ -17,11 +17,9 @@ simple-xlsx package is a package to read and write .xlsx format file.
 
 raco pkg install simple-xlsx
 
-@section{Usage}
+@section{Read}
 
-@defmodule[simple-xlsx]
-
-@subsection{Read}
+@defmodule[simple-xlsx #:link-target? #f]
 
 read from a .xlsx file.
 
@@ -120,7 +118,9 @@ there is also a complete read and write example on github:@link["https://github.
   same as sheet-name-rows, use sheet index to specify sheet.
 }
 
-@subsection{Write}
+@section{Write}
+
+@defmodule[simple-xlsx #:link-target? #f]
 
 write a xlsx file use xlsx% class.
 
@@ -128,7 +128,7 @@ use add-data-sheet method to add data type sheet to xlsx.
 
 use add-chart-sheet method to add chart type sheet to xlsx.
 
-@subsubsection{xlsx%}
+@subsection{xlsx%}
 
 @defstruct*[xlsx% ()]{}
 
@@ -136,7 +136,7 @@ xlsx% class represent a whole xlsx file's data.
 
 it contains data sheet or chart sheet.
 
-@subsubsection{Data Sheet}
+@subsection{Data Sheet}
 
 data sheet is a sheet contains data only.
 
@@ -165,7 +165,7 @@ for example:
     #:col_range "A-B" #:width 50)
 }
 
-@subsubsection{Add Style to Data Sheet}
+@subsection{Add Style to Data Sheet}
 
 you can add various style to a data sheet.
 
@@ -305,7 +305,7 @@ for example:
     #:style '( (dateFormat . "yyyy/mm/dd") ))
 }
 
-@subsubsection{Chart Sheet}
+@subsection{Chart Sheet}
 
 chart sheet is a sheet contains chart only.
 
@@ -350,7 +350,7 @@ only one x axis data and multiple y axis data
     #:data_range "B2-D2" #:y_topic "CAT")
 }
 
-@subsubsection{write file}
+@subsection{write file}
 
 @defproc[(write-xlsx-file
             [xlsx (xlsx%)]
@@ -359,7 +359,9 @@ only one x axis data and multiple y axis data
   write xlsx% to xlsx file.
 }
 
-@subsection{Complete Example}
+@section{Complete Example}
+
+@defmodule[simple-xlsx #:link-target? #f]
 
 @codeblock{
 #lang racket
