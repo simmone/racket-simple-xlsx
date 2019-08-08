@@ -30,11 +30,37 @@
 <dimension ref="@|dimension|"/>
 })
 
-(define (write-sheet-views is_active active_cell) @S{
+(define (write-sheet-views is_active active_cell freeze_range) @S{
 <sheetViews>
   <sheetView @|is_active| workbookViewId="0">
     @|active_cell|
-  </sheetView>
+    @|(with-output-to-string
+        (lambda ()
+          (let ([freeze_rows (car freeze_range)]
+                [freeze_cols (cdr freeze_range)])
+            (when (or
+                     (> freeze_rows 0)
+                     (> freeze_cols 0))
+
+              (printf "<pane")
+
+              (when (> freeze_rows 0)
+                (printf " ySplit=\"~a\"" freeze_rows))
+
+              (when (> freeze_cols 0)
+                (printf " xSplit=\"~a\"" freeze_cols))
+
+              (printf " topLeftCell=\"~a~a\"" (number->abc (add1 freeze_cols)) (add1 freeze_rows))
+
+              (cond
+                [(and (> freeze_rows 0) (= freeze_cols 0))
+                 (printf " activePane=\"bottomLeft\"")]
+                [(and (= freeze_rows 0) (> freeze_cols 0))
+                 (printf " activePane=\"topRight\"")]
+                [(and (> freeze_rows 0) (> freeze_cols 0))
+                 (printf " activePane=\"bottomRight\"")])
+            
+              (printf " state=\"frozen\"/>\n")))))|  </sheetView>
 </sheetViews>
 })
 
@@ -64,7 +90,7 @@
 })
 
 
-(define (output-sheet dimension is_active active_cell col_width_map rows_str) @S{
+(define (output-sheet dimension is_active active_cell freeze_range col_width_map rows_str) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <worksheet
@@ -73,7 +99,7 @@
 
 @|(prefix-each-line (write-dimension dimension) "  ")|
 
-@|(prefix-each-line (write-sheet-views is_active active_cell) "  ")|
+@|(prefix-each-line (write-sheet-views is_active active_cell freeze_range) "  ")|
 
 @|(prefix-each-line (write-sheet-formatPr) "  ")|
 
@@ -134,6 +160,7 @@
          [data_sheet (sheet-content sheet)]
          [rows (data-sheet-rows data_sheet)]
          [col_width_map (get-col-width-map rows)]
+         [freeze_range (data-sheet-freeze_range data_sheet)]
          [width_hash (data-sheet-width_hash data_sheet)]
          [dimension (if (= (length rows) 0) "A1" (string-append "A1:" (get-dimension rows)))]
          [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
@@ -153,7 +180,7 @@
     
     (set! rows_str (get-rows sheet_name xlsx))
 
-    (output-sheet dimension is_active active_cell col_width_map rows_str)))
+    (output-sheet dimension is_active active_cell freeze_range col_width_map rows_str)))
 
 (define (write-data-sheet-file dir xlsx)
   (make-directory* dir)

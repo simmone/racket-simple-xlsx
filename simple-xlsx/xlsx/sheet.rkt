@@ -4,15 +4,16 @@
           [struct sheet
                   (
                   (name string?)
-                  (seq exact-nonnegative-integer?)
+                  (seq natural?)
                   (type symbol?)
-                  (typeSeq exact-nonnegative-integer?)
+                  (typeSeq natural?)
                   (content (or/c data-sheet? chart-sheet?))
                   )]
           [struct data-sheet
                   (
                    (rows list?)
                    (width_hash hash?)
+                   (freeze_range (cons/c natural? natural?))
                    (cell_to_origin_style_hash hash?)
                    (cell_to_style_index_hash hash?)
                    )]
@@ -41,6 +42,7 @@
 (struct data-sheet (
                     [rows #:mutable] 
                     [width_hash #:mutable]
+                    [freeze_range #:mutable]
                     [cell_to_origin_style_hash #:mutable]
                     [cell_to_style_index_hash #:mutable]
                     ))

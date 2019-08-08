@@ -151,7 +151,7 @@ sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
       #:sheet_data '(("chenxiao" "cx") (1 2))))
 }
 
-set col width:
+@subsubsection{Set Col Width}
 
 column width is be set automatically by content's width.
 
@@ -163,6 +163,15 @@ for example:
   (send xlsx set-data-sheet-col-width! 
     #:sheet_name "DataSheet" 
     #:col_range "A-B" #:width 50)
+}
+
+@subsubsection{Freeze Pane}
+
+use set-data-sheet-freeze-pane! to set a freeze range: '(rows . cols)
+
+@codeblock{
+  ;; freeze 1 row and 1 col
+  (send xlsx set-data-sheet-freeze-pane! #:sheet_name "DataSheet" #:range '(1 . 1))
 }
 
 @subsection{Add Style to Data Sheet}
@@ -227,7 +236,7 @@ for example:
     #:style '( (backgroundColor . "00C851") ))
 }
 
-fontStyle:
+@subsubsection{fontStyle}
 
 fontSize: integer? default is 11.
 
@@ -243,7 +252,7 @@ for example:
     #:style '( (fontSize . 20) (fontName . "Impact") (fontColor . "FF8800") ))
 }
 
-numberFormat:
+@subsubsection{numberFormat}
 
 numberPrecision: non-exact-integer?
 
@@ -263,7 +272,7 @@ for example:
               ))
 }
 
-borderStyle:
+@subsubsection{borderStyle}
 
 borderDirection: @verbatim{'left 'right 'top 'bottom 'all}
 
@@ -288,7 +297,7 @@ for example:
     #:style '( (borderStyle . dashed) (borderColor . "blue")))
 }
 
-dateFormat:
+@subsubsection{dateFormat}
 
 year: yyyy, month: mm, day: dd
 
@@ -313,7 +322,7 @@ chart sheet use data sheet's data to constuct chart.
 
 chart type now can have: linechart, linechart3d, barchart, barchart3d, piechart, piechart3d
 
-add chart sheet:
+@subsubsection{add chart sheet}
 
 default chart_type is linechart or set chart type
 
@@ -389,6 +398,10 @@ only one x axis data and multiple y axis data
   ;; set column width manully
   (send xlsx set-data-sheet-col-width! 
     #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
+  
+  ;; freeze pane
+  (send xlsx set-data-sheet-freeze-pane!
+    #:sheet_name "DataSheet" #:range '(1 . 1))
 
   ;; add another data sheet
   (send xlsx add-data-sheet 

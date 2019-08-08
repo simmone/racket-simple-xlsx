@@ -83,7 +83,7 @@
                                         seq
                                         'data
                                         type_seq
-                                        (data-sheet transformed_sheet_data (make-hash) (make-hash) (make-hash)))))
+                                        (data-sheet transformed_sheet_data (make-hash) '(0 . 0) (make-hash) (make-hash)))))
                        (hash-set! sheet_name_map sheet_name (sub1 seq)))
                      (error (format "duplicate sheet name[~a]" sheet_name)))))
          
@@ -162,7 +162,9 @@
          (define/public 
            (add-chart-serial! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range #:y_topic [y_topic ""])
            (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
-                 (set-chart-sheet-y_data_range_list! (sheet-content (get-sheet-by-name sheet_name)) `(,@(chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name sheet_name))) ,(data-serial y_topic (data-range data_sheet_name data_range))))))
+                 (set-chart-sheet-y_data_range_list!
+                  (sheet-content (get-sheet-by-name sheet_name))
+                  `(,@(chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name sheet_name))) ,(data-serial y_topic (data-range data_sheet_name data_range))))))
 
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
@@ -170,6 +172,9 @@
          (define/public (set-data-sheet-col-width! #:sheet_name sheet_name #:col_range col_range #:width width)
            (let ([converted_col_range (check-col-range col_range)])
                  (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) converted_col_range width)))
+
+         (define/public (set-data-sheet-freeze-pane! #:sheet_name sheet_name #:range range)
+           (set-data-sheet-freeze_range! (sheet-content (get-sheet-by-name sheet_name)) range))
 
          (define/public (get-string-item-list)
            (sort (hash-keys string_item_map) string<?))

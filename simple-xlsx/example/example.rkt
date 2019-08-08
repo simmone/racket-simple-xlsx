@@ -1,6 +1,7 @@
 #lang racket
 
-(require simple-xlsx)
+;; (require simple-xlsx)
+(require "../main.rkt")
 
 (require racket/date)
 
@@ -14,6 +15,7 @@
 
   (send xlsx add-data-sheet #:sheet_name "DataSheet" #:sheet_data sheet_data)
   (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheet" #:col_range "A-B" #:width 50)
+  (send xlsx set-data-sheet-freeze-pane! #:sheet_name "DataSheet" #:range '(1 . 1))
 
   (send xlsx add-data-sheet #:sheet_name "DataSheetWithStyle" #:sheet_data sheet_data)
   (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheetWithStyle" #:col_range "A-B" #:width 50)
