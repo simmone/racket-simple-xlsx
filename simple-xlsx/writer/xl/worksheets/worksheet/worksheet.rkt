@@ -32,8 +32,15 @@
 
 (define (write-sheet-views is_active active_cell freeze_range) @S{
 <sheetViews>
-  <sheetView @|is_active| workbookViewId="0">
-    @|active_cell|
+  <sheetView 
+    @|(with-output-to-string
+        (lambda ()
+          (let ([freeze_rows (car freeze_range)]
+                [freeze_cols (cdr freeze_range)])
+            (when (and
+                  (= freeze_rows 0)
+                  (= freeze_cols 0))
+              (printf "~a" is_active)))))| workbookViewId="0">
     @|(with-output-to-string
         (lambda ()
           (let ([freeze_rows (car freeze_range)]
@@ -54,13 +61,16 @@
 
               (cond
                 [(and (> freeze_rows 0) (= freeze_cols 0))
-                 (printf " activePane=\"bottomLeft\"")]
+                 (printf " activePane=\"bottomLeft\" state=\"frozen\" />\n")
+                 (printf "<selection pane=\"bottomLeft\" />\n")]
                 [(and (= freeze_rows 0) (> freeze_cols 0))
-                 (printf " activePane=\"topRight\"")]
+                 (printf " activePane=\"topRight\" state=\"frozen\" />\n")
+                 (printf "<selection pane=\"topRight\" />\n")]
                 [(and (> freeze_rows 0) (> freeze_cols 0))
-                 (printf " activePane=\"bottomRight\"")])
-            
-              (printf " state=\"frozen\"/>\n")))))|  </sheetView>
+                 (printf " activePane=\"bottomRight\" state=\"frozen\" />\n")
+                 (printf "<selection pane=\"bottomLeft\" />\n")
+                 (printf "<selection pane=\"topRight\" />\n")
+                 (printf "<selection pane=\"bottomRight\" />\n")])))))|  </sheetView>
 </sheetViews>
 })
 

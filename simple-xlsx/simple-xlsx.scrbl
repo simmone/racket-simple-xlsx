@@ -25,7 +25,6 @@ read from a .xlsx file.
 
 you can get a specific cell's value or loop for the whole sheet's rows.
 
-
 there is also a complete read and write example on github:@link["https://github.com/simmone/racket-simple-xlsx/blob/master/simple-xlsx/example/example.rkt"]{includedin the source}.
 
 @defproc[(with-input-from-xlsx-file
