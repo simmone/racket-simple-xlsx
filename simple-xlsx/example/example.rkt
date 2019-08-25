@@ -1,8 +1,6 @@
 #lang racket
 
-;; (require simple-xlsx)
-
-(require "../main.rkt")
+(require simple-xlsx)
 
 (require racket/date)
 
