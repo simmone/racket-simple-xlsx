@@ -13,9 +13,14 @@
                   (
                    (rows list?)
                    (width_hash hash?)
+                   (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
                    (cell_to_origin_style_hash hash?)
                    (cell_to_style_index_hash hash?)
+                   (row_to_origin_style_hash hash?)
+                   (row_to_style_index_hash hash?)
+                   (col_to_origin_style_hash hash?)
+                   (col_to_style_index_hash hash?)
                    )]
           [struct chart-sheet
                   (
@@ -42,9 +47,14 @@
 (struct data-sheet (
                     [rows #:mutable] 
                     [width_hash #:mutable]
+                    [height_hash #:mutable]
                     [freeze_range #:mutable]
                     [cell_to_origin_style_hash #:mutable]
                     [cell_to_style_index_hash #:mutable]
+                    [row_to_origin_style_hash #:mutable]
+                    [row_to_style_index_hash #:mutable]
+                    [col_to_origin_style_hash #:mutable]
+                    [col_to_style_index_hash #:mutable]
                     ))
 
 (struct colAttr ([width #:mutable] [back_color #:mutable]))

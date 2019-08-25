@@ -8,10 +8,11 @@
 
 (require "../../../../lib/lib.rkt")
 (require "../../../../xlsx/xlsx.rkt")
+(require "../../../../xlsx/range-lib.rkt")
 (require "../../../../xlsx/sheet.rkt")
 
 (provide (contract-out
-          [write-data-sheet (-> string? (is-a?/c xlsx%) string?)]
+          [write-data-sheet (-> string? (is-a?/c xlsx%) output-port? string?)]
           [write-data-sheet-file (-> path-string? (is-a?/c xlsx%) void?)]
           [get-col-width-map (-> (listof list?) hash?)]
           ))
@@ -40,8 +41,7 @@
             (when (and
                   (= freeze_rows 0)
                   (= freeze_cols 0))
-              (printf "~a" is_active)))))| workbookViewId="0">
-    @|(with-output-to-string
+              (printf "~a" is_active)))))| workbookViewId="0">@|(with-output-to-string
         (lambda ()
           (let ([freeze_rows (car freeze_range)]
                 [freeze_cols (cdr freeze_range)])
@@ -62,15 +62,17 @@
               (cond
                 [(and (> freeze_rows 0) (= freeze_cols 0))
                  (printf " activePane=\"bottomLeft\" state=\"frozen\" />\n")
-                 (printf "<selection pane=\"bottomLeft\" />\n")]
+                 (printf "    <selection pane=\"bottomLeft\" />\n")]
                 [(and (= freeze_rows 0) (> freeze_cols 0))
                  (printf " activePane=\"topRight\" state=\"frozen\" />\n")
-                 (printf "<selection pane=\"topRight\" />\n")]
+                 (printf "    <selection pane=\"topRight\" />\n")]
                 [(and (> freeze_rows 0) (> freeze_cols 0))
                  (printf " activePane=\"bottomRight\" state=\"frozen\" />\n")
-                 (printf "<selection pane=\"bottomLeft\" />\n")
-                 (printf "<selection pane=\"topRight\" />\n")
-                 (printf "<selection pane=\"bottomRight\" />\n")])))))|  </sheetView>
+                 (printf "    <selection pane=\"bottomLeft\" />\n")
+                 (printf "    <selection pane=\"topRight\" />\n")
+                 (printf "    <selection pane=\"bottomRight\" />\n")])))
+    (printf "\n")))|
+  </sheetView>
 </sheetViews>
 })
 
@@ -78,17 +80,20 @@
 <sheetFormatPr defaultRowHeight="13.5"/>
 })
 
-(define (write-cols-width col_width_map) @S{
+(define (write-cols-style col_style_list) @S{
 <cols>
 @|(with-output-to-string
     (lambda ()
-      (let loop ([col_list (sort (hash->list col_width_map) < #:key car)])
-        (when (not (null? col_list))
-          (printf "  <col min=\"~a\" max=\"~a\" width=\"~a\"/>\n" 
-                  (car (car col_list)) 
-                  (car (car col_list)) 
-                  (cdr (car col_list)))
-          (loop (cdr col_list))))))|</cols>
+      (let loop ([col_styles col_style_list])
+        (when (not (null? col_styles))
+          (let* ([col_range (caar col_styles)]
+                 [val_list (cdar col_styles)]
+                 [width (first val_list)]
+                 [style (second val_list)]
+                 [width_str (if width (format " width=\"~a\"" width) "")]
+                 [style_str (if style (format " style=\"~a\"" style) "")])
+            (printf "  <col min=\"~a\" max=\"~a\"~a~a/>\n" (car col_range) (cdr col_range) width_str style_str))
+          (loop (cdr col_styles))))))|</cols>
 })
 
 (define (write-footer) @S{
@@ -99,8 +104,7 @@
 <pageSetup paperSize="9" orientation="portrait" horizontalDpi="200" verticalDpi="200" r:id="rId1"/>
 })
 
-
-(define (output-sheet dimension is_active active_cell freeze_range col_width_map rows_str) @S{
+(define (output-sheet dimension is_active active_cell freeze_range cols_str rows_str) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <worksheet
@@ -113,7 +117,7 @@
 
 @|(prefix-each-line (write-sheet-formatPr) "  ")|
 
-@|(prefix-each-line (write-cols-width col_width_map) "  ")|
+@|(prefix-each-line cols_str "  ")|
 
   <sheetData>
 @|(prefix-each-line rows_str "    ")|  </sheetData>
@@ -126,71 +130,103 @@
 (define (get-rows sheet_name xlsx)
   (let* ([string_index_map (send xlsx get-string-index-map)]
          [cell_to_style_index_hash (send xlsx get-cell-to-style-index-map sheet_name)]
+         [row_to_style_index_hash (send xlsx get-row-to-style-index-map sheet_name)]
+         [col_to_style_index_hash (send xlsx get-col-to-style-index-map sheet_name)]
          [sheet (send xlsx get-sheet-by-name sheet_name)]
          [data_sheet (sheet-content sheet)]
+         [height_hash (data-sheet-height_hash data_sheet)]
          [rows (data-sheet-rows data_sheet)]
          [col_count (length (car rows))]
-         [span_str (string-append "1:" (number->string col_count))])
+         [span_str (string-append "1:" (number->string col_count))]
+         [row_height_map (make-hash)])
+
+    (hash-for-each
+     height_hash
+     (lambda (row_range height)
+       (let ([row_map (range-to-row-hash row_range height)])
+         (hash-for-each
+          row_map
+          (lambda (each_row each_height)
+            (hash-set! row_height_map each_row each_height))))))
 
     (with-output-to-string
       (lambda ()
         (let loop-row ([loop_rows rows]
                        [row_seq 1])
           (when (not (null? loop_rows))
-                (printf "<row r=\"~a\" spans=\"~a\">\n" row_seq span_str)
-                (let ([item_list (car loop_rows)])
-                  (when (not (null? item_list))
-                        (let loop-col ([loop_cols item_list]
-                                       [col_seq 1])
-                          (when (not (null? loop_cols))
-                                (let* ([cell (car loop_cols)]
-                                       [dimension (string-append (number->abc col_seq) (number->string row_seq))]
-                                       [style_index (hash-ref cell_to_style_index_hash dimension #f)]
-                                       [style
-                                           (if style_index (string-append " s=\"" (number->string style_index) "\"") "")])
-                                  (cond
-                                   [(string? cell)
-                                    (printf "  <c r=\"~a\"~a t=\"s\"><v>~a</v></c>\n" 
-                                            dimension style (hash-ref string_index_map cell))]
-                                   [(exact-integer? cell)
-                                    (printf "  <c r=\"~a\"~a><v>~a</v></c>\n" 
-                                            dimension style (number->string (inexact->exact cell)))]
-                                   [(number? cell)
-                                    (printf "  <c r=\"~a\"~a><v>~a</v></c>\n" 
-                                            dimension style (number->string (exact->inexact cell)))]
-                                   [else
-                                    (printf "  <c r=\"~a\"><v>0</v></c>\n" dimension)]))
-                                (loop-col (cdr loop_cols) (add1 col_seq))))))
-                (printf "</row>\n")
-                (when (> (length loop_rows) 1) (printf "\n"))
-                (loop-row (cdr loop_rows) (add1 row_seq))))))))
+            (let ([style_str ""]
+                  [height_str ""])
 
-(define (write-data-sheet sheet_name xlsx)
+              (when (hash-has-key? row_to_style_index_hash row_seq)
+                (set! style_str (format " s=\"~a\" customFormat=\"1\"" (hash-ref row_to_style_index_hash row_seq))))
+
+              (when (hash-has-key? row_height_map row_seq)
+                (set! height_str (format " ht=\"~a\" customHeight=\"1\"" (hash-ref row_height_map row_seq))))
+
+              (printf "<row r=\"~a\" spans=\"~a\"~a~a>\n" row_seq span_str style_str height_str)
+
+              (let ([item_list (car loop_rows)])
+                (when (not (null? item_list))
+                  (let loop-col ([loop_cols item_list]
+                                 [col_seq 1])
+                    (when (not (null? loop_cols))
+                      (let* ([cell (car loop_cols)]
+                             [dimension (string-append (number->abc col_seq) (number->string row_seq))]
+                             [style
+                                 (cond
+                                  [(hash-has-key? cell_to_style_index_hash dimension)
+                                   (format " s=\"~a\"" (hash-ref cell_to_style_index_hash dimension))]
+                                  [(hash-has-key? row_to_style_index_hash row_seq)
+                                   (format " s=\"~a\"" (hash-ref row_to_style_index_hash row_seq))]
+                                  [(hash-has-key? col_to_style_index_hash col_seq)
+                                   (format " s=\"~a\"" (hash-ref col_to_style_index_hash col_seq))]
+                                  [else
+                                   ""])])
+                        (cond
+                         [(string? cell)
+                          (printf "  <c r=\"~a\"~a t=\"s\"><v>~a</v></c>\n" 
+                                  dimension style (hash-ref string_index_map cell))]
+                         [(exact-integer? cell)
+                          (printf "  <c r=\"~a\"~a><v>~a</v></c>\n" 
+                                  dimension style (number->string (inexact->exact cell)))]
+                         [(number? cell)
+                          (printf "  <c r=\"~a\"~a><v>~a</v></c>\n" 
+                                  dimension style (number->string (exact->inexact cell)))]
+                         [else
+                          (printf "  <c r=\"~a\"><v>0</v></c>\n" dimension)]))
+                      (loop-col (cdr loop_cols) (add1 col_seq))))))
+              (printf "</row>\n")
+              (when (> (length loop_rows) 1) (printf "\n")))
+            (loop-row (cdr loop_rows) (add1 row_seq))))))))
+
+(define (write-data-sheet sheet_name xlsx debug_port)
   (let* ([sheet (send xlsx get-sheet-by-name sheet_name)]
          [data_sheet (sheet-content sheet)]
          [rows (data-sheet-rows data_sheet)]
          [col_width_map (get-col-width-map rows)]
+         [col_to_style_index_hash (send xlsx get-col-to-style-index-map sheet_name)]
          [freeze_range (data-sheet-freeze_range data_sheet)]
          [width_hash (data-sheet-width_hash data_sheet)]
          [dimension (if (= (length rows) 0) "A1" (string-append "A1:" (get-dimension rows)))]
          [is_active (if (= (sheet-seq sheet) 1) "tabSelected=\"1\"" "")]
          [active_cell (if (null? data_sheet) "" "<selection activeCell=\"A1\" sqref=\"A1\"/>")]
+         [cols_str #f]
          [rows_str #f])
-
+    
+    (set! rows_str (get-rows sheet_name xlsx))
+    
     (hash-for-each
      width_hash
      (lambda (col_range width)
-       (let* ([items (regexp-match* #rx"([A-Z]+)" col_range)]
-              [start_index (abc->number (first items))]
-              [end_index (abc->number (second items))])
-         (let loop ([loop_index start_index])
-           (when (<= loop_index end_index)
-                 (hash-set! col_width_map loop_index width)
-                 (loop (add1 loop_index)))))))
-    
-    (set! rows_str (get-rows sheet_name xlsx))
+       (let ([col_map (range-to-col-hash col_range width)])
+         (hash-for-each
+          col_map
+          (lambda (each_col each_width)
+            (hash-set! col_width_map each_col each_width))))))
 
-    (output-sheet dimension is_active active_cell freeze_range col_width_map rows_str)))
+    (set! cols_str (write-cols-style (combine-cols-hash col_width_map col_to_style_index_hash)))
+
+    (output-sheet dimension is_active active_cell freeze_range cols_str rows_str)))
 
 (define (write-data-sheet-file dir xlsx)
   (make-directory* dir)
@@ -198,10 +234,11 @@
   (let loop ([loop_list (get-field sheets xlsx)])
     (when (not (null? loop_list))
           (when (eq? (sheet-type (car loop_list)) 'data)
-                (with-output-to-file (build-path dir (string-append "sheet" (number->string (sheet-typeSeq (car loop_list))) ".xml"))
-                  #:exists 'replace
-                  (lambda ()
-                    (printf "~a" (write-data-sheet (sheet-name (car loop_list)) xlsx)))))
+            (let ([debug_port (current-output-port)])
+              (with-output-to-file (build-path dir (string-append "sheet" (number->string (sheet-typeSeq (car loop_list))) ".xml"))
+                #:exists 'replace
+                (lambda ()
+                  (printf "~a" (write-data-sheet (sheet-name (car loop_list)) xlsx debug_port))))))
           (loop (cdr loop_list)))))
 
 (define (get-col-width-map rows)

@@ -3,6 +3,7 @@
 (require "../../../xlsx/xlsx.rkt")
 (require "../../../xlsx/sheet.rkt")
 (require "../../../xlsx/xlsx-lib.rkt")
+(require "../../../xlsx/range-lib.rkt")
 
 (provide (contract-out
           [print-pie-chart (-> string? (is-a?/c xlsx%) string?)]

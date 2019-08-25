@@ -17,6 +17,7 @@
 (require xml)
 
 (require "lib/lib.rkt")
+(require "xlsx/range-lib.rkt")
 
 (define read-xlsx%
   (class object%

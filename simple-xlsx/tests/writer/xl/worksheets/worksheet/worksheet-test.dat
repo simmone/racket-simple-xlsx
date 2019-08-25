@@ -7,18 +7,16 @@
   <dimension ref="A1:E2"/>
 
   <sheetViews>
-    <sheetView tabSelected="1" workbookViewId="0">
-      <selection activeCell="A1" sqref="A1"/>
+    <sheetView
+      tabSelected="1" workbookViewId="0">
+
     </sheetView>
   </sheetViews>
 
   <sheetFormatPr defaultRowHeight="13.5"/>
 
   <cols>
-    <col min="1" max="1" width="8"/>
-    <col min="2" max="2" width="8"/>
-    <col min="3" max="3" width="8"/>
-    <col min="4" max="4" width="8"/>
+    <col min="1" max="4" width="8"/>
     <col min="5" max="5" width="6"/>
   </cols>
 

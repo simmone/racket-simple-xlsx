@@ -164,6 +164,16 @@ for example:
     #:col_range "A-B" #:width 50)
 }
 
+@subsubsection{Set Row Height}
+
+for example:
+@codeblock{
+  ;; set rows 2-4 height: 20
+  (send xlsx set-data-sheet-row-height!
+    #:sheet_name "DataSheetWithStyle2"
+    #:row_range "2-4" #:height 30)
+}
+
 @subsubsection{Freeze Pane}
 
 use set-data-sheet-freeze-pane! to set a freeze range: '(rows . cols)
@@ -187,6 +197,12 @@ for example: @verbatim{'( (background . "FF0000") (fontSize . 20) )}
 
 you can use add-data-sheet-cell-style multiple times, to a cell, it's a pile effect.
 
+add-data-sheet-row-style! set rows styles.
+
+add-data-sheet-col-style! set cols styles.
+
+style priority: cell style > row style > col style
+
 for example: 
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
@@ -198,6 +214,14 @@ for example:
     #:sheet_name "DataSheet" 
     #:cell_range "C3-D4" 
     #:style '( (fontSize . 30) ))
+
+  (send xlsx add-data-sheet-row-style!
+    #:sheet_name "DataSheetWithStyle2"
+    #:row_range "1-3" #:style '( (backgroundColor . "00C851") ))
+
+  (send xlsx add-data-sheet-col-style!
+    #:sheet_name "DataSheetWithStyle2"
+    #:col_range "1-6" #:style '( (backgroundColor . "AA66CC") ))
 }
 
 the C2's style is @verbatim{'( (background . "FF0000") )}

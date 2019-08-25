@@ -69,9 +69,9 @@
 
         (let ([style_map (send xlsx get-cell-to-style-index-map "测试1")])
           (check-equal? (hash-count style_map) 16)
-          (check-equal? (hash-ref style_map "A1") 1)
-          (check-equal? (hash-ref style_map "B2") 2)
-          (check-equal? (hash-ref style_map "C2") 1)
+          (check-equal? (hash-ref style_map "A1") 2)
+          (check-equal? (hash-ref style_map "B2") 1)
+          (check-equal? (hash-ref style_map "C2") 2)
           (check-equal? (hash-ref style_map "D4") 3)
           )
 

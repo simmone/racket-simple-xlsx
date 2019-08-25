@@ -13,9 +13,6 @@
           [xml-get-list (-> symbol? xexpr? list?)]
           [xml-get-attr (-> symbol? string? xexpr? string?)]
           [xml-get (-> symbol? xexpr? string?)]
-          [abc->number (-> string? exact-nonnegative-integer?)]
-          [abc->range (-> string? pair?)]
-          [number->abc (-> number? string?)]
           [number->list (-> number? list?)]
           [format-date (-> date? string?)]
           [format-complete-time (-> date? string?)]
@@ -23,10 +20,7 @@
           [value-of-time (-> string? date?)]
           [format-w3cdtf (-> date? string?)]
           [create-sheet-name-list (-> exact-nonnegative-integer? list?)]
-          [get-dimension (-> list? string?)]
           [zip-xlsx (-> path-string? path-string? void?)]
-          [range-to-cell-hash (-> string? any/c hash?)]
-          [combine-hash-in-hash (-> (listof hash?) hash?)]
           [check-lines? (-> input-port? input-port? void?)]
           [prefix-each-line (-> string? string? string?)]
           [date->oa_date_number (->* (date?) (boolean?) number?)]
@@ -45,6 +39,13 @@
                    (not (string=? (car loop_lines) (list-ref test_lines line_no))))
                   (fail-check (format "error! line[~a] expected:[~a] actual:[~a]" (add1 line_no) (car loop_lines) (list-ref test_lines line_no))))
             (loop (cdr loop_lines) (add1 line_no))))))
+
+(define (number->list num)
+  (let loop ([s_list '()]
+             [index 1])
+    (if (<= index num)
+        `(,@s_list ,@(cons index (loop s_list (add1 index))))
+        s_list)))
 
 (define (format-date the_date)
   (format "~a~a~a"
@@ -118,73 +119,6 @@
 ;          (void)))))
           (delete-directory/files temp_dir)))))
 
-(define (abc->number abc)
-  (let ([sum 0])
-    (let loop ([char_list (reverse (string->list abc))]
-               [base 0])
-      (when (not (null? char_list))
-            (let* ([alpha (car char_list)]
-                   [alpha_int (add1 (- (char->integer alpha) (char->integer #\A)))])
-              (set! sum (+ (* alpha_int (expt 26 base)) sum)))
-            (loop (cdr char_list) (add1 base))))
-    sum))
-
-(define (abc->range abc_range)
-  (cond
-   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" abc_range)
-    (let ([abc_items (regexp-split #rx"-" abc_range)])
-      (if (= (length abc_items) 2)
-          (let* ([first_item (first abc_items)]
-                 [second_item (second abc_items)]
-                 [start_index
-                  (cond
-                   [(regexp-match #rx"^[0-9]+$" first_item)
-                    (string->number first_item)]
-                   [(regexp-match #rx"^[A-Z]+$" first_item)
-                    (abc->number first_item)]
-                   [else
-                    1])]
-                 [end_index
-                  (cond
-                   [(regexp-match #rx"^[0-9]+$" second_item)
-                    (string->number second_item)]
-                   [(regexp-match #rx"^[A-Z]+$" second_item)
-                    (abc->number second_item)]
-                   [else
-                    1])])
-            (if (<= start_index end_index)
-                (cons start_index end_index)
-                (cons 1 1)))
-          (cons 1 1)))]
-   [(regexp-match #rx"^[0-9]+$" abc_range)
-    (cons (string->number abc_range) (string->number abc_range))]
-   [(regexp-match #rx"^[A-Z]+$" abc_range)
-    (cons (abc->number abc_range) (abc->number abc_range))]
-   [else
-    (cons 1 1)]))
-
-(define (number->abc num)
-  (let ([abc ""])
-    (let loop ([loop_num num])
-      (if (> loop_num 26)
-          (let-values ([(quo remain) (quotient/remainder loop_num 26)])
-            (if (= remain 0)
-                (begin
-                  (set! abc (string-append "Z" abc))
-                  (loop (sub1 quo)))
-                (begin
-                  (set! abc (string-append (string (integer->char (+ 64 remain))) abc))
-                  (loop quo))))
-            (set! abc (string-append (string (integer->char (+ 64 loop_num))) abc))))
-    abc))
-
-(define (number->list num)
-  (let loop ([s_list '()]
-             [index 1])
-    (if (<= index num)
-        `(,@s_list ,@(cons index (loop s_list (add1 index))))
-        s_list)))
-
 ;; YYYYMMDD HH:MM:SS
 (define (value-of-time time_str)
   (let ([year (string->number (substring time_str 0 4))]
@@ -217,17 +151,6 @@
           (loop sheet_name_list (add1 count)))
         sheet_name_list)))
 
-(define (get-dimension data_list)
-  (let ([rows (length data_list)]
-        [cols 0])
-    (let loop ([loop_list data_list])
-      (when (not (null? loop_list))
-            (when (> (length (car loop_list)) cols)
-                  (set! cols (length (car loop_list))))
-            (loop (cdr loop_list))))
-
-    (string-append (number->abc cols) (number->string rows))))
-
 (define (zip-xlsx zip_file content_dir)
   (let ([pwd #f])
     (dynamic-wind
@@ -238,48 +161,6 @@
               (zip zip_file "[Content_Types].xml" "_rels" "docProps" "xl")
               (zip (build-path 'up zip_file) "[Content_Types].xml" "_rels" "docProps" "xl")))
         (lambda () (current-directory pwd)))))
-
-(define (range-to-cell-hash range_str val)
-  (let ([flat_map (make-hash)])
-    (when (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)
-          (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
-                 [start_col_index (abc->number (list-ref range_items 1))]
-                 [start_row_index (string->number (list-ref range_items 2))]
-                 [end_col_index (abc->number (list-ref range_items 3))]
-                 [end_row_index (string->number (list-ref range_items 4))])
-            (let range-loop ([loop_col_index start_col_index]
-                             [loop_row_index start_row_index])
-              (when (and
-                     (<= loop_col_index end_col_index)
-                     (<= loop_row_index end_row_index))
-                    (hash-set! flat_map 
-                               (string-append (number->abc loop_col_index) (number->string loop_row_index))
-                               val)
-                    (cond
-                     [(< loop_col_index end_col_index)
-                      (range-loop (add1 loop_col_index) loop_row_index)]
-                     [(< loop_row_index end_row_index)
-                      (range-loop start_col_index (add1 loop_row_index))])))))
-    flat_map))
-
-(define (combine-hash-in-hash hash_list)
-  (let ([result_map (make-hash)])
-    (let outer-hash-loop ([hashes hash_list])
-      (when (not (null? hashes))
-            (hash-for-each
-             (car hashes)
-             (lambda (cell_name style_hash)
-               (if (hash-has-key? result_map cell_name)
-                   (let ([old_hash (hash-copy (hash-ref result_map cell_name))])
-
-                     (hash-for-each
-                      style_hash
-                      (lambda (ik iv)
-                        (hash-set! old_hash ik iv)))
-                       (hash-set! result_map cell_name old_hash))
-                     (hash-set! result_map cell_name style_hash))))
-            (outer-hash-loop (cdr hashes))))
-    result_map))
 
 (define (prefix-each-line str prefix)
   (with-output-to-string
@@ -307,4 +188,3 @@
           (inexact->exact (floor (- (* (/ (floor oa_date_number) 1000) 86400000) epoch)))]
          [actual_date (seconds->date (+ date_seconds (* 24 60 60)) local_time?)])
     (seconds->date (find-seconds 0 0 0 (date-day actual_date) (date-month actual_date) (date-year actual_date) local_time?))))
-
