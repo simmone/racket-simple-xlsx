@@ -25,7 +25,7 @@
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (write-data-sheet "Sheet1" xlsx)
+           (write-data-sheet "Sheet1" xlsx (current-output-port))
            (lambda (actual)
              (check-lines? expected actual)))))))
    

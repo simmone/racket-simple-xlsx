@@ -246,20 +246,30 @@
                       ]
                      )))
                 style_pair_list)
-
+               
                (cond
                 [(eq? type 'cell)
-                 (set-data-sheet-cell_to_origin_style_hash!
-                  sheet
-                  (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))]
+                 (set! cell_to_origin_style_hash
+                       (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))]
                 [(eq? type 'row)
-                 (set-data-sheet-row_to_origin_style_hash!
-                  sheet
-                  (combine-hash-in-hash (list row_to_origin_style_hash (range-to-row-hash converted_range style_hash))))]
+                 (set! row_to_origin_style_hash
+                       (combine-hash-in-hash (list row_to_origin_style_hash (range-to-row-hash converted_range style_hash))))
+                 (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)]
                 [(eq? type 'col)
-                 (set-data-sheet-col_to_origin_style_hash!
-                  sheet
-                  (combine-hash-in-hash (list col_to_origin_style_hash (range-to-col-hash converted_range style_hash))))])))
+                 (set! col_to_origin_style_hash
+                       (combine-hash-in-hash (list col_to_origin_style_hash (range-to-col-hash converted_range style_hash))))
+                 (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)])
+               
+               (when (and (> (hash-count row_to_origin_style_hash) 0) (> (hash-count col_to_origin_style_hash) 0)
+                          (or (eq? type 'row) (eq? type 'col)))
+                 (set! cell_to_origin_style_hash (combine-hash-in-hash
+                                                  (list
+                                                   cell_to_origin_style_hash
+                                                   (cross-cell-style row_to_origin_style_hash col_to_origin_style_hash type)))))
+               
+               (set-data-sheet-cell_to_origin_style_hash! sheet cell_to_origin_style_hash)
+               (set-data-sheet-row_to_origin_style_hash! sheet row_to_origin_style_hash)
+               (set-data-sheet-col_to_origin_style_hash! sheet col_to_origin_style_hash)))
 
          (define/public (burn-styles!)
            (let sheet-loop ([sheet_list sheets])

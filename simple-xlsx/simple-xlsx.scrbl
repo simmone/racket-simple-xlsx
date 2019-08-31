@@ -189,21 +189,24 @@ you can add various style to a data sheet.
 
 includes background color, font style, number format, border style, date format.
 
-use add-data-sheet-cell-style to add style to cells.
-
-the last parameter style is pair list.
-
-for example: @verbatim{'( (background . "FF0000") (fontSize . 20) )}
-
-you can use add-data-sheet-cell-style multiple times, to a cell, it's a pile effect.
+add-data-sheet-cell-style! set cells styles.
 
 add-data-sheet-row-style! set rows styles.
 
 add-data-sheet-col-style! set cols styles.
 
-style priority: cell style > row style > col style
+styles format: @verbatim{'( (background . "FF0000") (fontSize . 20) )}
 
-for example: 
+you can set cell, row, col style any times, it's a pile effect.
+
+it means:
+
+if the latter style has same style property, it'll overwrite this property.
+
+if not, it'll add this property.
+
+it also means the order you set style is important.
+
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
@@ -221,18 +224,14 @@ for example:
 
   (send xlsx add-data-sheet-col-style!
     #:sheet_name "DataSheetWithStyle2"
-    #:col_range "1-6" #:style '( (backgroundColor . "AA66CC") ))
+    #:col_range "4-6" #:style '( (backgroundColor . "AA66CC") ))
 }
 
-the C2's style is @verbatim{'( (background . "FF0000") )}
+the C2's style is @verbatim{'( (backgroundColor . "AA66CC") )}
 
-the D3's style is @verbatim{'( (fontSize . 30) )}
+the D3's style is @verbatim{'( (backgroundColor . "AA66CC") (fontSize . 30) )}
 
-the C3's style is @verbatim{( (background . "FF0000") (fontSize . 30) )}
-
-if set a cell the same style property multiple times, the last one works.
-
-for example: 
+the C3's style is @verbatim{( (backgroundColor . "00C851") (fontSize . 30) )}
 
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
@@ -245,9 +244,9 @@ for example:
     #:cell_range "C3-D4" 
     #:style '( (background . "0000FF") ))
 }
-the C3's style is '( (background . "0000FF") ).
+the C3's style is '( (background . "0000FF") )
 
-backgroundColor:
+@subsubsection{backgroundColor}
 
 rgb color or color name.
 

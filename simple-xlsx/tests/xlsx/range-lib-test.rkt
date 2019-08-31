@@ -255,7 +255,6 @@
       (check-equal? (list-ref result_list 1) '( (2 . 2) #f 3) )
       (check-equal? (list-ref result_list 2) '( (3 . 3) 10 3) )
       (check-equal? (list-ref result_list 3) '( (4 . 4) #f 3) ))
-    )
 
     (let* ([width_hash (make-hash)]
            [style_hash (make-hash)]
@@ -274,7 +273,129 @@
       (check-equal? (list-ref result_list 1) '( (2 . 2) #f 3) )
       (check-equal? (list-ref result_list 2) '( (3 . 3) 10 #f) )
       (check-equal? (list-ref result_list 3) '( (5 . 5) 10 3) )
+
+    ))
+
+   (test-case
+    "test-cell->rowcol"
+    
+    (let ([rowcol (cell->rowcol "A1")])
+      (check-equal? (car rowcol) 1)
+      (check-equal? (cdr rowcol) 1))
+
+    (let ([rowcol (cell->rowcol "C10")])
+      (check-equal? (car rowcol) 10)
+      (check-equal? (cdr rowcol) 3))
+
+    (let ([rowcol (cell->rowcol "AB23")])
+      (check-equal? (car rowcol) 23)
+      (check-equal? (cdr rowcol) 28))
+
+    (let ([rowcol (cell->rowcol "23")])
+      (check-equal? (car rowcol) 0)
+      (check-equal? (cdr rowcol) 0))
+
+    (let ([rowcol (cell->rowcol "A")])
+      (check-equal? (car rowcol) 0)
+      (check-equal? (cdr rowcol) 0))
+
     )
+
+   (test-case
+    "test-cross-cell-style"
+    
+    (let ([row_map (make-hash)]
+          [col_map (make-hash)]
+          [row_style_map (make-hash)]
+          [col_style_map (make-hash)])
+
+      (hash-set! row_style_map 'a 1)
+      (hash-set! row_style_map 'b 2)
+
+      (hash-set! col_style_map 'a 2)
+      (hash-set! col_style_map 'b 1)
+      (hash-set! col_style_map 'c 3)
+
+      (hash-set! row_map 3 row_style_map)
+      (hash-set! row_map 4 row_style_map)
+
+      (hash-set! col_map 1 col_style_map)
+      (hash-set! col_map 3 col_style_map)
+      
+      (define row_end_map (cross-cell-style row_map col_map 'row))
+      (check-equal? (hash-count row_end_map) 4)
+      (check-true (hash-has-key? row_end_map "A3"))
+      (check-true (hash-has-key? row_end_map "A4"))
+      (check-true (hash-has-key? row_end_map "C3"))
+      (check-true (hash-has-key? row_end_map "C4"))
+      
+      (let ([cell_style_map (hash-ref row_end_map "C3")])
+        (check-equal? (hash-count cell_style_map) 3)
+        (check-equal? (hash-ref cell_style_map 'a) 1)
+        (check-equal? (hash-ref cell_style_map 'b) 2)
+        (check-equal? (hash-ref cell_style_map 'c) 3))
+
+      (define col_end_map (cross-cell-style row_map col_map 'col))
+      (check-equal? (hash-count col_end_map) 4)
+      (check-true (hash-has-key? col_end_map "A3"))
+      (check-true (hash-has-key? col_end_map "A4"))
+      (check-true (hash-has-key? col_end_map "C3"))
+      (check-true (hash-has-key? col_end_map "C4"))
+      
+      (let ([cell_style_map (hash-ref col_end_map "C3")])
+        (check-equal? (hash-count cell_style_map) 3)
+        (check-equal? (hash-ref cell_style_map 'a) 2)
+        (check-equal? (hash-ref cell_style_map 'b) 1)
+        (check-equal? (hash-ref cell_style_map 'c) 3))
+
+      )
+    )
+
+   (test-case
+    "test-expand-row-style-to-cell"
+    
+    (let ([cells_map (make-hash)]
+          [cell_style_map (make-hash)]
+          [rows_map (make-hash)]
+          [row_style_map (make-hash)])
+
+      (hash-set! cell_style_map 'a 1)
+      (hash-set! cell_style_map 'b 2)
+      (hash-set! cells_map "A5" cell_style_map)
+
+      (hash-set! row_style_map 'b 3)
+
+      (hash-set! rows_map 1 row_style_map)
+      (expand-row-style-to-cell rows_map cells_map)
+      (check-equal? (hash-ref (hash-ref cells_map "A5") 'b) 2)
+
+      (hash-set! rows_map 5 row_style_map)
+      (expand-row-style-to-cell rows_map cells_map)
+      (check-equal? (hash-ref (hash-ref cells_map "A5") 'b) 3)
+      ))
+
+   (test-case
+    "test-expand-col-style-to-cell"
+    
+    (let ([cells_map (make-hash)]
+          [cell_style_map (make-hash)]
+          [cols_map (make-hash)]
+          [col_style_map (make-hash)])
+
+      (hash-set! cell_style_map 'a 1)
+      (hash-set! cell_style_map 'b 2)
+      (hash-set! cells_map "A5" cell_style_map)
+
+      (hash-set! col_style_map 'b 3)
+
+      (hash-set! cols_map 2 col_style_map)
+      (expand-col-style-to-cell cols_map cells_map)
+      (check-equal? (hash-ref (hash-ref cells_map "A5") 'b) 2)
+
+      (hash-set! cols_map 1 col_style_map)
+      (expand-col-style-to-cell cols_map cells_map)
+      (check-equal? (hash-ref (hash-ref cells_map "A5") 'b) 3)
+      ))
 
    ))
 

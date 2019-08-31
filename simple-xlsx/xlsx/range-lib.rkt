@@ -3,21 +3,25 @@
 (require "../lib/lib.rkt")
 
 (provide (contract-out
-          [abc->number (-> string? exact-nonnegative-integer?)]
+          [abc->number (-> string? natural?)]
           [abc->range (-> string? pair?)]
-          [number->abc (-> number? string?)]
+          [number->abc (-> natural? string?)]
           [get-dimension (-> list? string?)]
           [check-cell-range (-> string? (or/c #f string?))]
           [check-col-range (-> string? string?)]
           [check-row-range (-> string? string?)]
           [only-one-row/col-data? (-> string? boolean?)]
           [convert-range (-> string? string?)]
-          [range-length (-> string? exact-nonnegative-integer?)]
+          [range-length (-> string? natural?)]
           [range-to-cell-hash (-> string? any/c hash?)]
           [range-to-row-hash (-> string? any/c hash?)]
           [range-to-col-hash (-> string? any/c hash?)]
           [combine-cols-hash (-> hash? hash? list?)]
           [combine-hash-in-hash (-> (listof hash?) hash?)]
+          [cell->rowcol (-> string? (cons/c natural? natural?))]
+          [cross-cell-style (-> hash? hash? symbol? hash?)]
+          [expand-row-style-to-cell (-> hash? hash? void?)]
+          [expand-col-style-to-cell (-> hash? hash? void?)]
           ))
 
 (define (abc->number abc)
@@ -77,7 +81,7 @@
                 (begin
                   (set! abc (string-append (string (integer->char (+ 64 remain))) abc))
                   (loop quo))))
-            (set! abc (string-append (string (integer->char (+ 64 loop_num))) abc))))
+          (set! abc (string-append (string (integer->char (+ 64 loop_num))) abc))))
     abc))
 
 (define (get-dimension data_list)
@@ -190,9 +194,9 @@
          [end_col_name (fourth items)]
          [end_row_index (fifth items)])
 
-         (if (string=? start_col_name end_col_name)
-             (add1 (- (string->number end_row_index) (string->number start_row_index)))
-             (add1 (- (abc->number end_col_name) (abc->number start_col_name))))))
+    (if (string=? start_col_name end_col_name)
+        (add1 (- (string->number end_row_index) (string->number start_row_index)))
+        (add1 (- (abc->number end_col_name) (abc->number start_col_name))))))
 
 (define (range-to-cell-hash range_str val)
   (let ([flat_map (make-hash)])
@@ -230,7 +234,7 @@
               (when (<= loop_row end_row)
                     (hash-set! flat_map loop_row val)
                     (loop (add1 loop_row)))))
-    flat_map)))
+      flat_map)))
 
 (define (range-to-col-hash range_str val)
   (let ([flat_map (make-hash)])
@@ -245,7 +249,7 @@
               (when (<= loop_col end_col)
                     (hash-set! flat_map loop_col val)
                     (loop (add1 loop_col)))))
-    flat_map)))
+      flat_map)))
 
 (define (combine-cols-hash width_map style_map)
   (let ([col_hash (make-hash)]
@@ -254,15 +258,15 @@
     
     (let loop-width ([loop_list width_list])
       (when (not (null? loop_list))
-        (hash-set! col_hash (caar loop_list) (list (cdar loop_list) #f))
-        (loop-width (cdr loop_list))))
+            (hash-set! col_hash (caar loop_list) (list (cdar loop_list) #f))
+            (loop-width (cdr loop_list))))
     
     (let loop-style ([loop_list style_list])
       (when (not (null? loop_list))
-        (let ([val_list (hash-ref col_hash (caar loop_list) (list #f #f))])
-          (hash-set! col_hash (caar loop_list) (list-set val_list 1 (cdar loop_list))))
-        (loop-style (cdr loop_list))))
-    
+            (let ([val_list (hash-ref col_hash (caar loop_list) (list #f #f))])
+              (hash-set! col_hash (caar loop_list) (list-set val_list 1 (cdar loop_list))))
+            (loop-style (cdr loop_list))))
+
     (let ([sorted_range_val_list (sort (hash->list col_hash) < #:key car)])
       (let loop-squeeze ([loop_list sorted_range_val_list]
                          [last_val (cdar sorted_range_val_list)]
@@ -322,7 +326,59 @@
                       style_hash
                       (lambda (ik iv)
                         (hash-set! old_hash ik iv)))
-                       (hash-set! result_map cell_name old_hash))
-                     (hash-set! result_map cell_name style_hash))))
+                     (hash-set! result_map cell_name old_hash))
+                   (hash-set! result_map cell_name style_hash))))
             (outer-hash-loop (cdr hashes))))
     result_map))
+
+(define (cell->rowcol cell_str)
+  (let ([split_items (regexp-match #rx"^([a-zA-Z]+)([0-9]+)$" cell_str)])
+    (if split_items
+        (cons (string->number (third split_items)) (abc->number (second split_items)))
+        '(0 . 0))))
+
+(define (cross-cell-style row_map col_map type)
+  (let ([cross_cell_map (make-hash)])
+    (hash-for-each
+     row_map
+     (lambda (row_seq row_style_map)
+       (hash-for-each
+        col_map
+        (lambda (col_seq col_style_map)
+          (let ([head_style_map (if (eq? type 'row) col_style_map row_style_map)]
+                [tail_style_map (if (eq? type 'row) row_style_map col_style_map)]
+                [style_map (make-hash)])
+            (hash-for-each
+             head_style_map
+             (lambda (style val)
+               (hash-set! style_map style val)))
+
+            (hash-for-each
+             tail_style_map
+             (lambda (style val)
+               (hash-set! style_map style val)))
+            
+            (hash-set! cross_cell_map (string-append (number->abc col_seq) (number->string row_seq)) style_map))))))
+    cross_cell_map))
+
+(define (expand-row-style-to-cell row_style_map cell_style_map)
+  (hash-for-each
+   cell_style_map
+   (lambda (cell cell_style_map)
+     (let ([rowcol (cell->rowcol cell)])
+       (when (hash-has-key? row_style_map (car rowcol))
+         (hash-for-each
+          (hash-ref row_style_map (car rowcol))
+          (lambda (style val)
+            (hash-set! cell_style_map style val))))))))
+
+(define (expand-col-style-to-cell col_style_map cell_style_map)
+  (hash-for-each
+   cell_style_map
+   (lambda (cell cell_style_map)
+     (let ([rowcol (cell->rowcol cell)])
+       (when (hash-has-key? col_style_map (cdr rowcol))
+         (hash-for-each
+          (hash-ref col_style_map (cdr rowcol))
+          (lambda (style val)
+            (hash-set! cell_style_map style val))))))))
