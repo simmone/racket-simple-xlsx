@@ -20,8 +20,8 @@
                     (list "" "" "" "" "" "" "Center")
                     (list "" "" "" "" "" "" "Top")
                     (list "" "" "" "" "" "" "Bottom")
-                    (list "" "" "" "" "" "" "Center")
-                    (list "" "" "" "" "" "" "Center/Center")
+                    (list "" "" "" "" "" "" "Middle")
+                    (list "" "" "" "" "" "" "Center/Middle")
                     )])
 
   (send xlsx add-data-sheet #:sheet_name "DataSheet" #:sheet_data sheet_data)
@@ -59,9 +59,9 @@
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G7" #:style '( (horizontalAlign . center) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G8" #:style '( (verticalAlign . top) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G9" #:style '( (verticalAlign . bottom) ))
-  (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G10" #:style '( (verticalAlign . center) ))
+  (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G10" #:style '( (verticalAlign . middle) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G11"
-        #:style '( (horizontalAlign . center) (verticalAlign . center) ))
+        #:style '( (horizontalAlign . center) (verticalAlign . middle) ))
 
   (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
   (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")

@@ -188,7 +188,11 @@
                          (format
                            "~a~a"
                            (if (hash-has-key? alignment_hash 'horizontalAlign) (format " horizontal=\"~a\"" (hash-ref alignment_hash 'horizontalAlign)) "")
-                           (if (hash-has-key? alignment_hash 'verticalAlign) (format " vertical=\"~a\"" (hash-ref alignment_hash 'verticalAlign)) ""))
+                           (if (hash-has-key? alignment_hash 'verticalAlign) (format " vertical=\"~a\""
+                                                                               (if (eq? (hash-ref alignment_hash 'verticalAlign) 'middle)
+                                                                                  'center
+                                                                                  (hash-ref alignment_hash 'verticalAlign)))
+                                                                             ""))
                        " vertical=\"center\""))]
                 )
             (printf "  <xf numFmtId=\"~a\" fontId=\"~a\" fillId=\"~a\" borderId=\"~a\" xfId=\"0\"" numFmt font fill border)

@@ -347,7 +347,7 @@ year: yyyy, month: mm, day: dd
 
 horizontalAlign: 'left 'right 'center
 
-verticalAlign: 'top 'bottom 'center
+verticalAlign: 'top 'bottom 'middle
 
 @codeblock{
   (send xlsx add-data-sheet-cell-style!
