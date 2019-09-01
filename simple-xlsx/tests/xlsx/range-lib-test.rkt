@@ -92,6 +92,8 @@
 
     (check-equal? (check-col-range "A") "A-A")
 
+    (check-equal? (check-col-range "7-12") "7-12")
+
     (check-equal? (check-col-range "10") "10-10")
     
     (check-exn exn:fail? (lambda () (check-col-range "B-A")))
@@ -100,9 +102,25 @@
     )
 
    (test-case
+    "test-check-row-range"
+    
+    (check-equal? (check-row-range "1-4") "1-4")
+
+    (check-equal? (check-row-range "7-12") "7-12")
+
+    (check-equal? (check-row-range "10") "10-10")
+    
+    (check-exn exn:fail? (lambda () (check-row-range "2-1")))
+
+    (check-exn exn:fail? (lambda () (check-row-range "12-7")))
+    )
+
+   (test-case
     "test-check-cell-range"
     
     (check-cell-range "A1-B2")
+
+    (check-cell-range "G7")
 
     (check-exn exn:fail? (lambda () (check-cell-range "A10-B9")))
 

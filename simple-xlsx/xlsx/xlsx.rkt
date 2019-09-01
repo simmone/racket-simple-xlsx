@@ -19,6 +19,7 @@
                    (numFmt_list list?)
                    (border_code_to_border_index_hash hash?)
                    (border_list list?)
+                   (alignment_code_to_alignment_hash hash?)
                    )]
           ))
 
@@ -33,6 +34,7 @@
                     [numFmt_list #:mutable]
                     [border_code_to_border_index_hash #:mutable]
                     [border_list #:mutable]
+                    [alignment_code_to_alignment_hash #:mutable]
                     ))
 
 (define xlsx%
@@ -43,7 +45,7 @@
           [sheets '()]
           [sheet_name_map (make-hash)]
           [string_item_map (make-hash)]
-          [style (xlsx-style (make-hash) '() (make-hash) '() (make-hash) '() (make-hash) '() (make-hash) '())]
+          [style (xlsx-style (make-hash) '() (make-hash) '() (make-hash) '() (make-hash) '() (make-hash) '() (make-hash))]
           )
          
          (define/public (add-data-sheet #:sheet_name sheet_name #:sheet_data sheet_data)
@@ -241,6 +243,8 @@
                        (eq? (car style_pair) 'borderStyle)
                        (eq? (car style_pair) 'borderColor)
                        (eq? (car style_pair) 'dateFormat)
+                       (eq? (car style_pair) 'horizontalAlign)
+                       (eq? (car style_pair) 'verticalAlign)
                        )
                       (hash-set! style_hash (car style_pair) (cdr style_pair))
                       ]
@@ -315,6 +319,9 @@
                                            [border_hash_code #f]
                                            [border_code_to_border_index_hash (xlsx-style-border_code_to_border_index_hash style)]
                                            [border_list (xlsx-style-border_list style)]
+                                           [alignment_hash (make-hash)]
+                                           [alignment_hash_code #f]
+                                           [alignment_code_to_alignment_hash (xlsx-style-alignment_code_to_alignment_hash style)]
                                            )
 
                                        (hash-for-each
@@ -344,6 +351,11 @@
                                              (eq? key 'borderColor)
                                              )
                                             (hash-set! border_hash key value)]
+                                           [(or
+                                             (eq? key 'horizontalAlign)
+                                             (eq? key 'verticalAlign)
+                                             )
+                                            (hash-set! alignment_hash key value)]
                                            )))
                                        
                                        (when (> (hash-count fill_hash) 0)
@@ -386,6 +398,12 @@
                                                    (set-xlsx-style-border_list! style `(,@border_list ,border_hash))
                                                    (hash-set! style_hash 'border (add1 (length border_list))))
                                                  (hash-set! style_hash 'border (hash-ref border_code_to_border_index_hash border_hash_code))))
+
+                                       (when (> (hash-count alignment_hash) 0)
+                                             (set! alignment_hash_code (equal-hash-code alignment_hash))
+
+                                             (hash-set! alignment_code_to_alignment_hash alignment_hash_code alignment_hash)
+                                             (hash-set! style_hash 'alignment alignment_hash))
                                        
                                        (when (> (hash-count style_hash) 0)
                                              (set! style_hash_code (equal-hash-code style_hash))

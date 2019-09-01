@@ -195,7 +195,7 @@ add-data-sheet-row-style! set rows styles.
 
 add-data-sheet-col-style! set cols styles.
 
-styles format: @verbatim{'( (background . "FF0000") (fontSize . 20) )}
+styles format: @verbatim{'( (backgroundColor . "FF0000") (fontSize . 20) )}
 
 you can set cell, row, col style any times, it's a pile effect.
 
@@ -211,7 +211,7 @@ it also means the order you set style is important.
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
     #:cell_range "B2-C3" 
-    #:style '( (background . "FF0000") ))
+    #:style '( (backgroundColor . "FF0000") ))
 
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
@@ -237,20 +237,21 @@ the C3's style is @verbatim{( (backgroundColor . "00C851") (fontSize . 30) )}
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
     #:cell_range "B2-C3" 
-    #:style '( (background . "FF0000") ))
+    #:style '( (backgroundColor . "FF0000") ))
 
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheet" 
     #:cell_range "C3-D4" 
-    #:style '( (background . "0000FF") ))
+    #:style '( (backgroundColor . "0000FF") ))
 }
-the C3's style is '( (background . "0000FF") )
+the C3's style is '( (backgroundColor . "0000FF") )
 
-@subsubsection{backgroundColor}
+@subsubsection{Background Color}
+
+@verbatim{'backgroundColor}
 
 rgb color or color name.
 
-for example:
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
@@ -258,7 +259,9 @@ for example:
     #:style '( (backgroundColor . "00C851") ))
 }
 
-@subsubsection{fontStyle}
+@subsubsection{Font Style}
+
+@verbatim{'fontSize 'fontColor 'fontName}
 
 fontSize: integer? default is 11.
 
@@ -266,7 +269,6 @@ fontColor: rgb color or colorname.
 
 fontName: system font name.
 
-for example:
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
@@ -274,7 +276,9 @@ for example:
     #:style '( (fontSize . 20) (fontName . "Impact") (fontColor . "FF8800") ))
 }
 
-@subsubsection{numberFormat}
+@subsubsection{Number Format}
+
+@verbatim{'numberPercent 'numberPrecision 'numberThousands}
 
 numberPrecision: non-exact-integer?
 
@@ -282,7 +286,6 @@ numberPercent: boolean?
 
 numberThousands: boolean?
 
-for example:
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
@@ -294,7 +297,9 @@ for example:
               ))
 }
 
-@subsubsection{borderStyle}
+@subsubsection{Border Style}
+
+@verbatim{'borderStyle 'borderColor}
 
 borderDirection: @verbatim{'left 'right 'top 'bottom 'all}
 
@@ -311,7 +316,6 @@ boderStyle:
 
 borderColor: rgb color or color name.
 
-for example:
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
@@ -319,11 +323,12 @@ for example:
     #:style '( (borderStyle . dashed) (borderColor . "blue")))
 }
 
-@subsubsection{dateFormat}
+@subsubsection{Date Format}
+
+@verbatim{'dateFormat}
 
 year: yyyy, month: mm, day: dd
 
-for example:
 @codeblock{
   (send xlsx add-data-sheet-cell-style! 
     #:sheet_name "DataSheetWithStyle" 
@@ -334,6 +339,21 @@ for example:
     #:sheet_name "DataSheetWithStyle" 
     #:cell_range "F2-F2" 
     #:style '( (dateFormat . "yyyy/mm/dd") ))
+}
+
+@subsubsection{Cell Alignment}
+
+@verbatim{'horizontalAlign 'verticalAlign}
+
+horizontalAlign: 'left 'right 'center
+
+verticalAlign: 'top 'bottom 'center
+
+@codeblock{
+  (send xlsx add-data-sheet-cell-style!
+    #:sheet_name "DataSheetWithStyle2"
+    #:cell_range "G5"
+    #:style '( (horizontalAlign . left) ))
 }
 
 @subsection{Chart Sheet}

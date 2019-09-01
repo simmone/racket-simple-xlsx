@@ -96,20 +96,24 @@
     (string-append (number->abc cols) (number->string rows))))
 
 (define (check-cell-range cell_range_str)
-  (if (regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" cell_range_str)
-      (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" cell_range_str)]
-             [start_col_name (second items)]
-             [start_col_index (string->number (third items))]
-             [end_col_name (fourth items)]
-             [end_col_index (string->number (fifth items))])
-        (cond
-         [(string<? end_col_name start_col_name)
-          (error (format "col name should from small to big[~a]" cell_range_str))]
-         [(< end_col_index start_col_index)
-          (error (format "col index should from small to big[~a]" cell_range_str))]
-         [else
-          cell_range_str]))
-      (error (format "invalid cell range! should be like this: A1-B2[~a]" cell_range_str))))
+  (cond
+   [(regexp-match #rx"^[A-Z]+[0-9]+-[A-Z]+[0-9]+$" cell_range_str)
+    (let* ([items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" cell_range_str)]
+           [start_col_name (second items)]
+           [start_col_index (string->number (third items))]
+           [end_col_name (fourth items)]
+           [end_col_index (string->number (fifth items))])
+      (cond
+       [(string<? end_col_name start_col_name)
+        (error (format "col name should from small to big[~a]" cell_range_str))]
+       [(< end_col_index start_col_index)
+        (error (format "col index should from small to big[~a]" cell_range_str))]
+       [else
+        cell_range_str]))]
+   [(regexp-match #rx"^[A-Z]+[0-9]+$" cell_range_str)
+    (format "~a-~a" cell_range_str cell_range_str)]
+   [else
+    (error (format "invalid cell range! should be like this: A1-B2[~a]" cell_range_str))]))
 
 (define (check-col-range col_range_str)
   (cond
@@ -132,11 +136,11 @@
           (string-append start_col_name "-" end_col_name)))]
    [(regexp-match #rx"^[0-9]+-[0-9]+$" col_range_str)
     (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" col_range_str)]
-           [start_col_index (second items)]
-           [end_col_index (third items)])
-      (if (string>? start_col_index end_col_index)
+           [start_col_index (string->number (second items))]
+           [end_col_index (string->number (third items))])
+      (if (> start_col_index end_col_index)
           (error (format "col index should from small to big[~a]" col_range_str))
-          (string-append start_col_index "-" end_col_index)))]
+          (format "~a-~a" start_col_index end_col_index)))]
    [else
     (error (format "invalid col range! should be like this: A-Z or 1-10 or A or 1 but is [~a]" col_range_str))]
    ))
@@ -150,11 +154,11 @@
       (string-append start_row_index "-" end_row_index))]
    [(regexp-match #rx"^[0-9]+-[0-9]+$" row_range_str)
     (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" row_range_str)]
-           [start_row_index (second items)]
-           [end_row_index (third items)])
-      (if (string>? start_row_index end_row_index)
+           [start_row_index (string->number (second items))]
+           [end_row_index (string->number (third items))])
+      (if (> start_row_index end_row_index)
           (error (format "row index should from small to big[~a]" row_range_str))
-          (string-append start_row_index "-" end_row_index)))]
+          (format "~a-~a" start_row_index end_row_index)))]
    [else
     (error (format "invalid row range! should be like this: A-Z or 1-10 or A or 1 but is [~a]" row_range_str))]
    ))

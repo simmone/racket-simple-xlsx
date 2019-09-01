@@ -177,16 +177,26 @@
     (lambda ()
       (let loop ([loop_list style_list])
         (when (not (null? loop_list))
-          (let ([fill (hash-ref (car loop_list) 'fill 0)]
-                [font (hash-ref (car loop_list) 'font 0)]
-                [numFmt (hash-ref (car loop_list) 'numFmt 0)]
-                [border (hash-ref (car loop_list) 'border 0)]
-               )
+          (let* ([fill (hash-ref (car loop_list) 'fill 0)]
+                 [font (hash-ref (car loop_list) 'font 0)]
+                 [numFmt (hash-ref (car loop_list) 'numFmt 0)]
+                 [border (hash-ref (car loop_list) 'border 0)]
+                 [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
+                 [alignment_str
+                    (format "<alignment~a />"
+                      (if alignment_hash
+                         (format
+                           "~a~a"
+                           (if (hash-has-key? alignment_hash 'horizontalAlign) (format " horizontal=\"~a\"" (hash-ref alignment_hash 'horizontalAlign)) "")
+                           (if (hash-has-key? alignment_hash 'verticalAlign) (format " vertical=\"~a\"" (hash-ref alignment_hash 'verticalAlign)) ""))
+                       " vertical=\"center\""))]
+                )
             (printf "  <xf numFmtId=\"~a\" fontId=\"~a\" fillId=\"~a\" borderId=\"~a\" xfId=\"0\"" numFmt font fill border)
             (when (not (= font 0)) (printf " applyFont=\"1\""))
             (when (not (= fill 0)) (printf " applyFill=\"1\""))
             (when (not (= border 0)) (printf " applyBorder=\"1\""))
-            (printf "><alignment vertical=\"center\"/></xf>\n"))
+            (when alignment_hash (printf " applyAlignment=\"1\""))
+            (printf ">~a</xf>\n" alignment_str))
           (loop (cdr loop_list))))))|</cellXfs>
 })
 
