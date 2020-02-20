@@ -183,7 +183,7 @@
                  [border (hash-ref (car loop_list) 'border 0)]
                  [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
                  [alignment_str
-                    (format "<alignment~a />"
+                    (format "<alignment~a/>"
                       (if alignment_hash
                          (format
                            "~a~a"

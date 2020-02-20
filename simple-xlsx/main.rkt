@@ -4,7 +4,7 @@
           [sheet-name-rows (-> path-string? string? list?)]
           [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
           [read-xlsx% class?]
-          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
+          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) any) any)]
           [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
           [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]                    
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]

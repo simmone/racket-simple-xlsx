@@ -1,6 +1,8 @@
 #lang racket
 
-(require simple-xlsx)
+;(require simple-xlsx)
+
+(require "../main.rkt")
 
 (require racket/date)
 
@@ -118,8 +120,10 @@
        (printf "~a,~a,~a\n" (date-year date_val) (date-month date_val) (date-day date_val)))
      ; 2018,9,17
 
-     (printf "~a\n" (get-sheet-rows xlsx))))
+     (printf "~a\n" (get-sheet-rows xlsx))
      ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
+     
+     ))
   )
 
   (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))

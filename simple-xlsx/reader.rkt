@@ -2,7 +2,7 @@
 
 (provide (contract-out
           [read-xlsx% class?]
-          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) void?) void?)]
+          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) any) any)]
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
           [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
           [get-cell-formula (-> string? (is-a?/c read-xlsx%) string?)]
