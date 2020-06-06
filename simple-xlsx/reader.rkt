@@ -1,7 +1,6 @@
 #lang racket
 
 (provide (contract-out
-          [read-xlsx% class?]
           [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) any) any)]
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
           [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
@@ -16,20 +15,9 @@
 
 (require xml)
 
+(require "xlsx/xlsx.rkt")
 (require "lib/lib.rkt")
 (require "xlsx/range-lib.rkt")
-
-(define read-xlsx%
-  (class object%
-         (init-field [xlsx_dir ""]
-                     [shared_map #f]
-                     [sheet_map #f]
-                     [sheet_name_map #f]
-                     [relation_name_map #f]
-                     [formula_map #f]
-                     [data_type_map #f]
-                     [dimension #f])
-         (super-new)))
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
   (with-unzip

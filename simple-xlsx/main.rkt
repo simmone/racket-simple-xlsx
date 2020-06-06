@@ -15,6 +15,7 @@
           [xlsx% class?]
           [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
           [oa_date_number->date (-> number? date?)]
+          [from-read-to-write-xlsx (-> (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
           ))
 
 (require "xlsx/xlsx.rkt")
@@ -24,3 +25,12 @@
 (require "reader.rkt")
 
 (require "writer.rkt")
+
+(define (from-read-to-write-xlsx read_xlsx)
+  (let ([xlsx (new xlsx%)])
+    (let loop ([sheet_names (get-sheet-names read_xlsx)])
+      (when (not (null? sheet_names))
+            (load-sheet (car sheet_names) read_xlsx)
+            (send xlsx add-data-sheet #:sheet_name (car sheet_names) #:sheet_data (get-sheet-rows read_xlsx))
+            (loop (cdr sheet_names))))
+    xlsx))

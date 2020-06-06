@@ -124,6 +124,15 @@
      ))
   )
 
+  (with-input-from-xlsx-file
+   "test.xlsx"
+   (lambda (xlsx)
+     (let ([write_xlsx (from-read-to-write-xlsx xlsx)])
+       (send write_xlsx set-data-sheet-col-width!
+             #:sheet_name "DataSheet"
+             #:col_range "A-F" #:width 20)
+       (write-xlsx-file write_xlsx "write_back.xlsx"))))
+
   (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))
   ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
 

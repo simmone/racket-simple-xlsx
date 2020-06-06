@@ -4,7 +4,10 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 # Install
     raco pkg install simple-xlsx
 
-# Basic Usage
+# Usage
+    please view the racket docs.
+
+# Example
 ```racket
 
 #lang racket
@@ -127,9 +130,20 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
        (printf "~a,~a,~a\n" (date-year date_val) (date-month date_val) (date-day date_val)))
      ; 2018,9,17
 
-     (printf "~a\n" (get-sheet-rows xlsx))))
+     (printf "~a\n" (get-sheet-rows xlsx))
      ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
+     
+     ))
   )
+
+  (with-input-from-xlsx-file
+   "test.xlsx"
+   (lambda (xlsx)
+     (let ([write_xlsx (from-read-to-write-xlsx xlsx)])
+       (send write_xlsx set-data-sheet-col-width!
+             #:sheet_name "DataSheet"
+             #:col_range "A-F" #:width 20)
+       (write-xlsx-file write_xlsx "write_back.xlsx"))))
 
   (printf "~a\n" (sheet-name-rows "test.xlsx" "DataSheet"))
   ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
