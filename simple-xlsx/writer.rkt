@@ -7,6 +7,7 @@
 (require racket/date)
 
 (require "xlsx/xlsx.rkt")
+(require "xlsx/sheet.rkt")
 (require "lib/lib.rkt")
 (require "writer/content-type/content-type.rkt")
 (require "writer/_rels/rels.rkt")
@@ -29,7 +30,7 @@
 (define (write-xlsx-file xlsx xlsx_file_name)
   (when (file-exists? xlsx_file_name)
         (delete-file xlsx_file_name))
-  
+
   (let ([tmp_dir #f])
     (dynamic-wind
         (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
