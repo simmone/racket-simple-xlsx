@@ -2,10 +2,12 @@ A Open Xml  Spreadsheet(.xlsx) reader and writer for Racket
 ==================
 
 # Install
+
     raco pkg install simple-xlsx
 
 # Usage
-    please view the racket docs.
+
+Please view [the Racket docs](https://docs.racket-lang.org/simple-xlsx/index.html).
 
 # Example
 ```racket
