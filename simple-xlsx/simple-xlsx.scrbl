@@ -3,105 +3,122 @@
 @(require (for-label racket))
 @(require (for-label simple-xlsx))
 
+@(require scribble/example)
+
+@(define example-eval (make-base-eval))
+@(example-eval '(require simple-xlsx racket/date))
+
 @title{Simple-Xlsx: Open Xml Spreadsheet(.xlsx) Reader and Writer}
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
-simple-xlsx package is a package to read and write .xlsx format file.
+@defmodule[simple-xlsx]
 
-.xlsx file is a open xml format file.
+The @tt{simple-xlsx} package allows you to read and write spreadsheets in the @tt{.xlsx} file format
+used by Microsoft Excel and LibreOffice. This an open XML file format.
 
 @table-of-contents[]
 
 @section[#:tag "install"]{Install}
 
-raco pkg install simple-xlsx
+@codeblock{raco pkg install simple-xlsx}
 
 @section{Read}
 
-@defmodule[simple-xlsx #:link-target? #f]
+Functions for reading from a @filepath{.xlsx} file.
 
-read from a .xlsx file.
+You can get a specific cell's value or loop for the whole sheet's rows.
 
-you can get a specific cell's value or loop for the whole sheet's rows.
-
-there is also a complete read and write example on github:@link["https://github.com/simmone/racket-simple-xlsx/blob/master/simple-xlsx/example/example.rkt"]{includedin the source}.
+There is also a complete read and write example 
+@link["https://github.com/simmone/racket-simple-xlsx/blob/master/simple-xlsx/example/example.rkt"]{included
+in the GitHub source}.
 
 @defproc[(with-input-from-xlsx-file
-              [xlsx_file_path (path-string?)]
-              [user-proc (-> xlsx_handler void?)]
+              [xlsx_file_path path-string?]
+              [user-proc (-> (is-a?/c xlsx%) void?)]
               )
             void?]{
-  read xlsx's main outer func, all read assosiated action is include in user-proc.
+  Loads a @filepath{.xlsx} file and calls @racket[_user-proc] with the @racket[xlsx%] object as its only
+  argument.
 }
 
 @defproc[(load-sheet
-           [sheet_name (string?)]
-           [xlsx_handler (xlsx_handler)]
+           [sheet_name string?]
+           [xlsx_handler (is-a?/c xlsx%)]
            )
            void?]{
-  load specified sheet by sheet name.
-  must first called before other func, because any other func is based on specified sheet.
+  Load a sheet specified by its sheet name.
+  
+  This must be called before attempting to read any cell values.
 }
 
 @defproc[(get-sheet-names
-            [xlsx_handler (xlsx_handler)]
+            [xlsx_handler (is-a?/c xlsx%)]
             )
-            list?]{
-  get sheet names.
+            (listof string?)]{
+  Returns a list of sheet names.
 }
 
 @defproc[(get-cell-value
-            [cell_axis (string?)]
-            [xlsx_handler (xlsx_handler)]
+            [cell_axis string?]
+            [xlsx_handler (is-a?/c xlsx%)]
             )
             any]{
-  get cell value through cell's axis.
-  cell axis: A1 B2 C3...
+  Returns the value of a specific cell. The @racket[_cell-axis] should be in the “A1” reference
+  style.
+
+  Example:
+
+  @racketblock[
+  (with-input-from-xlsx-file "workbook.xlsx"
+    (lambda (xlsx)
+      (load-sheet "Sheet1" xlsx)
+      (get-cell-value "C12" xlsx)))
+  ]
 }
 
 @defproc[(get-cell-formula
-            [cell_axis (string?)]
-            [xlsx_handler (xlsx_handler)]
+            [cell_axis string?]
+            [xlsx_handler (is-a?/c xlsx%)]
             )
             string?]{
-  get cell formula. If no formula for the cell, will return an empty string
+  Get a cell's formula (as opposed to the calculated value of the formula). If the cell has no formula, this will return an empty string.
 
-  Limitations: currently does not support array or shared formulae
-
-  cell axis: A1 B2 C3...
+  The @racket[_cell-axis] should be in the “A1” reference style.
+  
+  Limitations: Currently does not support array or shared formulae.
 }
 
 @defproc[(oa_date_number->date
-            [oa_date_number (number?)]
+            [oa_date_number number?]
             )
             date?]{
-  if knows cell's type is date, can use this function to convert to racket date? type.
-  if not convert, xlsx's date type just is a number, like 43361.
+Convert an @tt{xlsx} cell's "date" value into Racket's @racket[date?] struct. Any fractional portion of @racket[_oa_date_number] is ignored; this function's precision is to the day only.
+                                            
+Cells with a "date" type in @tt{xlsx} files are a plain number representing the count of days since 0 January 1900.
 
-  this function can convert number to a date? with precision to day only, the hour, minute and seconds set to 0.
-
-  (oa_date_number->date 43359.1212121) to a date is 2018-9-16 00:00:00.
+@examples[#:eval example-eval
+  (date->string (oa_date_number->date 43359.1212121))
+]
 }
 
 @defproc[(get-sheet-dimension
-            [xlsx_handler (xlsx_handler)]
+            [xlsx_handler (is-a?/c xlsx%)]
             )
             pair?]{
-  get current sheet's dimension, (cons row col)
-  like (1 . 4)
+  Returns the current sheet's dimension as @racket[(cons _row _col)], such as @racket['(1 . 4)].
 }
 
 @defproc[(get-sheet-rows
-            [xlsx_handler (xlsx_handler)]
+            [xlsx_handler (is-a?/c xlsx%)]
             )
             list?]{
   get-sheet-rows get all rows from current loaded sheet
 }
 
 @defproc[(sheet-name-rows
-            [xlsx_file_path (path-string?)]
-            [sheet_name (string?)]
+            [xlsx_file_path path-string?]
+            [sheet_name string?]
             )
             list?]{
   if, only if just want get a specific sheet name's data, no other operations on the xlsx file.
@@ -110,16 +127,14 @@ there is also a complete read and write example on github:@link["https://github.
 }
 
 @defproc[(sheet-ref-rows
-            [xlsx_file_path (path-string?)]
-            [sheet_index (exact-nonnegative-integer?)]
+            [xlsx_file_path path-string?]
+            [sheet_index exact-nonnegative-integer?]
             )
             list?]{
   same as sheet-name-rows, use sheet index to specify sheet.
 }
 
 @section{Write}
-
-@defmodule[simple-xlsx #:link-target? #f]
 
 write a xlsx file use xlsx% class.
 
@@ -129,19 +144,19 @@ use add-chart-sheet method to add chart type sheet to xlsx.
 
 @subsection{xlsx%}
 
-@defstruct*[xlsx% ()]{}
+@defclass[xlsx% object% ()]{
 
-xlsx% class represent a whole xlsx file's data.
+The @racket[xlsx%] class represents a whole xlsx file's data.
 
-it contains data sheet or chart sheet.
+It contains data sheet or chart sheet.
 
-@subsection{Data Sheet}
 
-data sheet is a sheet contains data only.
+@defmethod[(add-data-sheet [#:sheet_name sheet string?]
+                           [#:sheet_data cells (listof (listof any/c))]) void?]{
 
-add data sheet:
+Adds a data sheet (as opposed to a chart sheet) which holds normal data in cells.
 
-sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
+Example:
 
 @codeblock{
   (let ([xlsx (new xlsx%)])
@@ -150,13 +165,19 @@ sheet data just a list contains list: (list (list cell ...) (list cell ...)...).
       #:sheet_data '(("chenxiao" "cx") (1 2))))
 }
 
-@subsubsection{Set Col Width}
+}
+                                                                         
+@defmethod[(set-data-sheet-col-width! [#:sheet_name sheet string?]
+                                      [#:col_range cols string?]
+                                      [#:width width number?]) void?]{
 
-column width is be set automatically by content's width.
+Manually set the width of one or more columns.
 
-if you want to set it manually, use set-data-sheet-col-width! method
+Note that by default, column widths are set automatically by their content. Use this method to
+override the automatic sizing.
 
-for example:
+Example:
+
 @codeblock{
   ;; set column A, B width: 50
   (send xlsx set-data-sheet-col-width! 
@@ -164,32 +185,44 @@ for example:
     #:col_range "A-B" #:width 50)
 }
 
-@subsubsection{Set Row Height}
+}
 
-for example:
+@defmethod[(set-data-sheet-row-height! [#:sheet_name sheet string?]
+                                       [#:row_range rows string?]
+                                       [#:height height number?]) void?]{
+
+Set the height of specified rows.
+
+Example:
+
 @codeblock{
-  ;; set rows 2-4 height: 20
   (send xlsx set-data-sheet-row-height!
     #:sheet_name "DataSheetWithStyle2"
     #:row_range "2-4" #:height 30)
 }
 
-@subsubsection{Freeze Pane}
+}
 
-use set-data-sheet-freeze-pane! to set a freeze range: '(rows . cols)
+@defmethod[(set-data-sheet-freeze-pane! [#:sheet_name sheet string?]
+                                        [#:range range (cons/c exact-nonnegative-integer?
+                                                               exact-nonnegative-integer?)]) void?]{
+
+“Freezes” the given number of rows (counting from the top) and columns (counting from the left).
+
+Example:
 
 @codeblock{
   ;; freeze 1 row and 1 col
   (send xlsx set-data-sheet-freeze-pane! #:sheet_name "DataSheet" #:range '(1 . 1))
 }
 
-@subsection{Add Style to Data Sheet}
+}
 
-you can add various style to a data sheet.
 
-includes background color, font style, number format, border style, date format.
 
-add-data-sheet-cell-style! set cells styles.
+@defmethod[(add-data-sheet-cell-style! [#:sheet_name sheet string?]
+                                       [#:cell_range range string?]
+                                       [#:style style (listof (cons symbol? any/c))]) void?]{
 
 add-data-sheet-row-style! set rows styles.
 
@@ -244,8 +277,12 @@ the C3's style is @verbatim{( (backgroundColor . "00C851") (fontSize . 30) )}
     #:cell_range "C3-D4" 
     #:style '( (backgroundColor . "0000FF") ))
 }
-the C3's style is '( (backgroundColor . "0000FF") )
 
+the C3's style is '( (backgroundColor . "0000FF") )
+}
+
+} @; defclass
+                                                                                            
 @subsubsection{Background Color}
 
 @verbatim{'backgroundColor}
@@ -356,6 +393,7 @@ verticalAlign: 'top 'bottom 'middle
     #:style '( (horizontalAlign . left) ))
 }
 
+}
 @subsection{Chart Sheet}
 
 chart sheet is a sheet contains chart only.
@@ -404,8 +442,8 @@ only one x axis data and multiple y axis data
 @subsection{write file}
 
 @defproc[(write-xlsx-file
-            [xlsx (xlsx%)]
-            [path (path-string?)])
+            [xlsx (is-a?/c xlsx%)]
+            [path path-string?])
             void?]{
   write xlsx% to xlsx file.
 }
@@ -413,12 +451,10 @@ only one x axis data and multiple y axis data
 @section{From Read to Write}
 
 @defproc[(from-read-to-write-xlsx
-            [read_xlsx (read-xlsx%)])
-            xlsx%]{
+            [read_xlsx (is-a?/c xlsx%)])
+            (is-a?/c xlsx%)]{
   convert read xlsx object to write xlsx object.
 }
-
-@defmodule[simple-xlsx #:link-target? #f]
 
 @codeblock{
   (with-input-from-xlsx-file
@@ -432,8 +468,6 @@ only one x axis data and multiple y axis data
 }
 
 @section{Complete Example}
-
-@defmodule[simple-xlsx #:link-target? #f]
 
 @codeblock{
 #lang racket
