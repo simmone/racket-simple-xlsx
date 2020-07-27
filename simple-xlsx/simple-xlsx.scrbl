@@ -1,7 +1,6 @@
 #lang scribble/manual
 
-@(require (for-label racket))
-@(require (for-label simple-xlsx))
+@(require (for-label racket racket/date simple-xlsx))
 
 @(require scribble/example)
 
@@ -35,16 +34,21 @@ in the GitHub source}.
 
 @defproc[(with-input-from-xlsx-file
               [xlsx_file_path path-string?]
-              [user-proc (-> (is-a?/c xlsx%) void?)]
+              [user-proc (-> (is-a?/c read-xlsx%) void?)]
               )
             void?]{
-  Loads a @filepath{.xlsx} file and calls @racket[_user-proc] with the @racket[xlsx%] object as its only
-  argument.
+
+Loads a @filepath{.xlsx} file and calls @racket[_user-proc] with the resulting @racket[read-xlsx%]
+object as its only argument.
+
+To make changes to the file, convert the @racket[read-xlsx%] object to @racket[xlsx%] using
+@racket[from-read-to-write-xlsx].
+
 }
 
 @defproc[(load-sheet
            [sheet_name string?]
-           [xlsx_handler (is-a?/c xlsx%)]
+           [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
            )
            void?]{
   Load a sheet specified by its sheet name.
@@ -53,7 +57,7 @@ in the GitHub source}.
 }
 
 @defproc[(get-sheet-names
-            [xlsx_handler (is-a?/c xlsx%)]
+            [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
             )
             (listof string?)]{
   Returns a list of sheet names.
@@ -61,11 +65,12 @@ in the GitHub source}.
 
 @defproc[(get-cell-value
             [cell_axis string?]
-            [xlsx_handler (is-a?/c xlsx%)]
+            [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
             )
-            any]{
-  Returns the value of a specific cell. The @racket[_cell-axis] should be in the “A1” reference
-  style.
+            (or/c string? number?)]{
+
+Returns the value of a specific cell. Numeric values are returned as numbers, except when stored in
+cells with “Text” format type. The @racket[_cell-axis] should be in the “A1” reference style.
 
   Example:
 
@@ -79,10 +84,12 @@ in the GitHub source}.
 
 @defproc[(get-cell-formula
             [cell_axis string?]
-            [xlsx_handler (is-a?/c xlsx%)]
+            [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
             )
             string?]{
-  Get a cell's formula (as opposed to the calculated value of the formula). If the cell has no formula, this will return an empty string.
+
+Get a cell's formula (as opposed to the calculated value of the formula). If the cell has no
+formula, this will return an empty string.
 
   The @racket[_cell-axis] should be in the “A1” reference style.
   
@@ -93,68 +100,114 @@ in the GitHub source}.
             [oa_date_number number?]
             )
             date?]{
-Convert an @tt{xlsx} cell's "date" value into Racket's @racket[date?] struct. Any fractional portion of @racket[_oa_date_number] is ignored; this function's precision is to the day only.
+
+Convert an @tt{xlsx} numeric “date” value into Racket's @racket[date?] struct. Any fractional
+portion of @racket[_oa_date_number] is ignored; this function's precision is to the day only.
                                             
-Cells with a "date" type in @tt{xlsx} files are a plain number representing the count of days since 0 January 1900.
+Date values in @tt{xlsx} files are a plain number representing the count of days since 0 January
+1900.
 
 @examples[#:eval example-eval
   (date->string (oa_date_number->date 43359.1212121))
+  (parameterize ([date-display-format 'rfc2822])
+    (date->string (oa_date_number->date 44921.5601)))
 ]
 }
 
 @defproc[(get-sheet-dimension
-            [xlsx_handler (is-a?/c xlsx%)]
+            [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
             )
-            pair?]{
+            (cons/c positive-integer? positive-integer?)]{
+
   Returns the current sheet's dimension as @racket[(cons _row _col)], such as @racket['(1 . 4)].
+
 }
 
 @defproc[(get-sheet-rows
-            [xlsx_handler (is-a?/c xlsx%)]
+            [xlsx_handler (or/c (is-a?/c read-xlsx%) (is-a?/c xlsx%))]
             )
-            list?]{
-  get-sheet-rows get all rows from current loaded sheet
+            (listof (listof (or/c string? number?)))]{
+
+  Returns all rows from the current loaded sheet.
+
 }
 
 @defproc[(sheet-name-rows
-            [xlsx_file_path path-string?]
-            [sheet_name string?]
+            [xlsx-file-path path-string?]
+            [sheet-name string?]
             )
-            list?]{
-  if, only if just want get a specific sheet name's data, no other operations on the xlsx file.
+            (listof (listof (or/c string? number?)))]{
 
-  this is the most simple func to get xlsx data.
+Reads the spreadsheet file specified by @racket[xlsx-file-path] and returns the data contained in
+the sheet named @racket[_sheet-name]. If the file or the sheet do not exist, an exception is raised.
+
+This is the most simple function for reading xlsx data. Use it when you don’t need to do any other
+operations on the file.
+
 }
 
 @defproc[(sheet-ref-rows
-            [xlsx_file_path path-string?]
-            [sheet_index exact-nonnegative-integer?]
+            [xlsx-file-path path-string?]
+            [sheet-index exact-nonnegative-integer?]
             )
-            list?]{
-  same as sheet-name-rows, use sheet index to specify sheet.
+            (listof (listof (or/c string? number?)))]{
+
+Like @racket[sheet-name-rows], but uses a numeric index to specify sheet, starting from @code{0}.
+
+}
+
+@defclass[read-xlsx% object% ()]{
+
+Class containing data read in from an existing @filepath{.xlsx} file. Convert to a @racket[xlsx%]
+using @racket[from-read-to-write-xlsx].
+
 }
 
 @section{Write}
 
-write a xlsx file use xlsx% class.
+@defproc[(write-xlsx-file
+            [xlsx (is-a?/c xlsx%)]
+            [path path-string?])
+            void?]{
 
-use add-data-sheet method to add data type sheet to xlsx.
+Save the spreadsheet in @racket[_xlsx] to a @filepath{.xlsx} file. If the file exists it will be
+silently overwritten.
 
-use add-chart-sheet method to add chart type sheet to xlsx.
+}
+
+@defproc[(from-read-to-write-xlsx
+            [read_xlsx (is-a?/c read-xlsx%)])
+            (is-a?/c xlsx%)]{
+
+Converts a @racket[read-xlsx%] object (the kind produced within the body of
+@racket[with-input-from-xlsx-file]) to a “writeable” @racket[xlsx%] object.
+
+In general, the workflow to modify an existing @filepath{.xlsx} file is:
+
+@codeblock{
+  (with-input-from-xlsx-file
+   "test.xlsx"
+   (lambda (xlsx)
+     (let ([write_xlsx (from-read-to-write-xlsx xlsx)])
+       (send write_xlsx set-data-sheet-col-width!
+             #:sheet_name "DataSheet"
+             #:col_range "A-F" #:width 20)
+       (write-xlsx-file write_xlsx "write_back.xlsx"))))
+}
+
+} @; defproc
 
 @subsection{xlsx%}
 
 @defclass[xlsx% object% ()]{
 
-The @racket[xlsx%] class represents a whole xlsx file's data.
-
-It contains data sheet or chart sheet.
-
+The @racket[xlsx%] class provides methods for changing a spreadsheet's data, contained in either
+@tech{data sheets} or @tech{chart sheets}.
 
 @defmethod[(add-data-sheet [#:sheet_name sheet string?]
                            [#:sheet_data cells (listof (listof any/c))]) void?]{
 
-Adds a data sheet (as opposed to a chart sheet) which holds normal data in cells.
+Adds a @deftech{data sheet} (as opposed to a @tech{chart sheet}), which holds normal data in cells.
 
 Example:
 
@@ -219,36 +272,165 @@ Example:
 }
 
 
-
 @defmethod[(add-data-sheet-cell-style! [#:sheet_name sheet string?]
                                        [#:cell_range range string?]
                                        [#:style style (listof (cons symbol? any/c))]) void?]{
 
-add-data-sheet-row-style! set rows styles.
+Sets the @tech{cell style} for specific cells. The @racket[_range] string should be either a single
+cell or a range of cells in “A1” reference style: @racket{C4} or @racket{B2-C3}.
 
-add-data-sheet-col-style! set cols styles.
+}
 
-styles format: @verbatim{'( (backgroundColor . "FF0000") (fontSize . 20) )}
+@defmethod[(add-data-sheet-row-style!  [#:sheet_name sheet string?]
+                                       [#:row_range range string?]
+                                       [#:style style (listof (cons symbol? any/c))]) void?]{
 
-you can set cell, row, col style any times, it's a pile effect.
+Sets the @tech{cell style} for an entire row or range of rows. The @racket[_range] string should
+contain either a single integer (@racket{1}) or a range like @racket{2-4}.
 
-it means:
+}
 
-if the latter style has same style property, it'll overwrite this property.
+@defmethod[(add-data-sheet-col-style!  [#:sheet_name sheet string?]
+                                       [#:col_range range string?]
+                                       [#:style style (listof (cons symbol? any/c))]) void?]{
 
-if not, it'll add this property.
+Sets the @tech{cell style} for an entire column or range of columns. The @racket[_range] string
+should contain either a single integer (@racket{1}) or a range like @racket{2-4}.
 
-it also means the order you set style is important.
+}
+
+@defmethod[(add-chart-sheet [#:sheet_name sheet string?]
+                            [#:chart_type type (or/c 'linechart
+                                                     'linechart3d
+                                                     'barchart
+                                                     'barchart3d
+                                                     'piechart
+                                                     'piechart3d)
+                                                'linechart]
+                            [#:topic topic string?]
+                            [#:x_topic x-topic string?]
+                            ) void?]{
+
+Adds a @deftech{chart sheet} to the spreadsheet, which is a sheet containing only a chart. A chart
+sheet draws its data from a @tech{data sheet}.
+
+Examples:
 
 @codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheet" 
-    #:cell_range "B2-C3" 
+  (send xlsx add-chart-sheet
+    #:sheet_name "LineChart1"
+    #:topic "Horizontal Data"
+    #:x_topic "Kg")
+
+  (send xlsx add-chart-sheet
+    #:sheet_name "LineChart1"
+    #:chart_type 'bar
+    #:topic "Horizontal Data"
+    #:x_topic "Kg")
+}
+
+}
+
+@defmethod[(set-chart-x-data! [#:sheet_name sheet string?]
+                              [#:data_sheet_name data-sheet string?]
+                              [#:data_range range string?]) void?]{
+
+Set the x-axis data for a @tech{chart sheet}'s chart.
+
+Example:
+
+@codeblock{
+  (send xlsx set-chart-x-data!
+    #:sheet_name "LineChart1"
+    #:data_sheet_name "DataSheet"
+    #:data_range "B1-D1")
+}
+
+}
+
+@defmethod[(add-chart-x-serial! [#:sheet_name sheet string?]
+                                [#:data_sheet_name data-sheet string?]
+                                [#:data_range range string?]
+                                [#:y_topic y-topic string?]) void?]{
+
+Adds a data range as as y-axis (series) data for a @tech{chart sheet}'s chart.
+
+
+Example:
+
+@codeblock{
+  (send xlsx add-chart-serial!
+    #:sheet_name "LineChart1"
+    #:data_sheet_name "DataSheet"
+    #:data_range "B2-D2" #:y_topic "CAT")
+}
+
+
+}
+
+} @; defclass
+
+@subsection{Cell Styles}
+
+A @deftech{cell style} is a list of pairs, where each pair is a property/value pair according to
+this grammar:
+
+@racketgrammar*[#:literals (backgroundColor
+                            fontSize
+                            fontColor
+                            fontName
+                            numberPrecision
+                            numberPercent
+                            numberThousands
+                            borderStyle thin medium thick dashed thinDashed
+                                        mediumDashed thickDashed double hair dotted
+                                        dashDot dashDotDot slantDashDot
+                                        mediumDashDot mediumDashDotDot
+                            borderDirection left right top bottom all
+                            borderColor
+                            dateFormat
+                            horizontalAlign center
+                            verticalAlign middle)
+                (setting (backgroundColor . color-string)
+                       (fontSize . positive-integer)
+                       (fontName . string)
+                       (fontColor . color-string)
+                       (numberPrecision . positive-integer)
+                       (numberPercent . boolean)
+                       (numberThousands . boolean)
+                       (borderStyle . border-line)
+                       (borderDirection . dir)
+                       (borderColor . color-string)
+                       (dateFormat . ymd-format-string)
+                       (horizontalAlign . h-alignment)
+                       (verticalAlign . v-alignment)
+                       )
+                (border-line thin medium thick dashed thinDashed
+                             mediumDashed thickDashed double hair dotted
+                             dashDot dashDotDot slantDashDot
+                             mediumDashDot mediumDashDotDot)
+                (dir left right top bottom all)
+                (h-alignment left right center)
+                (v-alignment top bottom middle)
+                (color-string hex-rgb-string color-name)]
+
+
+When you change a cell's style, the settings you give will add to or overwrite the previous values.
+Each affected cell retains its previous settings for any properties not identified.
+
+This means the order in which you set styles is important.
+
+Example:
+
+@codeblock{
+  (send xlsx add-data-sheet-cell-style!
+    #:sheet_name "DataSheet"
+    #:cell_range "B2-C3"
     #:style '( (backgroundColor . "FF0000") ))
 
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheet" 
-    #:cell_range "C3-D4" 
+  (send xlsx add-data-sheet-cell-style!
+    #:sheet_name "DataSheet"
+    #:cell_range "C3-D4"
     #:style '( (fontSize . 30) ))
 
   (send xlsx add-data-sheet-row-style!
@@ -258,214 +440,20 @@ it also means the order you set style is important.
   (send xlsx add-data-sheet-col-style!
     #:sheet_name "DataSheetWithStyle2"
     #:col_range "4-6" #:style '( (backgroundColor . "AA66CC") ))
-}
-
-the C2's style is @verbatim{'( (backgroundColor . "AA66CC") )}
-
-the D3's style is @verbatim{'( (backgroundColor . "AA66CC") (fontSize . 30) )}
-
-the C3's style is @verbatim{( (backgroundColor . "00C851") (fontSize . 30) )}
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheet" 
-    #:cell_range "B2-C3" 
-    #:style '( (backgroundColor . "FF0000") ))
-
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheet" 
-    #:cell_range "C3-D4" 
-    #:style '( (backgroundColor . "0000FF") ))
-}
-
-the C3's style is '( (backgroundColor . "0000FF") )
-}
-
-} @; defclass
-                                                                                            
-@subsubsection{Background Color}
-
-@verbatim{'backgroundColor}
-
-rgb color or color name.
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "A2-B3" 
-    #:style '( (backgroundColor . "00C851") ))
-}
-
-@subsubsection{Font Style}
-
-@verbatim{'fontSize 'fontColor 'fontName}
-
-fontSize: integer? default is 11.
-
-fontColor: rgb color or colorname.
-
-fontName: system font name.
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "B3-C4" 
-    #:style '( (fontSize . 20) (fontName . "Impact") (fontColor . "FF8800") ))
-}
-
-@subsubsection{Number Format}
-
-@verbatim{'numberPercent 'numberPrecision 'numberThousands}
-
-numberPrecision: non-exact-integer?
-
-numberPercent: boolean?
-
-numberThousands: boolean?
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "E2-E2" 
-    #:style '( 
-              (numberPercent . #t) 
-              (numberPrecision . 2) 
-              (numberThousands . #t)
-              ))
-}
-
-@subsubsection{Border Style}
-
-@verbatim{'borderStyle 'borderColor}
-
-borderDirection: @verbatim{'left 'right 'top 'bottom 'all}
-
-boderStyle: 
-@verbatim{
-            'thin 'medium 'thick 'dashed 'thinDashed 
-
-            'mediumDashed 'thickDashed 'double 'hair 'dotted 
-
-            'dashDot 'dashDotDot 'mediumDashDot 'mediumDashDotDot 
-
-            'slantDashDot
-}
-
-borderColor: rgb color or color name.
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "B2-C4" 
-    #:style '( (borderStyle . dashed) (borderColor . "blue")))
-}
-
-@subsubsection{Date Format}
-
-@verbatim{'dateFormat}
-
-year: yyyy, month: mm, day: dd
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "F2-F2" 
-    #:style '( (dateFormat . "yyyy-mm-dd") ))
-
-  (send xlsx add-data-sheet-cell-style! 
-    #:sheet_name "DataSheetWithStyle" 
-    #:cell_range "F2-F2" 
-    #:style '( (dateFormat . "yyyy/mm/dd") ))
-}
-
-@subsubsection{Cell Alignment}
-
-@verbatim{'horizontalAlign 'verticalAlign}
-
-horizontalAlign: 'left 'right 'center
-
-verticalAlign: 'top 'bottom 'middle
-
-@codeblock{
-  (send xlsx add-data-sheet-cell-style!
-    #:sheet_name "DataSheetWithStyle2"
-    #:cell_range "G5"
-    #:style '( (horizontalAlign . left) ))
-}
 
 }
-@subsection{Chart Sheet}
 
-chart sheet is a sheet contains chart only.
+After the above operations:
 
-chart sheet use data sheet's data to constuct chart.
+@itemlist[
 
-chart type now can have: linechart, linechart3d, barchart, barchart3d, piechart, piechart3d
+@item{C2's style is @code{'((backgroundColor . "AA66CC"))}.}
 
-@subsubsection{add chart sheet}
+@item{D3's style is @code{'((backgroundColor . "AA66CC") (fontSize . 30))}}
 
-default chart_type is linechart or set chart type
+@item{C3's style is @code{'((backgroundColor . "00C851") (fontSize . 30))}}
+]
 
-chart type is one of these: line, line3d, bar, bar3d, pie, pie3d
-
-@codeblock{
-  (send xlsx add-chart-sheet 
-    #:sheet_name "LineChart1" 
-    #:topic "Horizontal Data" 
-    #:x_topic "Kg")
-
-  (send xlsx add-chart-sheet 
-    #:sheet_name "LineChart1" 
-    #:chart_type 'bar 
-    #:topic "Horizontal Data" 
-    #:x_topic "Kg")
-}
-
-set-chart-x-data! and add-chart-serail!:
-
-use this two methods to set chart's x axis data and y axis data
-
-only one x axis data and multiple y axis data
-
-@codeblock{
-  (send xlsx set-chart-x-data! 
-    #:sheet_name "LineChart1" 
-    #:data_sheet_name "DataSheet" 
-    #:data_range "B1-D1")
-
-  (send xlsx add-chart-serial! 
-    #:sheet_name "LineChart1" 
-    #:data_sheet_name "DataSheet" 
-    #:data_range "B2-D2" #:y_topic "CAT")
-}
-
-@subsection{write file}
-
-@defproc[(write-xlsx-file
-            [xlsx (is-a?/c xlsx%)]
-            [path path-string?])
-            void?]{
-  write xlsx% to xlsx file.
-}
-
-@section{From Read to Write}
-
-@defproc[(from-read-to-write-xlsx
-            [read_xlsx (is-a?/c xlsx%)])
-            (is-a?/c xlsx%)]{
-  convert read xlsx object to write xlsx object.
-}
-
-@codeblock{
-  (with-input-from-xlsx-file
-   "test.xlsx"
-   (lambda (xlsx)
-     (let ([write_xlsx (from-read-to-write-xlsx xlsx)])
-       (send write_xlsx set-data-sheet-col-width!
-             #:sheet_name "DataSheet"
-             #:col_range "A-F" #:width 20)
-       (write-xlsx-file write_xlsx "write_back.xlsx"))))
-}
 
 @section{Complete Example}
 
@@ -591,7 +579,10 @@ only one x axis data and multiple y axis data
      ; 2018,9,17
 
      (printf "~a\n" (get-sheet-rows xlsx))
-     ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
+     ; '(("month/brand" 201601 201602 201603 201604 201605)
+     ;   ("CAT" 100 300 200 0.6934 43360)
+     ;   ("Puma" 200 400 300 139999.89223 43361)
+     ;   ("Asics" 300 500 400 23.34 43362))
      
      ))
   )
