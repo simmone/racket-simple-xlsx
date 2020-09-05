@@ -1,15 +1,12 @@
 #lang racket
 
-(require file/unzip)
-(require file/zip)
 (require xml)
 (require xml/path)
 (require racket/date)
 (require rackunit)
+(require file/zip)
 
 (provide (contract-out
-          [with-unzip-entry (-> path-string? path-string? (-> path-string? any) any)]
-          [with-unzip (-> path-string? (-> path-string? any) any)]
           [xml-get-list (-> symbol? xexpr? list?)]
           [xml-get-attr (-> symbol? string? xexpr? string?)]
           [xml-get (-> symbol? xexpr? string?)]
@@ -90,34 +87,6 @@
 
 (define (xml-get-list list-node-name xml-list)
   (se-path*/list (list list-node-name) xml-list))
-
-(define (with-unzip-entry zip_file entry_file do_proc)
-  (let ([temp_dir #f])
-    (dynamic-wind
-        (lambda ()
-          (set! temp_dir (make-temporary-file "ziptmp~a" 'directory ".")))
-        (lambda ()
-          (let ([directory_entries (read-zip-directory zip_file)])
-            (unzip-entry
-             zip_file
-             directory_entries
-             (path->zip-path entry_file)
-             (make-filesystem-entry-reader #:dest temp_dir #:exists 'replace))
-            (do_proc (build-path temp_dir entry_file))))
-        (lambda ()
-          (delete-directory/files temp_dir)))))
-
-(define (with-unzip zip_file do_proc)
-  (let ([temp_dir #f])
-    (dynamic-wind
-        (lambda ()
-          (set! temp_dir (make-temporary-file "ziptmp~a" 'directory ".")))
-        (lambda ()
-          (unzip zip_file (make-filesystem-entry-reader #:dest temp_dir #:exists 'replace))
-          (do_proc temp_dir))
-        (lambda ()
-;          (void)))))
-          (delete-directory/files temp_dir)))))
 
 ;; YYYYMMDD HH:MM:SS
 (define (value-of-time time_str)

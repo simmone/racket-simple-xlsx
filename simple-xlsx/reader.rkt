@@ -14,13 +14,14 @@
           ))
 
 (require xml)
+(require file/unzip)
 
 (require "xlsx/xlsx.rkt")
 (require "lib/lib.rkt")
 (require "xlsx/range-lib.rkt")
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
-  (with-unzip
+  (call-with-unzip
    xlsx_file
    (lambda (tmp_dir)
      (let ([new_shared_map #f]
@@ -156,7 +157,7 @@
         [data_sheet_file_name
          (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))])
     
-    (when (string=? (path->string (fourth (explode-path data_sheet_file_name))) "worksheets")
+    (when (string=? (path->string (car (take-right (explode-path data_sheet_file_name) 2))) "worksheets")
           (let ([file_str (file->string data_sheet_file_name)])
             (set! rows
                   (let loop ([loop_list
@@ -273,9 +274,16 @@
   (get-field dimension xlsx))
 
 (define (get-sheet-rows xlsx)
-  (let* ([dimension (get-field dimension xlsx)]
-         [rows (car dimension)]
-         [cols (cdr dimension)])
+  (let ([dimension null]
+        [rows null]
+        [cols null])
+    
+    (set! dimension (get-field dimension xlsx))
+    
+    (set! rows (car dimension))
+
+    (set! cols (cdr dimension))
+
     (let loop ([row_index 1]
                [result_list '()])
       (if (<= row_index rows)
