@@ -175,12 +175,15 @@
   <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>
 @|(with-output-to-string
     (lambda ()
-      (let loop ([loop_list style_list])
+      (let loop (
+                 [loop_list style_list]
+                 [index 0]
+                )
         (when (not (null? loop_list))
-          (let* ([fill (hash-ref (car loop_list) 'fill 0)]
-                 [font (hash-ref (car loop_list) 'font 0)]
-                 [numFmt (hash-ref (car loop_list) 'numFmt 0)]
-                 [border (hash-ref (car loop_list) 'border 0)]
+          (let* ([fill (hash-ref (car loop_list) 'fill index)]
+                 [font (hash-ref (car loop_list) 'font index)]
+                 [numFmt (hash-ref (car loop_list) 'numFmt index)]
+                 [border (hash-ref (car loop_list) 'border index)]
                  [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
                  [alignment_str
                     (format "<alignment~a/>"
@@ -201,7 +204,7 @@
             (when (not (= border 0)) (printf " applyBorder=\"1\""))
             (when alignment_hash (printf " applyAlignment=\"1\""))
             (printf ">~a</xf>\n" alignment_str))
-          (loop (cdr loop_list))))))|</cellXfs>
+          (loop (cdr loop_list) (add1 index))))))|</cellXfs>
 })
 
 (define (write-cellStyles) @S{

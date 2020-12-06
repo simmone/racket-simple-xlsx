@@ -381,6 +381,10 @@
                                                    (hash-set! style_hash 'fill (+ 2 (length fill_list))))
                                                  (hash-set! style_hash 'fill (hash-ref fill_code_to_fill_index_hash fill_hash_code))))
 
+                                       (when (> (hash-count numFmt_code_to_numFmt_index_hash) 0)
+                                             (set! numFmt_index
+                                                   (cdr (argmax cdr (hash->list numFmt_code_to_numFmt_index_hash)))))
+
                                        (when (> (hash-count numFmt_hash) 0)
                                              (set! numFmt_hash_code (equal-hash-code numFmt_hash))
 
