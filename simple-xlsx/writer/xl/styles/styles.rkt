@@ -65,52 +65,59 @@
 })
 
 (define (get-numFormatCode format_hash)
-  (if (hash-has-key? format_hash 'dateFormat)
-      (let ([format_str (hash-ref format_hash 'dateFormat)])
-        (with-output-to-string
-          (lambda ()
-            (let loop ([loop_list (string->list format_str)]
-                       [critical_tag? #f]
-                       [connect_tag? #f]
-                       )
-              (if (not (null? loop_list))
-                  (if (or
-                       (char=? (car loop_list) #\y)
-                       (char=? (car loop_list) #\m)
-                       (char=? (car loop_list) #\d))
-                      (if connect_tag?
-                          (begin
-                            (printf "&quot;~a" (car loop_list))
-                            (loop (cdr loop_list) #t #f))
-                          (begin
-                            (printf "~a" (car loop_list))
-                            (loop (cdr loop_list) #t #f)))
-                      (if critical_tag?
-                          (begin
-                            (printf "&quot;~a" (car loop_list))
-                            (loop (cdr loop_list) #f #t))
-                          (begin
-                            (printf "~a" (car loop_list))
-                            (loop (cdr loop_list) #f #t))))
-                  (when connect_tag?
-                        (printf "&quot;"))))
-            (printf ";@"))))
-      (let* ([raw_number_precision (hash-ref format_hash 'numberPrecision 2)]
-             [number_precision (if (natural? raw_number_precision) raw_number_precision 2)]
-             [number_precision_str
-              (format "0~a~a"
-                      (if (not (= number_precision 0)) "." "")
-                      (~a "" #:min-width number_precision #:pad-string "0"))]
-             [number_thousands (hash-ref format_hash 'numberThousands #f)]
-             [number_percent (hash-ref format_hash 'numberPercent #f)])
-        (cond
-         [number_thousands
-          (string-append "#,###" number_precision_str)]
-         [number_percent
-          (string-append number_precision_str "%")]
-         [else
-          number_precision_str]
-         ))))
+  (cond
+   [(hash-has-key? format_hash 'dateFormat)
+    (let ([format_str (hash-ref format_hash 'dateFormat)])
+      (with-output-to-string
+        (lambda ()
+          (let loop ([loop_list (string->list format_str)]
+                     [critical_tag? #f]
+                     [connect_tag? #f]
+                     )
+            (if (not (null? loop_list))
+                (if (or
+                     (char=? (car loop_list) #\y)
+                     (char=? (car loop_list) #\m)
+                     (char=? (car loop_list) #\d))
+                    (if connect_tag?
+                        (begin
+                          (printf "&quot;~a" (car loop_list))
+                          (loop (cdr loop_list) #t #f))
+                        (begin
+                          (printf "~a" (car loop_list))
+                          (loop (cdr loop_list) #t #f)))
+                    (if critical_tag?
+                        (begin
+                          (printf "&quot;~a" (car loop_list))
+                          (loop (cdr loop_list) #f #t))
+                        (begin
+                          (printf "~a" (car loop_list))
+                          (loop (cdr loop_list) #f #t))))
+                (when connect_tag?
+                      (printf "&quot;"))))
+          (printf ";@"))))]
+   [(or
+     (hash-has-key? format_hash 'numberPrecision)
+     (hash-has-key? format_hash 'numberThousands)
+     (hash-has-key? format_hash 'numberPercent))
+    (let* ([raw_number_precision (hash-ref format_hash 'numberPrecision 2)]
+           [number_precision (if (natural? raw_number_precision) raw_number_precision 2)]
+           [number_precision_str
+            (format "0~a~a"
+                    (if (not (= number_precision 0)) "." "")
+                    (~a "" #:min-width number_precision #:pad-string "0"))]
+           [number_thousands (hash-ref format_hash 'numberThousands #f)]
+           [number_percent (hash-ref format_hash 'numberPercent #f)])
+      (cond
+       [number_thousands
+        (string-append "#,###" number_precision_str)]
+       [number_percent
+        (string-append number_precision_str "%")]
+       [else
+        number_precision_str]
+       ))]
+   [(hash-has-key? format_hash 'formatCode)
+    (hash-ref format_hash 'formatCode)]))
 
 (define (write-numFmts numFmt_list) @S{
 <numFmts count="@|(number->string (add1 (length numFmt_list)))|">

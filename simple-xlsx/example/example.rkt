@@ -1,6 +1,6 @@
 #lang racket
 
-(require simple-xlsx)
+(require "../main.rkt")
 
 (require racket/date)
 
@@ -11,9 +11,9 @@
                    (list "Puma" 200 400 300 139999.89223 (seconds->date (find-seconds 0 0 0 18 9 2018)))
                    (list "Asics" 300 500 400 23.34 (seconds->date (find-seconds 0 0 0 19 9 2018))))]
       [sheet_data2 (list
-                    (list "month/brand" "201601" "201602" "201603" "201604" "201605" "")
+                    (list "month/brand" "201601" "201602" "201603" "201604" "201605" "alignment")
                     (list "CAT" 100 300 200 0.6934 (seconds->date (find-seconds 0 0 0 17 9 2018)) "")
-                    (list "Puma" 200 400 300 139999.89223 (seconds->date (find-seconds 0 0 0 18 9 2018)) "")
+                    (list "Puma" 200 400 300 -139999.89223 (seconds->date (find-seconds 0 0 0 18 9 2018)) "")
                     (list "Asics" 300 500 400 23.34 (seconds->date (find-seconds 0 0 0 19 9 2018)) "")
                     (list "" "" "" "" "" "" "Left")
                     (list "" "" "" "" "" "" "Right")
@@ -62,6 +62,10 @@
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G10" #:style '( (verticalAlign . middle) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G11"
         #:style '( (horizontalAlign . center) (verticalAlign . middle) ))
+
+  (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheetWithStyle2" #:col_range "E-F" #:width 30)
+  (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G1" #:style '((formatCode . "@__&quot;means&quot;__@")))
+  (send xlsx add-data-sheet-col-style! #:sheet_name "DataSheetWithStyle2" #:col_range "E-F" #:style '((formatCode . "￥#,##0.00;[Red]￥-#,##0.00")))
 
   (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
   (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")

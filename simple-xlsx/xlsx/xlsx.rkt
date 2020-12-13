@@ -258,6 +258,7 @@
                        (eq? (car style_pair) 'dateFormat)
                        (eq? (car style_pair) 'horizontalAlign)
                        (eq? (car style_pair) 'verticalAlign)
+                       (eq? (car style_pair) 'formatCode)
                        )
                       (hash-set! style_hash (car style_pair) (cdr style_pair))
                       ]
@@ -267,7 +268,9 @@
                (cond
                 [(eq? type 'cell)
                  (set! cell_to_origin_style_hash
-                       (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))]
+                       (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))
+                 (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)
+                 (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)]
                 [(eq? type 'row)
                  (set! row_to_origin_style_hash
                        (combine-hash-in-hash (list row_to_origin_style_hash (range-to-row-hash converted_range style_hash))))
@@ -302,12 +305,13 @@
                           [col_to_style_index_hash (data-sheet-col_to_style_index_hash sheet)]
                           [style_code_to_style_index_hash (make-hash)]
                           [numFmt_index 164])
-                     
+
                      (let style-loop ([styles_list
                                        (list
                                         (cons cell_to_origin_style_hash cell_to_style_index_hash)
                                         (cons row_to_origin_style_hash row_to_style_index_hash)
                                         (cons col_to_origin_style_hash col_to_style_index_hash))])
+
                        (when (not (null? styles_list))
                              (let loop ([loop_list (hash->list (caar styles_list))])
                                (when (not (null? loop_list))
@@ -356,6 +360,7 @@
                                              (eq? key 'numberPercent)
                                              (eq? key 'numberThousands)
                                              (eq? key 'dateFormat)
+                                             (eq? key 'formatCode)
                                              )
                                             (hash-set! numFmt_hash key value)]
                                            [(or
@@ -421,7 +426,7 @@
 
                                              (hash-set! alignment_code_to_alignment_hash alignment_hash_code alignment_hash)
                                              (hash-set! style_hash 'alignment alignment_hash))
-                                       
+
                                        (when (> (hash-count style_hash) 0)
                                              (set! style_hash_code (equal-hash-code style_hash))
                                              

@@ -75,7 +75,12 @@ Please view [the Racket docs](https://docs.racket-lang.org/simple-xlsx/index.htm
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G9" #:style '( (verticalAlign . bottom) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G10" #:style '( (verticalAlign . middle) ))
   (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G11"
-        #:style '( (horizontalAlign . center) (verticalAlign . middle) ))
+        #:style '( (horizontalAlign . center) (verticalAlign . middle)
+  ))
+
+  (send xlsx set-data-sheet-col-width! #:sheet_name "DataSheetWithStyle2" #:col_range "E-F" #:width 30)
+  (send xlsx add-data-sheet-cell-style! #:sheet_name "DataSheetWithStyle2" #:cell_range "G1" #:style '((formatCode . "@__&quot;means&quot;__@")))
+  (send xlsx add-data-sheet-col-style! #:sheet_name "DataSheetWithStyle2" #:col_range "E-F" #:style '((formatCode . "￥#,##0.00;[Red]￥-#,##0.00")))
 
   (send xlsx add-chart-sheet #:sheet_name "LineChart1" #:topic "Horizontal Data" #:x_topic "Kg")
   (send xlsx set-chart-x-data! #:sheet_name "LineChart1" #:data_sheet_name "DataSheet" #:data_range "B1-D1")
