@@ -14,7 +14,7 @@
    #:formats? '("xml_decode.pdf")
    (lambda ()
      (detail-page
-      #:line_break_length? 120
+      #:line_break_length? 110
       #:font_size? 'small
       (lambda ()
         (detail-h1 "Decode XML Process")
