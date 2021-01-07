@@ -38,8 +38,8 @@
                  (map (lambda (sym) (hash-set! sym_hash sym #f)) sym_list)
 
                  ;; load xml file to xexpr to start parsing
-                 ;; ancester_prefix means parent node name, start from ""
-                 (let loop-node ([ancester_prefix ""]
+                 ;; ancester_prefix means parent node name, start from #f
+                 (let loop-node ([ancester_prefix #f]
                                  [in_list? #f]
                                  [xml_list (list (xml->xexpr (document-element (read-xml filtered_port))))])
 
@@ -49,7 +49,7 @@
                    (detail-line (format "in_list?;[~a]\n" in_list?))
                    (detail-line (format "xml_list:[~a]\n" xml_list))
                    (detail-line "***************************************")
-
+                   
                    (if (not (null? xml_list))
                        (let ([node (car xml_list)])
                          (detail-line (format "node:[~a]" node))
@@ -81,7 +81,11 @@
                                              (let ([count_sym (format "~a.~a.count" ancester_prefix prefix)])
                                                (hash-set! xml_hash count_sym (add1 (hash-ref xml_hash count_sym 0)))
                                                (set! prefix (format "~a~a" prefix (hash-ref xml_hash count_sym)))))
-                                       (hash-set! xml_hash (format "~a.~a.~a" ancester_prefix prefix (caar attrs)) (cadar attrs))
+
+                                       (hash-set! xml_hash (format "~a~a.~a" 
+                                                                   (if ancester_prefix (format "~a." ancester_prefix) "")
+                                                                   prefix (caar attrs))
+                                                  (cadar attrs))
                                        (loop-attr (cdr attrs))))
                                (detail-line (format "xml_hash after process attrs:[~a]" xml_hash))
 
