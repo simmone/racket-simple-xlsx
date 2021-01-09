@@ -19,7 +19,6 @@
       (lambda ()
         (detail-h1 "Decode XML Process")
         (detail-line (format "XML File:~a" xml))
-        (detail-line (format "List Symbol:~a" sym_list))
 
         (call-with-input-file
             xml
@@ -36,17 +35,16 @@
 
                  ;; which syms need be count and convert to list, turn them to map to convenient to check
                  (map (lambda (sym) (hash-set! sym_hash sym #f)) sym_list)
+                 (detail-line (format "List Symbol:~a" sym_hash))
 
                  ;; load xml file to xexpr to start parsing
                  ;; ancester_prefix means parent node name, start from #f
                  (let loop-node ([ancester_prefix #f]
-                                 [in_list? #f]
                                  [xml_list (list (xml->xexpr (document-element (read-xml filtered_port))))])
 
                    (detail-line "")
                    (detail-line "***************************************")
                    (detail-line (format "ancester_prefix:[~a]\n" ancester_prefix))
-                   (detail-line (format "in_list?;[~a]\n" in_list?))
                    (detail-line (format "xml_list:[~a]\n" xml_list))
                    (detail-line "***************************************")
                    
@@ -54,38 +52,49 @@
                        (let ([node (car xml_list)])
                          (detail-line (format "node:[~a]" node))
                          (if (not (list? node))
-                             (begin
-                               (detail-line "node is a symbol")
-                               (if (hash-has-key? sym_hash ancester_prefix) ;; prefix is the sym we expect it to be a list, count it
-                                   (begin
-                                     (detail-line "node is a list symbol")
-                                     (hash-set! xml_hash (format "~a.count" ancester_prefix) (add1 (hash-ref xml_hash (format "~a.count" ancester_prefix) 0)))
-                                     (detail-line (format "xml_hash after process attrs:[~a]" xml_hash))
-                                     (loop-node node #t (cdr xml_list)))
-                                   (begin
-                                     (detail-line "node is not a list symbol")
-                                     (loop-node node #f (cdr xml_list)))))
+                             (if (null? node)
+                                 (begin
+                                   (detail-line "null node, next loop")
+                                   (loop-node node (cdr xml_list)))
+                                 (begin
+                                   (detail-line "node is a symbol")
+                                   (detail-line (format "is_list?:[~a]" (hash-has-key? sym_hash ancester_prefix)))
+                                   (if (hash-has-key? sym_hash ancester_prefix) ;; prefix is the sym we expect it to be a list, count it
+                                       (let ([count_sym (format "~a.count" ancester_prefix)])
+                                         (detail-line "node is a list symbol")
+                                         (hash-set! xml_hash count_sym (add1 (hash-ref xml_hash count_sym 0)))
+                                         (let ([new_prefix (string->symbol (format "~a~a" ancester_prefix (hash-ref xml_hash count_sym)))])
+                                           (detail-line (format "it is a list sym, prefix changed to:[~a]" new_prefix))
+                                           (loop-node new_prefix (cdr xml_list))))
+                                       (begin
+                                         (detail-line "node is not a list symbol")
+                                         (loop-node node (cdr xml_list))))))
                              (begin
                                (let* ([prefix #f]
                                       [node_prefix (car node)]
                                       [attr_list (cadr node)]
                                       [content_list (cddr node)])
 
+                                 (set! prefix (string->symbol (format "~a~a" (if ancester_prefix (format "~a." ancester_prefix) "") node_prefix)))
+
                                  (detail-line "node is a list")
                                  (detail-line (format "node_prefix:[~a]" node_prefix))
+                                 (detail-line (format "prefix:[~a]" prefix))
+                                 (detail-line (format "is_list?:[~a]" (hash-has-key? sym_hash prefix)))
                                  (detail-line (format "attrs:[~a]" attr_list))
                                  (detail-line (format "content:[~a]" content_list))
 
-                                 (set! prefix (format "~a~a" (if ancester_prefix (format "~a." ancester_prefix) "") node_prefix))
-
-                                 (when (hash-has-key? sym_hash node_prefix)
-                                       (let ([count_sym (format "~a.count" node_prefix)])
+                                 (when (hash-has-key? sym_hash prefix)
+                                       (let ([count_sym (format "~a.count" prefix)])
                                          (hash-set! xml_hash count_sym (add1 (hash-ref xml_hash count_sym 0)))
-                                         (set! prefix (format "~a~a~a"
-                                                              (if ancester_prefix (format "~a." ancester_prefix) "")
-                                                              node_prefix
-                                                              (hash-ref xml_hash count_sym)
-                                                              ))))
+                                         (set! prefix (string->symbol
+                                                       (format "~a~a~a"
+                                                               (if ancester_prefix (format "~a." ancester_prefix) "")
+                                                               node_prefix
+                                                               (hash-ref xml_hash count_sym)
+                                                               )))
+                                         (detail-line (format "it is a list sym, prefix changed to:[~a]" prefix))
+                                         ))
 
                                  (detail-line "process the attrs")
                                  (let loop-attr ([attrs attr_list])
@@ -97,14 +106,15 @@
 
                                  (detail-line "process the content")
                                  (if (null? content_list)
-                                     (loop-node prefix in_list? '(""))
-                                     (loop-node prefix in_list? content_list)))
+                                     (loop-node prefix '(""))
+                                     (loop-node prefix content_list)))
 
-                               (loop-node ancester_prefix in_list? (cdr xml_list)))))
-                       (detail-new-page
-                        (lambda ()
-                          (detail-line "")
-                          (detail-line "***************************************")
-                          (detail-line (format "xml_hash:[~a]" xml_hash))
-                          (detail-line "***************************************")
-                          xml_hash))))))))))))))
+                               (loop-node ancester_prefix (cdr xml_list)))))
+                       xml_hash))
+
+                 (detail-new-page)
+                 (detail-line "")
+                 (detail-line "***************************************")
+                 (detail-line (format "xml_hash:[~a]" xml_hash))
+                 (detail-line "***************************************")
+                 xml_hash))))))))))
