@@ -65,34 +65,46 @@
                                    (begin
                                      (detail-line "node is not a list symbol")
                                      (loop-node node #f (cdr xml_list)))))
-                             (let* ([prefix (car node)]
-                                    [attr_list (cadr node)]
-                                    [content_list (cddr node)])
+                             (begin
+                               (let* ([prefix #f]
+                                      [node_prefix (car node)]
+                                      [attr_list (cadr node)]
+                                      [content_list (cddr node)])
 
-                               (detail-line "node is a list")
-                               (detail-line (format "prefix:[~a]" prefix))
-                               (detail-line (format "attrs:[~a]" attr_list))
-                               (detail-line (format "content:[~a]" content_list))
+                                 (detail-line "node is a list")
+                                 (detail-line (format "node_prefix:[~a]" node_prefix))
+                                 (detail-line (format "attrs:[~a]" attr_list))
+                                 (detail-line (format "content:[~a]" content_list))
 
-                               (detail-line "process the attrs")
-                               (let loop-attr ([attrs attr_list])
-                                 (when (not (null? attrs))
-                                       (when (hash-has-key? sym_hash ancester_prefix)
-                                             (let ([count_sym (format "~a.~a.count" ancester_prefix prefix)])
-                                               (hash-set! xml_hash count_sym (add1 (hash-ref xml_hash count_sym 0)))
-                                               (set! prefix (format "~a~a" prefix (hash-ref xml_hash count_sym)))))
+                                 (set! prefix (format "~a~a" (if ancester_prefix (format "~a." ancester_prefix) "") node_prefix))
 
-                                       (hash-set! xml_hash (format "~a~a.~a" 
-                                                                   (if ancester_prefix (format "~a." ancester_prefix) "")
-                                                                   prefix (caar attrs))
-                                                  (cadar attrs))
-                                       (loop-attr (cdr attrs))))
-                               (detail-line (format "xml_hash after process attrs:[~a]" xml_hash))
+                                 (when (hash-has-key? sym_hash node_prefix)
+                                       (let ([count_sym (format "~a.count" node_prefix)])
+                                         (hash-set! xml_hash count_sym (add1 (hash-ref xml_hash count_sym 0)))
+                                         (set! prefix (format "~a~a~a"
+                                                              (if ancester_prefix (format "~a." ancester_prefix) "")
+                                                              node_prefix
+                                                              (hash-ref xml_hash count_sym)
+                                                              ))))
 
-                               (detail-line "process the content")
-                               (if (null? content_list)
-                                   (loop-node prefix in_list? '(""))
-                                   (loop-node prefix in_list? content_list))
+                                 (detail-line "process the attrs")
+                                 (let loop-attr ([attrs attr_list])
+                                   (when (not (null? attrs))
+                                         (hash-set! xml_hash (format "~a.~a" prefix (caar attrs)) (cadar attrs))
 
-                               (loop-node prefix in_list? (cdr xml_list)))))
-                       xml_hash))))))))))))
+                                         (loop-attr (cdr attrs))))
+                                 (detail-line (format "xml_hash after process attrs:[~a]" xml_hash))
+
+                                 (detail-line "process the content")
+                                 (if (null? content_list)
+                                     (loop-node prefix in_list? '(""))
+                                     (loop-node prefix in_list? content_list)))
+
+                               (loop-node ancester_prefix in_list? (cdr xml_list)))))
+                       (detail-new-page
+                        (lambda ()
+                          (detail-line "")
+                          (detail-line "***************************************")
+                          (detail-line (format "xml_hash:[~a]" xml_hash))
+                          (detail-line "***************************************")
+                          xml_hash))))))))))))))

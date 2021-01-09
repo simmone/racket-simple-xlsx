@@ -17,8 +17,7 @@
    (test-case
     "test-workbook"
 
-    (let ([xml_hash (load-xml-hash workbook_xml_file '(sheets))])
-      (printf "~a\n" xml_hash)
+    (let ([xml_hash (load-xml-hash workbook_xml_file '(sheet))])
       (check-equal? (hash-count xml_hash) 58)
       (check-equal? (hash-ref xml_hash "workbook.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
       (check-equal? (hash-ref xml_hash "fileVersion.appName") "xl")
