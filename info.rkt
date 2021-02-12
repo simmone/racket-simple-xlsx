@@ -13,3 +13,4 @@
                      "rackunit-lib"
                      "at-exp-lib"))
 
+(define test-omit-paths '("info.rkt"))
