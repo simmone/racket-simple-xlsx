@@ -4,15 +4,15 @@
           [load-shared-strings (-> path-string? hash?)]
           ))
 
-(require "../lib/xml.rkt")
+(require simple-xml)
 
 (define (load-shared-strings shared_string_file)
-  (let ([xml_hash (load-xml-hash shared_string_file '(t phoneticPr))]
+  (let ([xml_hash (xml->hash shared_string_file)]
         [shared_hash (make-hash)])
 
     (let loop ([loop_count 1])
-      (when (<= loop_count (hash-ref xml_hash "t.count"))
-            (let ([t (hash-ref xml_hash (format "t~a" loop_count))])
+      (when (<= loop_count (hash-ref xml_hash "sst.si's count" 0))
+            (let ([t (hash-ref xml_hash (format "sst.si~a.t" loop_count))])
               (hash-set! shared_hash
                          loop_count
                          (cond
