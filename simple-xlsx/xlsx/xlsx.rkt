@@ -7,7 +7,6 @@
 
 (provide (contract-out
           [new-xlsx% class?]
-          [read-xlsx% class?]
           [xlsx% class?]
           [struct xlsx-style
                   (

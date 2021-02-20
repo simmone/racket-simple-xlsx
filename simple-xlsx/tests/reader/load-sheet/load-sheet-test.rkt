@@ -5,34 +5,21 @@
 (require rackunit "../../../reader/load-sheet.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path sheet_file "sheet.xml")
+(define-runtime-path sheet_file "sheet1.xml")
 
-(define test-load-sheet
+(define test-load-sheet-file
   (test-suite
-   "test-load-sheet"
+   "test-load-sheet-file"
    
    (test-case
-    "test-load-sheet"
+    "test-load-sheet-file"
 
-    (let-values ([(sheet_id_list sheet_id_name_map sheet_name_id_map sheet_id_rid_map)
-                  (load-sheet sheet_file)])
-      (check-equal? (length sheet_id_list) 10)
+    (let-values ([(dimension data_map formula_map data_type_map)
+                  (load-sheet-file sheet_file)])
 
-      (check-equal? (first sheet_id_list) "1")
-      (check-equal? (hash-ref sheet_id_name_map "1") "DataSheet")
-      (check-equal? (hash-ref sheet_name_id_map "DataSheet") "1")
-      (check-equal? (hash-ref sheet_id_rid_map "1") "rId1")
-
-      (check-equal? (fifth sheet_id_list) "5")
-      (check-equal? (hash-ref sheet_id_name_map "5") "LineChart2")
-      (check-equal? (hash-ref sheet_name_id_map "LineChart2") "5")
-      (check-equal? (hash-ref sheet_id_rid_map "5") "rId5")
-
-      (check-equal? (tenth sheet_id_list) "10")
-      (check-equal? (hash-ref sheet_id_name_map "10") "PieChart3D")
-      (check-equal? (hash-ref sheet_name_id_map "PieChart3D") "10")
-      (check-equal? (hash-ref sheet_id_rid_map "10") "rId10")
+      (check-equal? dimension '(4 . 4))
+      (check-equal? (hash-count data_map) 16)
 
       ))))
 
-(run-tests test-load-sheet)
+(run-tests test-load-sheet-file)

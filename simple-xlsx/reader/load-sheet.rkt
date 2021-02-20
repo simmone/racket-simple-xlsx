@@ -1,33 +1,42 @@
 #lang racket
 
 (provide (contract-out
-          [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
-          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]
-          [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
-          [sheet-name-rows (-> path-string? string? list?)]
+          [load-sheet-file (-> string? (is-a?/c new-xlsx%) (values pair? hash? hash? hash?))]
+          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c new-xlsx%) void?)]
+          [get-sheet-rows (-> (is-a?/c new-xlsx%) list?)]
           [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
+          [get-sheet-names (-> (is-a?/c new-xlsx%) list?)]
           ))
 
 (require simple-xml)
 (require file/unzip)
 
-(require "lib/lib.rkt")
-(require "xlsx/xlsx.rkt")
-(require "xlsx/range-lib.rkt")
+(require "../lib/lib.rkt")
+(require "../xlsx/xlsx.rkt")
+(require "../xlsx/range-lib.rkt")
 
 (define (load-sheet sheet_name xlsx)
-  (let ([data_map (make-hash)]
-        [formula_map (make-hash)]
-        [type_map (make-hash)]
-        [dimension_col 0]
-        [dimension ""]
-        [data_sheet_file_name
-         (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name)))])
+  (let-values ([(dimension data_map formula_map type_map)
+                (load-sheet-file
+                 (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name))))])
 
-    (let ([xml_hash (xml->hash sheet_xml_file)])
-      (set-field! dimension xlsx (cons
-                                  (hash-ref xml_hash "worksheet.sheetData.row's count")
-                                  (hash-ref xml_hash "worksheet.cols's count")))
+    (set-field! dimension xlsx dimension)
+    (set-field! sheet_map xlsx data_map)
+    (set-field! formula_map xlsx formula_map)
+    (set-field! data_type_map xlsx type_map)))
+
+(define (load-sheet-file sheet_file)
+  (let ([dimension #f]
+        [data_map (make-hash)]
+        [formula_map (make-hash)]
+        [type_map (make-hash)])
+
+    (let ([xml_hash (xml->hash sheet_file)])
+
+      (set! dimension 
+            (cons
+             (hash-ref xml_hash "worksheet.sheetData.row's count")
+             (hash-ref xml_hash "worksheet.cols's count")))
 
       (let loop-row ([row_count 1])
         (when (<= row_count (hash-ref xml_hash "worksheet.sheetData.row's count"))
@@ -50,25 +59,15 @@
                   (hash-set! formula_map para_r para_f))
                 )
               (loop-col (add1 col_count))))
-          (loop-row (add1 row_count))))
+          (loop-row (add1 row_count)))))
 
-                                      (let loop-cell ([cell_list (cdr cell_item)])
-                                        (when (not (null? cell_list))
-                                              (cond 
-                                                [(equal? (caar cell_list) 'v)
-                                                 (hash-set! data_map para_r (caddar cell_list))]
-                                                [(equal? (caar cell_list) 'f)
-                                                 (hash-set! formula_map para_r (caddar cell_list))]
-                                              )
-                                              (loop-cell (cdr cell_list))))
-                                      )))))
-                    row_xml)))
-           rows)
-          )
+    (values dimension data_map formula_map type_map)))
 
-    (set-field! sheet_map xlsx data_map)
-    (set-field! formula_map xlsx formula_map)
-    (set-field! data_type_map xlsx type_map)))
+(define (get-sheet-names xlsx)
+  (map
+   (lambda (item)
+     (car item))
+   (sort #:key cdr (hash->list (get-field sheet_name_map xlsx)) string<?)))
 
 (define (load-sheet-ref sheet_index xlsx)
   (load-sheet (list-ref (get-sheet-names xlsx) sheet_index) xlsx))
@@ -126,18 +125,3 @@
             result_list))
           (reverse result_list)))))
 
-(define (sheet-name-rows xlsx_file_path sheet_name)
-  (with-input-from-xlsx-file
-   xlsx_file_path
-   (lambda (xlsx)
-     (load-sheet sheet_name xlsx)
-     
-     (get-sheet-rows xlsx))))
-
-(define (sheet-ref-rows xlsx_file_path sheet_index)
-  (with-input-from-xlsx-file
-   xlsx_file_path
-   (lambda (xlsx)
-     (load-sheet-ref sheet_index xlsx)
-     
-     (get-sheet-rows xlsx))))

@@ -55,3 +55,13 @@
                   (sheet_rid_rel_map read_sheet_rid_rel_map)))
        (user_proc xlsx_obj)))))
 
+(define (sheet-name-rows xlsx_file_path sheet_name)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet sheet_name xlsx)
+     
+     (get-sheet-rows xlsx))))
+
+
+
