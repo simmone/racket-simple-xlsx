@@ -1,10 +1,9 @@
 #lang racket
 
 (provide (contract-out
-          [load-sheet-file (-> string? (is-a?/c new-xlsx%) (values pair? hash? hash? hash?))]
+          [load-sheet-file (-> path-string? (values pair? hash? hash? hash?))]
           [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c new-xlsx%) void?)]
           [get-sheet-rows (-> (is-a?/c new-xlsx%) list?)]
-          [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
           [get-sheet-names (-> (is-a?/c new-xlsx%) list?)]
           ))
 
@@ -36,12 +35,12 @@
       (set! dimension 
             (cons
              (hash-ref xml_hash "worksheet.sheetData.row's count")
-             (hash-ref xml_hash "worksheet.cols's count")))
+             (hash-ref xml_hash "worksheet.cols.col's count")))
 
       (let loop-row ([row_count 1])
         (when (<= row_count (hash-ref xml_hash "worksheet.sheetData.row's count"))
           (let loop-col ([col_count 1])
-            (when (<= col_count (hash-ref xml_hash "worksheet.sheetData.cols's count"))
+            (when (<= col_count (hash-ref xml_hash "worksheet.cols.col's count"))
               (let (
                     [para_r (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.r" row_count col_count) "")]
                     [para_t (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.t" row_count col_count) "")]
