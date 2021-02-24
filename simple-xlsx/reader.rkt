@@ -52,22 +52,7 @@
                   (sheet_name_id_map read_sheet_name_id_map)
                   (sheet_id_rid_map read_sheet_id_rid_map)
                   (sheet_rid_rel_map read_sheet_rid_rel_map)
-                  (sheet #f)
-                  (style #f)
                   (shared_strings_map read_shared_strings_map)
-                  (formula_map #f)
-                  (data_type_map #f)
-                  (dimension #f)))
+                  (sheet #f)))
 
        (user_proc xlsx_obj)))))
-
-(define (sheet-name-rows xlsx_file_path sheet_name)
-  (with-input-from-xlsx-file
-   xlsx_file_path
-   (lambda (xlsx)
-     (load-sheet sheet_name xlsx)
-     
-     (get-sheet-rows xlsx))))
-
-
-

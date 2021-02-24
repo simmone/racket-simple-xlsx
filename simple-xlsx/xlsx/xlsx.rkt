@@ -47,16 +47,11 @@
           [sheet_name_id_map #f]
           [sheet_id_rid_map #f]
           [sheet_rid_rel_map #f]
-          [sheet #f]
-          [style #f]
           [shared_strings_map #f]
-          [formula_map #f]
-          [data_type_map #f]
-          [dimension #f])
+          [sheet #f]
+          )
 
-         (super-new)
-
-         ))
+         (super-new)))
 
 (define xlsx%
   (class object%

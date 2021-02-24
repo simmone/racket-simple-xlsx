@@ -124,3 +124,12 @@
             result_list))
           (reverse result_list)))))
 
+(define (sheet-name-rows xlsx_file_path sheet_name)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet sheet_name xlsx)
+     
+     (get-sheet-rows xlsx))))
+
+
