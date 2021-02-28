@@ -2,6 +2,7 @@
 
 (provide (contract-out
           [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) any) any)]
+          [sheet-name-rows (-> path-string? string? list?)]
           [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
           [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
           [get-cell-formula (-> string? (is-a?/c read-xlsx%) string?)]
@@ -9,7 +10,6 @@
           [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
           [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]
           [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
-          [sheet-name-rows (-> path-string? string? list?)]
           [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
           ))
 
@@ -25,20 +25,13 @@
    xlsx_file
    (lambda (tmp_dir)
      (let (
-           [read_sheet_id_list '()]
-           [read_sheet_id_name_map (make-hash)]
-           [read_sheet_name_id_map (make-hash)]
-           [read_sheet_id_rid_map (make-hash)]
-           [read_shared_strings_map #f]
-           [read_sheet_rid_rel_map #f]
-           [xlsx_obj #f])
+           [_xlsx 
+            (xlsx "" 0
+                  (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
+                  (make-hash)
+                  )])
 
-       (let-values ([(_sheet_id_list _sheet_id_rid_map _sheet_name_id_map _sheet_id_name_map)
-                     (load-workbook (build-path tmp_dir "xl" "workbook.xml"))])
-         (set! read_sheet_id_list _sheet_id_list)
-         (set! read_sheet_id_rid_map _sheet_id_rid_map)
-         (set! read_sheet_name_id_map _sheet_name_id_map)
-         (set! read_sheet_id_name_map _sheet_id_name_map))
+       (load-workbook (build-path tmp_dir "xl" "workbook.xml") _xlsx)
 
        (set! read_shared_strings_map (load-shared-strings (build-path tmp_dir "xl" "sharedStrings.xml")))
 
@@ -56,3 +49,11 @@
                   (sheet #f)))
 
        (user_proc xlsx_obj)))))
+
+(define (sheet-name-rows xlsx_file_path sheet_name)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet sheet_name xlsx)
+     
+     (get-sheet-rows xlsx))))

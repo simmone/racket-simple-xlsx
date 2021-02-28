@@ -4,6 +4,8 @@
 
 (require rackunit "../../../reader/load-workbook.rkt")
 
+(require "../../../xlsx/xlsx.rkt")
+
 (require racket/runtime-path)
 (define-runtime-path workbook_file "workbook.xml")
 
@@ -14,24 +16,25 @@
    (test-case
     "test-load-workbook"
 
-    (let-values ([(sheet_id_list sheet_id_name_map sheet_name_id_map sheet_id_rid_map)
-                  (load-workbook workbook_file)])
-      (check-equal? (length sheet_id_list) 10)
+    (let ([_xlsx (new-xlsx)])
+      (load-workbook workbook_file _xlsx)
 
-      (check-equal? (first sheet_id_list) "1")
-      (check-equal? (hash-ref sheet_id_name_map "1") "DataSheet")
-      (check-equal? (hash-ref sheet_name_id_map "DataSheet") "1")
-      (check-equal? (hash-ref sheet_id_rid_map "1") "rId1")
+      (check-equal? (xlsx-sheet_count _xlsx) 10)
 
-      (check-equal? (fifth sheet_id_list) "5")
-      (check-equal? (hash-ref sheet_id_name_map "5") "LineChart2")
-      (check-equal? (hash-ref sheet_name_id_map "LineChart2") "5")
-      (check-equal? (hash-ref sheet_id_rid_map "5") "rId5")
+      (check-equal? (hash-ref (xlsx-sheet_index_id_map _xlsx) 0) "1")
+      (check-equal? (hash-ref (xlsx-sheet_index_name_map _xlsx) 0) "DataSheet")
+      (check-equal? (hash-ref (xlsx-sheet_name_index_map _xlsx) "DataSheet") 0)
+      (check-equal? (hash-ref (xlsx-sheet_index_rid_map _xlsx) 0) "rId1")
 
-      (check-equal? (tenth sheet_id_list) "10")
-      (check-equal? (hash-ref sheet_id_name_map "10") "PieChart3D")
-      (check-equal? (hash-ref sheet_name_id_map "PieChart3D") "10")
-      (check-equal? (hash-ref sheet_id_rid_map "10") "rId10")
+      (check-equal? (hash-ref (xlsx-sheet_index_id_map _xlsx) 4) "5")
+      (check-equal? (hash-ref (xlsx-sheet_index_name_map _xlsx) 4) "LineChart2")
+      (check-equal? (hash-ref (xlsx-sheet_name_index_map _xlsx) "LineChart2") 4)
+      (check-equal? (hash-ref (xlsx-sheet_index_rid_map _xlsx) 4) "rId5")
+
+      (check-equal? (hash-ref (xlsx-sheet_index_id_map _xlsx) 9) "10")
+      (check-equal? (hash-ref (xlsx-sheet_index_name_map _xlsx) 9) "PieChart3D")
+      (check-equal? (hash-ref (xlsx-sheet_name_index_map _xlsx) "PieChart3D") 9)
+      (check-equal? (hash-ref (xlsx-sheet_index_rid_map _xlsx) 9) "rId10")
 
       ))))
 

@@ -3,10 +3,22 @@
 (require "../lib/lib.rkt")
 (require "xlsx-lib.rkt")
 (require "range-lib.rkt")
-(require "sheet.rkt")
+(require "../sheet/sheet.rkt")
 
 (provide (contract-out
-          [new-xlsx% class?]
+          [struct xlsx
+                  (
+                   (xlsx_dir path-string?)
+                   (sheet_count natural?)
+                   (sheet_index_id_map (hash/c natural? string?))
+                   (sheet_index_name_map (hash/c natural? string?))
+                   (sheet_name_index_map (hash/c string? natural?))
+                   (sheet_index_rid_map (hash/c natural? string?))
+                   (sheet_rid_rel_map (hash/c string? string?))
+                   (shared_strings_map (hash/c string? string?))
+                   )
+                  ]
+          [new-xlsx (-> xlsx?)]
           [xlsx% class?]
           [struct xlsx-style
                   (
@@ -38,20 +50,22 @@
                     [alignment_code_to_alignment_hash #:mutable]
                     ))
 
-(define new-xlsx%
-  (class object%
-         (init-field
-          [xlsx_dir #f]
-          [sheet_id_list #f]
-          [sheet_id_name_map #f]
-          [sheet_name_id_map #f]
-          [sheet_id_rid_map #f]
-          [sheet_rid_rel_map #f]
-          [shared_strings_map #f]
-          [sheet #f]
-          )
+(struct xlsx 
+ (
+  [xlsx_dir #:mutable]
+  [sheet_count #:mutable]
+  [sheet_index_id_map #:mutable]
+  [sheet_index_name_map #:mutable]
+  [sheet_name_index_map #:mutable]
+  [sheet_index_rid_map #:mutable]
+  [sheet_rid_rel_map #:mutable]
+  [shared_strings_map #:mutable]
+  ))
 
-         (super-new)))
+(define (new-xlsx)
+  (xlsx "" 0
+        (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
+        (make-hash)))
 
 (define xlsx%
   (class object%

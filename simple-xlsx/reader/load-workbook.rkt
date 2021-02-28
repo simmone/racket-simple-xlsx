@@ -1,30 +1,26 @@
 #lang racket
 
 (provide (contract-out
-          [load-workbook (-> path-string? (values list? hash? hash? hash?))]
+          [load-workbook (-> path-string? xlsx? void?)]
           ))
 
 (require simple-xml)
 
-(define (load-workbook workbook_file)
-  (let ([sheet_id_list '()]
-        [sheet_id_name_map (make-hash)]
-        [sheet_name_id_map (make-hash)]
-        [sheet_id_rid_map (make-hash)])
+(require "../xlsx/xlsx.rkt")
 
-    (let ([xml_hash (xml->hash workbook_file)])
-      (let loop ([loop_count 1])
-        (when (<= loop_count (hash-ref xml_hash "workbook.sheets.sheet's count" 0))
-              (let ([sheet_name (hash-ref xml_hash (format "workbook.sheets.sheet~a.name" loop_count))]
-                    [sheet_id (hash-ref xml_hash (format "workbook.sheets.sheet~a.sheetId" loop_count))]
-                    [rid (hash-ref xml_hash (format "workbook.sheets.sheet~a.r:id" loop_count))])
-                (set! sheet_id_list `(,@sheet_id_list ,sheet_id))
-                (hash-set! sheet_id_rid_map sheet_id rid)
-                (hash-set! sheet_name_id_map sheet_name sheet_id)
-                (hash-set! sheet_id_name_map sheet_id sheet_name))
-              (loop (add1 loop_count)))))
-    (values
-     sheet_id_list
-     sheet_id_name_map
-     sheet_name_id_map
-     sheet_id_rid_map)))
+(define (load-workbook workbook_file _xlsx)
+    (let* ([xml_hash (xml->hash workbook_file)])
+
+      (set-xlsx-sheet_count! _xlsx (hash-ref xml_hash "workbook.sheets.sheet's count" 0))
+
+      (let loop ([index 1])
+        (when (<= index (xlsx-sheet_count _xlsx))
+              (let ([sheet_name (hash-ref xml_hash (format "workbook.sheets.sheet~a.name" index))]
+                    [sheet_id (hash-ref xml_hash (format "workbook.sheets.sheet~a.sheetId" index))]
+                    [rid (hash-ref xml_hash (format "workbook.sheets.sheet~a.r:id" index))])
+                (hash-set! (xlsx-sheet_index_id_map _xlsx) (sub1 index) sheet_id)
+                (hash-set! (xlsx-sheet_name_index_map _xlsx) sheet_name (sub1 index))
+                (hash-set! (xlsx-sheet_index_name_map _xlsx) (sub1 index) sheet_name)
+                (hash-set! (xlsx-sheet_index_rid_map _xlsx) (sub1 index) rid)
+                )
+              (loop (add1 index))))))
