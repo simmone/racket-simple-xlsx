@@ -4,6 +4,8 @@
 
 (require rackunit "../../../reader/load-shared-strings.rkt")
 
+(require "../../../xlsx/xlsx.rkt")
+
 (require racket/runtime-path)
 (define-runtime-path sharedStrings_file "sharedStrings.xml")
 
@@ -14,11 +16,13 @@
    (test-case
     "test-load-shared-strings"
 
-    (let ([shared_strings_map (load-shared-strings sharedStrings_file)])
-      (check-equal? (hash-count shared_strings_map) 17)
-      (check-equal? (hash-ref shared_strings_map 1) "")
-      (check-equal? (hash-ref shared_strings_map 2) "201601")
-      (check-equal? (hash-ref shared_strings_map 17) "month/brand")
+    (let ([_xlsx (new-xlsx)])
+      (load-shared-strings sharedStrings_file _xlsx)
+
+      (check-equal? (hash-count (XLSX-shared_strings_map _xlsx)) 17)
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 1) "")
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 2) "201601")
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 17) "month/brand")
       ))))
 
 (run-tests test-load-shared-strings)

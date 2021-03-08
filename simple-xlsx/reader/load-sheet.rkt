@@ -2,9 +2,9 @@
 
 (provide (contract-out
           [load-sheet-file (-> path-string? (values pair? hash? hash? hash?))]
-          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c new-xlsx%) void?)]
-          [get-sheet-rows (-> (is-a?/c new-xlsx%) list?)]
-          [get-sheet-names (-> (is-a?/c new-xlsx%) list?)]
+          [load-sheet-ref (-> exact-nonnegative-integer? XLSX? void?)]
+          [get-sheet-rows (-> XLSX? list?)]
+          [get-sheet-names (-> XLSX? list?)]
           ))
 
 (require simple-xml)

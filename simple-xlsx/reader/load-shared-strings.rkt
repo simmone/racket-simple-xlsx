@@ -1,19 +1,19 @@
 #lang racket
 
 (provide (contract-out
-          [load-shared-strings (-> path-string? hash?)]
+          [load-shared-strings (-> path-string? XLSX? void?)]
           ))
 
 (require simple-xml)
 
-(define (load-shared-strings shared_string_file)
-  (let ([xml_hash (xml->hash shared_string_file)]
-        [shared_hash (make-hash)])
+(require "../xlsx/xlsx.rkt")
 
+(define (load-shared-strings shared_string_file _xlsx)
+  (let ([xml_hash (xml->hash shared_string_file)])
     (let loop ([loop_count 1])
       (when (<= loop_count (hash-ref xml_hash "sst.si's count" 0))
             (let ([t (hash-ref xml_hash (format "sst.si~a.t" loop_count))])
-              (hash-set! shared_hash
+              (hash-set! (XLSX-shared_strings_map _xlsx)
                          loop_count
                          (cond
                           [(string? t)
@@ -22,5 +22,5 @@
                            (string (integer->char t))]
                           [else
                            ""])))
-            (loop (add1 loop_count))))
-    shared_hash))
+            (loop (add1 loop_count))))))
+

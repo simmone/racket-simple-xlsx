@@ -6,7 +6,7 @@
 (require "../sheet/sheet.rkt")
 
 (provide (contract-out
-          [struct xlsx
+          [struct XLSX
                   (
                    (xlsx_dir path-string?)
                    (sheet_count natural?)
@@ -18,7 +18,7 @@
                    (shared_strings_map (hash/c string? string?))
                    )
                   ]
-          [new-xlsx (-> xlsx?)]
+          [new-xlsx (-> XLSX?)]
           [xlsx% class?]
           [struct xlsx-style
                   (
@@ -50,7 +50,7 @@
                     [alignment_code_to_alignment_hash #:mutable]
                     ))
 
-(struct xlsx 
+(struct XLSX
  (
   [xlsx_dir #:mutable]
   [sheet_count #:mutable]
@@ -63,7 +63,7 @@
   ))
 
 (define (new-xlsx)
-  (xlsx "" 0
+  (XLSX "" 0
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
         (make-hash)))
 

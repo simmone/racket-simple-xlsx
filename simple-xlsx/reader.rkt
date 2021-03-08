@@ -24,16 +24,10 @@
   (call-with-unzip
    xlsx_file
    (lambda (tmp_dir)
-     (let (
-           [_xlsx 
-            (xlsx "" 0
-                  (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
-                  (make-hash)
-                  )])
-
+     (let ([_xlsx (new-xlsx)])
        (load-workbook (build-path tmp_dir "xl" "workbook.xml") _xlsx)
 
-       (set! read_shared_strings_map (load-shared-strings (build-path tmp_dir "xl" "sharedStrings.xml")))
+       (load-shared-strings (build-path tmp_dir "xl" "sharedStrings.xml") _xlsx)
 
        (set! read_sheet_rid_rel_map (load-workbook-rels (build-path tmp_dir "xl" "_rels" "workbook.xml.rels")))
        
