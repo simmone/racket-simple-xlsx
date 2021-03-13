@@ -1,6 +1,7 @@
 #lang racket
 
 (provide (contract-out
+          [load-sheet (-> string? XLSX? void?)]
           [load-sheet-file (-> path-string? (values pair? hash? hash? hash?))]
           [load-sheet-ref (-> exact-nonnegative-integer? XLSX? void?)]
           [get-sheet-rows (-> XLSX? list?)]
@@ -123,5 +124,3 @@
              (number->list cols))
             result_list))
           (reverse result_list)))))
-
-

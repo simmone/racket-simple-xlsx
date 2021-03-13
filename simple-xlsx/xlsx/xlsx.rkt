@@ -62,8 +62,8 @@
   [shared_strings_map #:mutable]
   ))
 
-(define (new-xlsx xlsx_dir)
-  (XLSX xlsx_dir 0
+(define (new-xlsx)
+  (XLSX "" 0
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
         (make-hash)))
 

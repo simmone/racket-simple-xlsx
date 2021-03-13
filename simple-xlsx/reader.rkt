@@ -1,35 +1,35 @@
 #lang racket
 
 (provide (contract-out
-          [with-input-from-xlsx-file (-> path-string? (-> (is-a?/c read-xlsx%) any) any)]
+          [with-input-from-xlsx-file (-> path-string? (-> XLSX? any) any)]
           [sheet-name-rows (-> path-string? string? list?)]
-          [get-sheet-names (-> (is-a?/c read-xlsx%) list?)]
-          [get-cell-value (-> string? (is-a?/c read-xlsx%) any)]
-          [get-cell-formula (-> string? (is-a?/c read-xlsx%) string?)]
-          [get-sheet-dimension (-> (is-a?/c read-xlsx%) pair?)]
-          [load-sheet (-> string? (is-a?/c read-xlsx%) void?)]
-          [load-sheet-ref (-> exact-nonnegative-integer? (is-a?/c read-xlsx%) void?)]
-          [get-sheet-rows (-> (is-a?/c read-xlsx%) list?)]
-          [sheet-ref-rows (-> path-string? exact-nonnegative-integer? list?)]
+          [get-sheet-names (-> XLSX? list?)]
+          [load-sheet (-> string? XLSX? void?)]
+          [load-sheet-ref (-> exact-nonnegative-integer? XLSX? void?)]
+          [get-sheet-rows (-> XLSX? list?)]
           ))
+
+(require file/unzip)
 
 (require "xlsx/xlsx.rkt")
 
 (require "reader/load-workbook.rkt")
-(require "reader/load-shared-string.rkt")
+(require "reader/load-shared-strings.rkt")
 (require "reader/load-workbook-rels.rkt")
 (require "reader/load-sheet.rkt")
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
   (call-with-unzip
    xlsx_file
-   (lambda (tmp_dir)
-     (let ([_xlsx (new-xlsx tmp_dir)])
-       (load-workbook (build-path tmp_dir "xl" "workbook.xml") _xlsx)
+   (lambda (xlsx_dir)
+     (let ([_xlsx (new-xlsx)])
+       (set-XLSX-xlsx_dir! _xlsx xlsx_dir)
 
-       (load-shared-strings (build-path tmp_dir "xl" "sharedStrings.xml") _xlsx)
+       (load-workbook (build-path xlsx_dir "xl" "workbook.xml") _xlsx)
 
-       (load-workbook-rels (build-path tmp_dir "xl" "_rels" "workbook.xml.rels") _xlsx)
+       (load-shared-strings (build-path xlsx_dir "xl" "sharedStrings.xml") _xlsx)
+
+       (load-workbook-rels (build-path xlsx_dir "xl" "_rels" "workbook.xml.rels") _xlsx)
        
        (user_proc _xlsx)))))
 
