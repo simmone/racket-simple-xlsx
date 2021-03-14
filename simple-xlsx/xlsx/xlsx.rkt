@@ -15,7 +15,9 @@
                    (sheet_name_index_map (hash/c string? natural?))
                    (sheet_index_rid_map (hash/c natural? string?))
                    (sheet_rid_rel_map (hash/c string? string?))
+                   (sheet_index_rel_map (hash/c natural? string?))
                    (shared_strings_map (hash/c string? string?))
+                   (current_sheet (or/c #f SHEET?))
                    )
                   ]
           [new-xlsx (-> XLSX?)]
@@ -59,13 +61,16 @@
   [sheet_name_index_map #:mutable]
   [sheet_index_rid_map #:mutable]
   [sheet_rid_rel_map #:mutable]
+  [sheet_index_rel_map #:mutable]
   [shared_strings_map #:mutable]
+  [current_sheet #:mutable]
   ))
 
 (define (new-xlsx)
   (XLSX "" 0
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
-        (make-hash)))
+        (make-hash) (make-hash)
+        #f))
 
 (define xlsx%
   (class object%

@@ -1,6 +1,14 @@
 #lang racket
 
 (provide (contract-out
+          [struct SHEET
+                  (
+                  (name string?)
+                  (seq natural?)
+                  (type symbol?)
+                  (typeSeq natural?)
+                  (content (or/c data-sheet? chart-sheet?))
+                  )]
           [struct sheet
                   (
                   (name string?)
@@ -41,6 +49,8 @@
                    (data_range data-range?)
                    )]
           ))
+
+(struct SHEET ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
 
 (struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
 

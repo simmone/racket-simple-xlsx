@@ -1,9 +1,7 @@
 #lang racket
 
 (provide (contract-out
-          [load-sheet (-> string? XLSX? void?)]
           [load-sheet-file (-> path-string? (values pair? hash? hash? hash?))]
-          [load-sheet-ref (-> exact-nonnegative-integer? XLSX? void?)]
           [get-sheet-rows (-> XLSX? list?)]
           [get-sheet-names (-> XLSX? list?)]
           ))
@@ -14,16 +12,6 @@
 (require "../lib/lib.rkt")
 (require "../xlsx/xlsx.rkt")
 (require "../xlsx/range-lib.rkt")
-
-(define (load-sheet sheet_name xlsx)
-  (let-values ([(dimension data_map formula_map type_map)
-                (load-sheet-file
-                 (build-path (get-field xlsx_dir xlsx) "xl" (hash-ref (get-field relation_name_map xlsx) (hash-ref (get-field sheet_name_map xlsx) sheet_name))))])
-
-    (set-field! dimension xlsx dimension)
-    (set-field! sheet_map xlsx data_map)
-    (set-field! formula_map xlsx formula_map)
-    (set-field! data_type_map xlsx type_map)))
 
 (define (load-sheet-file sheet_file)
   (let ([dimension #f]
@@ -68,9 +56,6 @@
    (lambda (item)
      (car item))
    (sort #:key cdr (hash->list (get-field sheet_name_map xlsx)) string<?)))
-
-(define (load-sheet-ref sheet_index xlsx)
-  (load-sheet (list-ref (get-sheet-names xlsx) sheet_index) xlsx))
 
 (define (get-cell-value item_name xlsx)
   (let ([sheet_map (get-field sheet_map xlsx)]

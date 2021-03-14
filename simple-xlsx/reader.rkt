@@ -1,3 +1,4 @@
+
 #lang racket
 
 (provide (contract-out
@@ -12,6 +13,7 @@
 (require file/unzip)
 
 (require "xlsx/xlsx.rkt")
+(require "sheet/sheet.rkt")
 
 (require "reader/load-workbook.rkt")
 (require "reader/load-shared-strings.rkt")
@@ -32,6 +34,14 @@
        (load-workbook-rels (build-path xlsx_dir "xl" "_rels" "workbook.xml.rels") _xlsx)
        
        (user_proc _xlsx)))))
+
+(define (load-sheet sheet_name xlsx)
+  (load-sheet-file
+   (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name)))))
+
+(define (load-sheet-ref sheet_index xlsx)
+  (load-sheet-file
+   (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index))))
 
 (define (sheet-name-rows xlsx_file_path sheet_name)
   (with-input-from-xlsx-file

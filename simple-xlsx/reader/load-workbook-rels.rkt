@@ -19,5 +19,6 @@
                      [relation_ship_target (hash-ref xml_hash (format "Relationships.Relationship~a.Target" loop_count))]
                      )
                 (hash-set! (XLSX-sheet_rid_rel_map _xlsx) relation_ship_id relation_ship_target)
+                (hash-set! (XLSX-sheet_index_rel_map _xlsx) (sub1 loop_count) relation_ship_target)
 
                 (loop (add1 loop_count))))))))

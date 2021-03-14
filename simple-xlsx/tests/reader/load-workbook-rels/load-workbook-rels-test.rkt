@@ -20,11 +20,16 @@
       (load-workbook-rels workbook_rels_file _xlsx)
 
       (check-equal? (hash-count (XLSX-sheet_rid_rel_map _xlsx)) 13)
+      (check-equal? (hash-count (XLSX-sheet_index_rel_map _xlsx)) 13)
 
       (check-equal? (hash-ref (XLSX-sheet_rid_rel_map _xlsx) "rId1") "worksheets/sheet1.xml")
+      (check-equal? (hash-ref (XLSX-sheet_index_rel_map _xlsx) 0) "worksheets/sheet1.xml")
       (check-equal? (hash-ref (XLSX-sheet_rid_rel_map _xlsx) "rId4") "chartsheets/sheet1.xml")
+      (check-equal? (hash-ref (XLSX-sheet_index_rel_map _xlsx) 3) "chartsheets/sheet1.xml")
       (check-equal? (hash-ref (XLSX-sheet_rid_rel_map _xlsx) "rId5") "chartsheets/sheet2.xml")
+      (check-equal? (hash-ref (XLSX-sheet_index_rel_map _xlsx) 4) "chartsheets/sheet2.xml")
       (check-equal? (hash-ref (XLSX-sheet_rid_rel_map _xlsx) "rId10") "chartsheets/sheet7.xml")
+      (check-equal? (hash-ref (XLSX-sheet_index_rel_map _xlsx) 9) "chartsheets/sheet7.xml")
       ))
     
     ))
