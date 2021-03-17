@@ -1,7 +1,7 @@
 #lang racket
 
 (provide (contract-out
-          [load-sheet-file (-> path-string? (values pair? hash? hash? hash?))]
+          [load-sheet-file (-> path-string? SHEET?)]
           [get-sheet-rows (-> XLSX? list?)]
           [get-sheet-names (-> XLSX? list?)]
           ))
@@ -10,7 +10,7 @@
 (require file/unzip)
 
 (require "../lib/lib.rkt")
-(require "../xlsx/xlsx.rkt")
+(require "../sheet/sheet.rkt")
 (require "../xlsx/range-lib.rkt")
 
 (define (load-sheet-file sheet_file)

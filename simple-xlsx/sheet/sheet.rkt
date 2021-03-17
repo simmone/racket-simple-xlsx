@@ -1,24 +1,9 @@
 #lang racket
 
 (provide (contract-out
-          [struct SHEET
+          [struct DATA-SHEET
                   (
-                  (name string?)
-                  (seq natural?)
-                  (type symbol?)
-                  (typeSeq natural?)
-                  (content (or/c data-sheet? chart-sheet?))
-                  )]
-          [struct sheet
-                  (
-                  (name string?)
-                  (seq natural?)
-                  (type symbol?)
-                  (typeSeq natural?)
-                  (content (or/c data-sheet? chart-sheet?))
-                  )]
-          [struct data-sheet
-                  (
+                   (name string?)
                    (rows list?)
                    (width_hash hash?)
                    (height_hash hash?)
@@ -30,31 +15,29 @@
                    (col_to_origin_style_hash hash?)
                    (col_to_style_index_hash hash?)
                    )]
-          [struct chart-sheet
+          [struct CHART-SHEET
                   (
+                   (name string?)
                    (chart_type symbol?)
                    (topic string?)
                    (x_topic string?)
-                   (x_data_range data-range?)
+                   (x_data_range DATA-RANGE?)
                    (y_data_range_list list?)
                    )]
-          [struct data-range
+          [struct DATA-RANGE
                   (
                    (sheet_name string?)
                    (range_str string?)
                    )]
-          [struct data-serial
+          [struct DATA-SERIAL
                   (
                    (topic string?)
-                   (data_range data-range?)
+                   (data_range DATA-RANGE?)
                    )]
           ))
 
-(struct SHEET ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
-
-(struct sheet ([name #:mutable] [seq #:mutable] [type #:mutable] [typeSeq #:mutable] [content #:mutable]))
-
-(struct data-sheet (
+(struct DATA-SHEET (
+                    [name #:mutable]
                     [rows #:mutable] 
                     [width_hash #:mutable]
                     [height_hash #:mutable]
@@ -69,11 +52,12 @@
 
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
 
-(struct chart-sheet (
+(struct CHART-SHEET (
+                     [name :mutable]
                      [chart_type #:mutable] 
                      [topic #:mutable] 
                      [x_topic #:mutable] 
                      [x_data_range #:mutable] 
                      [y_data_range_list #:mutable]))
-(struct data-range ([sheet_name #:mutable] [range_str #:mutable]))
-(struct data-serial ([topic #:mutable] [data_range #:mutable]))
+(struct DATA-RANGE ([sheet_name #:mutable] [range_str #:mutable]))
+(struct DATA-SERIAL ([topic #:mutable] [data_range #:mutable]))
