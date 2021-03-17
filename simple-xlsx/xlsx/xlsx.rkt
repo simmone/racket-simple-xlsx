@@ -17,7 +17,7 @@
                    (sheet_rid_rel_map (hash/c string? string?))
                    (sheet_index_rel_map (hash/c natural? string?))
                    (shared_strings_map (hash/c string? string?))
-                   (current_sheet (or/c #f SHEET?))
+                   (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
                    )
                   ]
           [new-xlsx (-> XLSX?)]

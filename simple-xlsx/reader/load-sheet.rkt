@@ -1,9 +1,10 @@
 #lang racket
 
 (provide (contract-out
-          [load-sheet-file (-> path-string? SHEET?)]
-          [get-sheet-rows (-> XLSX? list?)]
-          [get-sheet-names (-> XLSX? list?)]
+          [load-data-sheet-file (-> path-string? DATA-SHEET?)]
+          [load-chart-sheet-file (-> path-string? CHART-SHEET?)]
+          [get-sheet-rows (-> DATA-SHEET? list?)]
+          [get-sheet-names (-> DATA-SHEET? list?)]
           ))
 
 (require simple-xml)
@@ -13,7 +14,10 @@
 (require "../sheet/sheet.rkt")
 (require "../xlsx/range-lib.rkt")
 
-(define (load-sheet-file sheet_file)
+(define (load-chart-sheet-file sheet_file)
+  (void))
+
+(define (load-data-sheet-file sheet_file)
   (let ([dimension #f]
         [data_map (make-hash)]
         [formula_map (make-hash)]

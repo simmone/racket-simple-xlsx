@@ -36,12 +36,18 @@
        (user_proc _xlsx)))))
 
 (define (load-sheet sheet_name xlsx)
-  (load-sheet-file
-   (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name)))))
+  (let ([sheet_index (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name)])
+    (load-sheet-ref sheet_index xlsx)))
 
 (define (load-sheet-ref sheet_index xlsx)
-  (load-sheet-file
-   (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index))))
+  (set-XLSX-sheet_list!
+   xlsx
+   `(,@sheet_list
+     ,(if (regexp-match #rx"worksheets" (XLSX-sheet_index_rel_map xlsx))
+          (load-data-sheet-file
+           (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))
+          (load-chart-sheet-file
+           (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))))))
 
 (define (sheet-name-rows xlsx_file_path sheet_name)
   (with-input-from-xlsx-file
