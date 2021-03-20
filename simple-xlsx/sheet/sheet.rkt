@@ -53,7 +53,7 @@
 (struct colAttr ([width #:mutable] [back_color #:mutable]))
 
 (struct CHART-SHEET (
-                     [name :mutable]
+                     [name #:mutable]
                      [chart_type #:mutable] 
                      [topic #:mutable] 
                      [x_topic #:mutable] 

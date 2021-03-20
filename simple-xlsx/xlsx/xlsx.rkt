@@ -53,18 +53,18 @@
                     ))
 
 (struct XLSX
- (
-  [xlsx_dir #:mutable]
-  [sheet_count #:mutable]
-  [sheet_index_id_map #:mutable]
-  [sheet_index_name_map #:mutable]
-  [sheet_name_index_map #:mutable]
-  [sheet_index_rid_map #:mutable]
-  [sheet_rid_rel_map #:mutable]
-  [sheet_index_rel_map #:mutable]
-  [shared_strings_map #:mutable]
-  [current_sheet #:mutable]
-  ))
+        (
+         [xlsx_dir #:mutable]
+         [sheet_count #:mutable]
+         [sheet_index_id_map #:mutable]
+         [sheet_index_name_map #:mutable]
+         [sheet_name_index_map #:mutable]
+         [sheet_index_rid_map #:mutable]
+         [sheet_rid_rel_map #:mutable]
+         [sheet_index_rel_map #:mutable]
+         [shared_strings_map #:mutable]
+         [sheet_list #:mutable]
+         ))
 
 (define (new-xlsx)
   (XLSX "" 0
@@ -88,7 +88,7 @@
                  (if (not (hash-has-key? sheet_name_map sheet_name))
                      (let* ([sheet_length (length sheets)]
                             [seq (add1 sheet_length)]
-                            [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'data)) sheets)))]
+                            [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) sheets)))]
                             [transformed_sheet_data 
                              (let loop ([loop_list sheet_data]
                                         [result '()])
@@ -116,12 +116,10 @@
                                    (reverse result)))])
 
                        (set! sheets `(,@sheets
-                                      ,(sheet
+                                      ,(DATA-SHEET
                                         sheet_name
-                                        seq
-                                        'data
-                                        type_seq
-                                        (data-sheet transformed_sheet_data (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)))))
+                                        transformed_sheet_data
+                                        (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
                        (hash-set! sheet_name_map sheet_name (sub1 seq)))
                      (error (format "duplicate sheet name[~a]" sheet_name)))))
          
@@ -143,7 +141,7 @@
                         [row_end_index (string->number (second row_range))]
                         [direction (if (string=? start_col_name end_col_name) 'vertical 'horizontal)])
                    (if (eq? direction 'vertical)
-                       (let loop ([loop_list (data-sheet-rows (sheet-content data_sheet))]
+                       (let loop ([loop_list (DATA-SHEET-rows data_sheet)]
                                   [row_count 1]
                                   [result_list '()])
                          (if (not (null? loop_list))
@@ -152,7 +150,7 @@
                                        (cons (list-ref (car loop_list) col_start_index) result_list))
                                  (loop (cdr loop_list) (add1 row_count) result_list))
                              (reverse result_list)))
-                       (let loop ([loop_list (list-ref (data-sheet-rows (sheet-content data_sheet)) (sub1 row_start_index))]
+                       (let loop ([loop_list (list-ref (DATA-SHEET-rows data_sheet) (sub1 row_start_index))]
                                   [col_index 0]
                                   [result_list '()])
                          (if (not (null? loop_list))
@@ -165,14 +163,10 @@
            (if (not (hash-has-key? sheet_name_map sheet_name))
                (let* ([sheet_length (length sheets)]
                       [seq (add1 sheet_length)]
-                      [type_seq (add1 (length (filter (lambda (rec) (eq? (sheet-type rec) 'chart)) sheets)))])
+                      [type_seq (add1 (length (filter (lambda (rec) (CHART-SHEET? rec)) sheets)))])
                  (set! sheets `(,@sheets
-                                ,(sheet
-                                  sheet_name
-                                  seq
-                                  'chart
-                                  type_seq
-                                  (chart-sheet chart_type topic x_topic (data-range "" "") '()))))
+                                ,(CHART-SHEET
+                                  chart_type topic x_topic (data-range "" "") '())))
                  (hash-set! sheet_name_map sheet_name (sub1 seq)))
                (error (format "duplicate sheet name[~a]" sheet_name))))
 
@@ -192,7 +186,7 @@
                      (error (format "end index beyond data range[~a]" row_end_index))]
                     [else
                      #t]))))
-                 
+         
          (define/public (set-chart-x-data! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range)
            (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
                  (set-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name sheet_name)) (data-range data_sheet_name data_range))))
@@ -209,11 +203,11 @@
          
          (define/public (set-data-sheet-col-width! #:sheet_name sheet_name #:col_range col_range #:width width)
            (let ([converted_col_range (check-col-range col_range)])
-                 (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) converted_col_range width)))
+             (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) converted_col_range width)))
 
          (define/public (set-data-sheet-row-height! #:sheet_name sheet_name #:row_range row_range #:height height)
            (let ([converted_row_range (check-row-range row_range)])
-                 (hash-set! (data-sheet-height_hash (sheet-content (get-sheet-by-name sheet_name))) converted_row_range height)))
+             (hash-set! (data-sheet-height_hash (sheet-content (get-sheet-by-name sheet_name))) converted_row_range height)))
 
          (define/public (set-data-sheet-freeze-pane! #:sheet_name sheet_name #:range range)
            (set-data-sheet-freeze_range! (sheet-content (get-sheet-by-name sheet_name)) range))
@@ -240,78 +234,79 @@
            (add-data-sheet-style! #:sheet_name sheet_name #:range range #:style style_pair_list #:type 'col))
 
          (define/private (add-data-sheet-style! #:sheet_name sheet_name #:range range #:style style_pair_list #:type type)
-           (let* ([converted_range #f]
+           (let* (
+                  [converted_range #f]
                   [item_to_origin_style_hash #f]
-                  [sheet (sheet-content (get-sheet-by-name sheet_name))]
+                  [sheet (get-sheet-by-name sheet_name)]
                   [style_hash (make-hash)]
-                  [cell_to_origin_style_hash (data-sheet-cell_to_origin_style_hash sheet)]
-                  [row_to_origin_style_hash (data-sheet-row_to_origin_style_hash sheet)]
-                  [col_to_origin_style_hash (data-sheet-col_to_origin_style_hash sheet)]
+                  [cell_to_origin_style_hash (DATA-SHEET-cell_to_origin_style_hash sheet)]
+                  [row_to_origin_style_hash (DATA-SHEET-row_to_origin_style_hash sheet)]
+                  [col_to_origin_style_hash (DATA-SHEET-col_to_origin_style_hash sheet)]
                   )
              
              (cond
               [(eq? type 'cell)
                (set! converted_range (check-cell-range range))
-               (set! item_to_origin_style_hash (data-sheet-cell_to_origin_style_hash sheet))]
+               (set! item_to_origin_style_hash (DATA-SHEET-cell_to_origin_style_hash sheet))]
               [(eq? type 'row)
                (set! converted_range (check-row-range range))
-               (set! item_to_origin_style_hash (data-sheet-row_to_origin_style_hash sheet))]
+               (set! item_to_origin_style_hash (DATA-SHEET-row_to_origin_style_hash sheet))]
               [(eq? type 'col)
                (set! converted_range (check-col-range range))
-               (set! item_to_origin_style_hash (data-sheet-col_to_origin_style_hash sheet))])
+               (set! item_to_origin_style_hash (DATA-SHEET-col_to_origin_style_hash sheet))])
 
-               (for-each
-                (lambda (style_pair)
-                  (when (and
-                         (pair? style_pair)
-                         (symbol? (car style_pair)))
-                    (cond
-                     [(or
-                       (eq? (car style_pair) 'backgroundColor)
-                       (eq? (car style_pair) 'fontSize)
-                       (eq? (car style_pair) 'fontColor)
-                       (eq? (car style_pair) 'fontName)
-                       (eq? (car style_pair) 'numberPrecision)
-                       (eq? (car style_pair) 'numberPercent)
-                       (eq? (car style_pair) 'numberThousands)
-                       (eq? (car style_pair) 'borderDirection)
-                       (eq? (car style_pair) 'borderStyle)
-                       (eq? (car style_pair) 'borderColor)
-                       (eq? (car style_pair) 'dateFormat)
-                       (eq? (car style_pair) 'horizontalAlign)
-                       (eq? (car style_pair) 'verticalAlign)
-                       (eq? (car style_pair) 'formatCode)
-                       )
-                      (hash-set! style_hash (car style_pair) (cdr style_pair))
-                      ]
-                     )))
-                style_pair_list)
-               
-               (cond
-                [(eq? type 'cell)
-                 (set! cell_to_origin_style_hash
-                       (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))
-                 (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)
-                 (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)]
-                [(eq? type 'row)
-                 (set! row_to_origin_style_hash
-                       (combine-hash-in-hash (list row_to_origin_style_hash (range-to-row-hash converted_range style_hash))))
-                 (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)]
-                [(eq? type 'col)
-                 (set! col_to_origin_style_hash
-                       (combine-hash-in-hash (list col_to_origin_style_hash (range-to-col-hash converted_range style_hash))))
-                 (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)])
-               
-               (when (and (> (hash-count row_to_origin_style_hash) 0) (> (hash-count col_to_origin_style_hash) 0)
-                          (or (eq? type 'row) (eq? type 'col)))
-                 (set! cell_to_origin_style_hash (combine-hash-in-hash
-                                                  (list
-                                                   cell_to_origin_style_hash
-                                                   (cross-cell-style row_to_origin_style_hash col_to_origin_style_hash type)))))
-               
-               (set-data-sheet-cell_to_origin_style_hash! sheet cell_to_origin_style_hash)
-               (set-data-sheet-row_to_origin_style_hash! sheet row_to_origin_style_hash)
-               (set-data-sheet-col_to_origin_style_hash! sheet col_to_origin_style_hash)))
+             (for-each
+              (lambda (style_pair)
+                (when (and
+                       (pair? style_pair)
+                       (symbol? (car style_pair)))
+                      (cond
+                       [(or
+                         (eq? (car style_pair) 'backgroundColor)
+                         (eq? (car style_pair) 'fontSize)
+                         (eq? (car style_pair) 'fontColor)
+                         (eq? (car style_pair) 'fontName)
+                         (eq? (car style_pair) 'numberPrecision)
+                         (eq? (car style_pair) 'numberPercent)
+                         (eq? (car style_pair) 'numberThousands)
+                         (eq? (car style_pair) 'borderDirection)
+                         (eq? (car style_pair) 'borderStyle)
+                         (eq? (car style_pair) 'borderColor)
+                         (eq? (car style_pair) 'dateFormat)
+                         (eq? (car style_pair) 'horizontalAlign)
+                         (eq? (car style_pair) 'verticalAlign)
+                         (eq? (car style_pair) 'formatCode)
+                         )
+                        (hash-set! style_hash (car style_pair) (cdr style_pair))
+                        ]
+                       )))
+              style_pair_list)
+             
+             (cond
+              [(eq? type 'cell)
+               (set! cell_to_origin_style_hash
+                     (combine-hash-in-hash (list cell_to_origin_style_hash (range-to-cell-hash converted_range style_hash))))
+               (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)
+               (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)]
+              [(eq? type 'row)
+               (set! row_to_origin_style_hash
+                     (combine-hash-in-hash (list row_to_origin_style_hash (range-to-row-hash converted_range style_hash))))
+               (expand-row-style-to-cell row_to_origin_style_hash cell_to_origin_style_hash)]
+              [(eq? type 'col)
+               (set! col_to_origin_style_hash
+                     (combine-hash-in-hash (list col_to_origin_style_hash (range-to-col-hash converted_range style_hash))))
+               (expand-col-style-to-cell col_to_origin_style_hash cell_to_origin_style_hash)])
+             
+             (when (and (> (hash-count row_to_origin_style_hash) 0) (> (hash-count col_to_origin_style_hash) 0)
+                        (or (eq? type 'row) (eq? type 'col)))
+                   (set! cell_to_origin_style_hash (combine-hash-in-hash
+                                                    (list
+                                                     cell_to_origin_style_hash
+                                                     (cross-cell-style row_to_origin_style_hash col_to_origin_style_hash type)))))
+             
+             (set-DATA-SHEET-cell_to_origin_style_hash! sheet cell_to_origin_style_hash)
+             (set-DATA-SHEET-row_to_origin_style_hash! sheet row_to_origin_style_hash)
+             (set-DATA-SHEET-col_to_origin_style_hash! sheet col_to_origin_style_hash)))
 
          (define/public (burn-styles!)
            (let sheet-loop ([sheet_list sheets])
