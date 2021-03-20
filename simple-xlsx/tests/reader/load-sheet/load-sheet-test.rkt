@@ -12,13 +12,13 @@
    "test-load-sheet-file"
    
    (test-case
-    "test-load-sheet-file"
+    "test-load-data-sheet-file"
 
-    (let-values ([(dimension data_map formula_map data_type_map)
-                  (load-sheet-file sheet_file)])
+    (let-values ([sheet (load-data-sheet-file sheet_file)])
 
-      (check-equal? dimension '(4 . 4))
-      (check-equal? (hash-count data_map) 16)
+      (check-equal? (length (DATA-SHEET-rows sheet)) 4)
+      (check-equal? (length (car (DATA-SHEET-rows sheet))) 4)
+      (check-equal? (hash-count (DATA-SHEET-data_map sheet)) 16)
 
       ))))
 

@@ -166,13 +166,13 @@
                       [type_seq (add1 (length (filter (lambda (rec) (CHART-SHEET? rec)) sheets)))])
                  (set! sheets `(,@sheets
                                 ,(CHART-SHEET
-                                  chart_type topic x_topic (data-range "" "") '())))
+                                  chart_type topic x_topic (DATA-RANGE "" "") '())))
                  (hash-set! sheet_name_map sheet_name (sub1 seq)))
                (error (format "duplicate sheet name[~a]" sheet_name))))
 
          (define/public (check-data-range-valid #:sheet_name sheet_name #:range_str range_str)
            (when (only-one-row/col-data? range_str)
-                 (let* ([rows (data-sheet-rows (sheet-content (get-sheet-by-name sheet_name)))]
+                 (let* ([rows (DATA-SHEET-rows (get-sheet-by-name sheet_name))]
                         [first_row (first rows)]
                         [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
                         [col_number (sub1 (abc->number col_name))]
@@ -189,28 +189,28 @@
          
          (define/public (set-chart-x-data! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range)
            (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
-                 (set-chart-sheet-x_data_range! (sheet-content (get-sheet-by-name sheet_name)) (data-range data_sheet_name data_range))))
+                 (set-CHART-SHEET-x_data_range! (get-sheet-by-name sheet_name) (DATA-RANGE data_sheet_name data_range))))
 
          (define/public 
            (add-chart-serial! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range #:y_topic [y_topic ""])
            (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
-                 (set-chart-sheet-y_data_range_list!
-                  (sheet-content (get-sheet-by-name sheet_name))
-                  `(,@(chart-sheet-y_data_range_list (sheet-content (get-sheet-by-name sheet_name))) ,(data-serial y_topic (data-range data_sheet_name data_range))))))
+                 (set-CHART-SHEET-y_data_range_list!
+                  (get-sheet-by-name sheet_name)
+                  `(,@(CHART-SHEET-y_data_range_list (get-sheet-by-name sheet_name)) ,(DATA-SERIAL y_topic (DATA-RANGE data_sheet_name data_range))))))
 
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))
          
          (define/public (set-data-sheet-col-width! #:sheet_name sheet_name #:col_range col_range #:width width)
            (let ([converted_col_range (check-col-range col_range)])
-             (hash-set! (data-sheet-width_hash (sheet-content (get-sheet-by-name sheet_name))) converted_col_range width)))
+             (hash-set! (DATA-SHEET-width_hash (get-sheet-by-name sheet_name)) converted_col_range width)))
 
          (define/public (set-data-sheet-row-height! #:sheet_name sheet_name #:row_range row_range #:height height)
            (let ([converted_row_range (check-row-range row_range)])
-             (hash-set! (data-sheet-height_hash (sheet-content (get-sheet-by-name sheet_name))) converted_row_range height)))
+             (hash-set! (DATA-SHEET-height_hash (get-sheet-by-name sheet_name)) converted_row_range height)))
 
          (define/public (set-data-sheet-freeze-pane! #:sheet_name sheet_name #:range range)
-           (set-data-sheet-freeze_range! (sheet-content (get-sheet-by-name sheet_name)) range))
+           (set-DATA-SHEET-freeze_range! (get-sheet-by-name sheet_name) range))
 
          (define/public (get-string-item-list)
            (sort (hash-keys shared_string_map) string<?))
@@ -312,14 +312,14 @@
            (let sheet-loop ([sheet_list sheets])
              (when (and 
                     (not (null? sheet_list))
-                    (eq? (sheet-type (car sheet_list)) 'data))
-                   (let* ([sheet (sheet-content (car sheet_list))]
-                          [cell_to_origin_style_hash (data-sheet-cell_to_origin_style_hash sheet)]
-                          [cell_to_style_index_hash (data-sheet-cell_to_style_index_hash sheet)]
-                          [row_to_origin_style_hash (data-sheet-row_to_origin_style_hash sheet)]
-                          [row_to_style_index_hash (data-sheet-row_to_style_index_hash sheet)]
-                          [col_to_origin_style_hash (data-sheet-col_to_origin_style_hash sheet)]
-                          [col_to_style_index_hash (data-sheet-col_to_style_index_hash sheet)]
+                    (DATA-SHEET? (car sheet_list)))
+                   (let* ([sheet (car sheet_list)]
+                          [cell_to_origin_style_hash (DATA-SHEET-cell_to_origin_style_hash sheet)]
+                          [cell_to_style_index_hash (DATA-SHEET-cell_to_style_index_hash sheet)]
+                          [row_to_origin_style_hash (DATA-SHEET-row_to_origin_style_hash sheet)]
+                          [row_to_style_index_hash (DATA-SHEET-row_to_style_index_hash sheet)]
+                          [col_to_origin_style_hash (DATA-SHEET-col_to_origin_style_hash sheet)]
+                          [col_to_style_index_hash (DATA-SHEET-col_to_style_index_hash sheet)]
                           [style_code_to_style_index_hash (make-hash)]
                           [numFmt_index 164])
 
@@ -459,13 +459,13 @@
                    (sheet-loop (cdr sheet_list)))))
 
          (define/public (get-cell-to-style-index-map sheet_name)
-           (data-sheet-cell_to_style_index_hash (sheet-content (get-sheet-by-name sheet_name))))
+           (DATA-SHEET-cell_to_style_index_hash (get-sheet-by-name sheet_name)))
 
          (define/public (get-row-to-style-index-map sheet_name)
-           (data-sheet-row_to_style_index_hash (sheet-content (get-sheet-by-name sheet_name))))
+           (DATA-SHEET-row_to_style_index_hash (get-sheet-by-name sheet_name)))
 
          (define/public (get-col-to-style-index-map sheet_name)
-           (data-sheet-col_to_style_index_hash (sheet-content (get-sheet-by-name sheet_name))))
+           (DATA-SHEET-col_to_style_index_hash (get-sheet-by-name sheet_name)))
 
          (define/public (get-style-list) (xlsx-style-style_list style))
 
