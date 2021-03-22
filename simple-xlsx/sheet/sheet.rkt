@@ -4,6 +4,10 @@
           [struct DATA-SHEET
                   (
                    (name string?)
+                   [dimension #f]
+                   [data_map (make-hash)]
+                   [formula_map (make-hash)]
+                   [type_map (make-hash)]
                    (rows list?)
                    (width_hash hash?)
                    (height_hash hash?)
