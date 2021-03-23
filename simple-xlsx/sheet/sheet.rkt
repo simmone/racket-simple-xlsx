@@ -3,12 +3,11 @@
 (provide (contract-out
           [struct DATA-SHEET
                   (
-                   (name string?)
-                   [dimension #f]
-                   [data_map (make-hash)]
-                   [formula_map (make-hash)]
-                   [type_map (make-hash)]
-                   (rows list?)
+                   (dimension (cons/c natural? natural?))
+                   (data_map (hash/c string? number?))
+                   (formula_map (hash/c string? string?))
+                   (type_map (hash/c string? string?))
+                   (rows (listof (listof string?)))
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
@@ -21,7 +20,6 @@
                    )]
           [struct CHART-SHEET
                   (
-                   (name string?)
                    (chart_type symbol?)
                    (topic string?)
                    (x_topic string?)
@@ -42,6 +40,10 @@
 
 (struct DATA-SHEET (
                     [name #:mutable]
+                    [dimension #:mutable]
+                    [data_map #:mutable]
+                    [formula_map #:mutable]
+                    [type_map #:mutable]
                     [rows #:mutable] 
                     [width_hash #:mutable]
                     [height_hash #:mutable]
@@ -54,7 +56,7 @@
                     [col_to_style_index_hash #:mutable]
                     ))
 
-(struct colAttr ([width #:mutable] [back_color #:mutable]))
+(struct COL-ATTR ([width #:mutable] [back_color #:mutable]))
 
 (struct CHART-SHEET (
                      [name #:mutable]

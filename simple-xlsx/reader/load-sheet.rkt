@@ -18,17 +18,30 @@
   (void))
 
 (define (load-data-sheet-file sheet_file)
-  (let ([dimension #f]
-        [data_map (make-hash)]
-        [formula_map (make-hash)]
-        [type_map (make-hash)])
+  (let ([sheet 
+         (DATA-SHEET
+          '(0 . 0)
+          (make-hash)
+          (make-hash)
+          (make-hash)
+          '()
+          (make-hash)
+          (make-hash)
+          '(0 . 0)
+          (make-hash)
+          (make-hash)
+          (make-hash)
+          (make-hash)
+          (make-hash)
+          (make-hash))])
 
     (let ([xml_hash (xml->hash sheet_file)])
 
-      (set! dimension 
-            (cons
-             (hash-ref xml_hash "worksheet.sheetData.row's count")
-             (hash-ref xml_hash "worksheet.cols.col's count")))
+      (set-DATA-SHEET-dimension!
+       sheet
+       (cons
+        (hash-ref xml_hash "worksheet.sheetData.row's count")
+        (hash-ref xml_hash "worksheet.cols.col's count")))
 
       (let loop-row ([row_count 1])
         (when (<= row_count (hash-ref xml_hash "worksheet.sheetData.row's count"))
