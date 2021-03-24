@@ -53,6 +53,8 @@
       (check-equal? (hash-count (XLSX-shared_strings_map xlsx)) 18)
       (check-equal? (hash-ref (XLSX-shared_strings_map xlsx) "1") "")
       (check-equal? (hash-ref (XLSX-shared_strings_map xlsx) "18") "month/brand")
+      
+      (check-equal? (get-sheet-names xlsx) '("DataSheet"))
 
       ))
     

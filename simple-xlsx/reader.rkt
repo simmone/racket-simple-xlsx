@@ -35,6 +35,17 @@
        
        (user_proc _xlsx)))))
 
+(define (get-sheet-names xlsx)
+  (let loop ([index 0]
+             [result_list '()])
+    (if (not (null? result_list))
+        (loop
+         (add1 index)
+         (cons
+          (hash-ref (XLSX-sheet_index_name_map xlsx) index)
+          result_list))
+        (reverse result_list))))
+
 (define (load-sheet sheet_name xlsx)
   (let ([sheet_index (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name)])
     (load-sheet-ref sheet_index xlsx)))

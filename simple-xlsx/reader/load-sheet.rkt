@@ -4,7 +4,6 @@
           [load-data-sheet-file (-> path-string? DATA-SHEET?)]
           [load-chart-sheet-file (-> path-string? CHART-SHEET?)]
           [get-sheet-rows (-> DATA-SHEET? list?)]
-          [get-sheet-names (-> DATA-SHEET? list?)]
           ))
 
 (require simple-xml)
@@ -54,12 +53,6 @@
               (loop-col (add1 col_count))))
           (loop-row (add1 row_count)))))
     sheet))
-
-(define (get-sheet-names xlsx)
-  (map
-   (lambda (item)
-     (car item))
-   (sort #:key cdr (hash->list (get-field sheet_name_map xlsx)) string<?)))
 
 (define (get-cell-value item_name xlsx)
   (let ([sheet_map (get-field sheet_map xlsx)]
