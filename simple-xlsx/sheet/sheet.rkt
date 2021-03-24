@@ -4,10 +4,10 @@
           [struct DATA-SHEET
                   (
                    (dimension (cons/c natural? natural?))
-                   (data_map (hash/c string? number?))
-                   (formula_map (hash/c string? string?))
-                   (type_map (hash/c string? string?))
-                   (rows (listof (listof string?)))
+                   (v_map (hash/c string? (or/c number? string?)))
+                   (t_map (hash/c string? string?))
+                   (f_map (hash/c string? string?))
+                   (s_map (hash/c string? string?))
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
@@ -39,12 +39,11 @@
           ))
 
 (struct DATA-SHEET (
-                    [name #:mutable]
                     [dimension #:mutable]
-                    [data_map #:mutable]
-                    [formula_map #:mutable]
-                    [type_map #:mutable]
-                    [rows #:mutable] 
+                    [v_map #:mutable]
+                    [t_map #:mutable]
+                    [f_map #:mutable]
+                    [s_map #:mutable]
                     [width_hash #:mutable]
                     [height_hash #:mutable]
                     [freeze_range #:mutable]
@@ -59,7 +58,6 @@
 (struct COL-ATTR ([width #:mutable] [back_color #:mutable]))
 
 (struct CHART-SHEET (
-                     [name #:mutable]
                      [chart_type #:mutable] 
                      [topic #:mutable] 
                      [x_topic #:mutable] 

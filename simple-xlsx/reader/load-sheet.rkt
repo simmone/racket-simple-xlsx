@@ -20,20 +20,9 @@
 (define (load-data-sheet-file sheet_file)
   (let ([sheet 
          (DATA-SHEET
-          '(0 . 0)
-          (make-hash)
-          (make-hash)
-          (make-hash)
-          '()
-          (make-hash)
-          (make-hash)
-          '(0 . 0)
-          (make-hash)
-          (make-hash)
-          (make-hash)
-          (make-hash)
-          (make-hash)
-          (make-hash))])
+          '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash)
+          (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash)
+          (make-hash) (make-hash) (make-hash) (make-hash))])
 
     (let ([xml_hash (xml->hash sheet_file)])
 
@@ -49,24 +38,22 @@
             (when (<= col_count (hash-ref xml_hash "worksheet.cols.col's count"))
               (let (
                     [para_r (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.r" row_count col_count) "")]
-                    [para_t (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.t" row_count col_count) "")]
-                    [para_s (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.s" row_count col_count) "")]
+                    [para_t (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.t" row_count col_count) #f)]
+                    [para_s (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.s" row_count col_count) #f)]
                     [para_v (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.v" row_count col_count) #f)]
                     [para_f (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.f" row_count col_count) #f)]
                     )
 
-                (hash-set! type_map para_r (cons para_t para_s))
+                (hash-set! (DATA-SHEET-v_map sheet) para_r para_v)
 
-                (when para_v
-                  (hash-set! data_map para_r para_v))
+                (when para_t (hash-set! (DATA-SHEET-t_map sheet) para_r para_t))
 
-                (when para_f
-                  (hash-set! formula_map para_r para_f))
-                )
+                (when para_f (hash-set! (DATA-SHEET-f_map sheet) para_r para_f))
+
+                (when para_s (hash-set! (DATA-SHEET-s_map sheet) para_r para_s)))
               (loop-col (add1 col_count))))
           (loop-row (add1 row_count)))))
-
-    (values dimension data_map formula_map type_map)))
+    sheet))
 
 (define (get-sheet-names xlsx)
   (map

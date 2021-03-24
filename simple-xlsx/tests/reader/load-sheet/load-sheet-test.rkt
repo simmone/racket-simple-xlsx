@@ -18,9 +18,8 @@
 
     (let ([sheet (load-data-sheet-file sheet_file)])
 
-      (check-equal? (length (DATA-SHEET-rows sheet)) 4)
-      (check-equal? (length (car (DATA-SHEET-rows sheet))) 4)
-      (check-equal? (hash-count (DATA-SHEET-data_map sheet)) 16)
+      (check-equal? (DATA-SHEET-dimension sheet) '(4 . 4))
+      (check-equal? (hash-count (DATA-SHEET-v_map sheet)) 16)
 
       ))))
 
