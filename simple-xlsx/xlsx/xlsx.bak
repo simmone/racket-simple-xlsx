@@ -128,6 +128,37 @@
                (list-ref sheets (hash-ref sheet_name_map sheet_name))
                (error (format "no such sheet[~a]" sheet_name))))
          
+         (define/public (get-range-data sheet_name range_str)
+           (when (check-data-range-valid #:sheet_name sheet_name #:range_str range_str)
+                 (let* ([data_sheet (get-sheet-by-name sheet_name)]
+                        [col_range (regexp-match* #rx"([A-Z]+)" range_str)]
+                        [start_col_name (first col_range)]
+                        [col_start_index (sub1 (abc->number start_col_name))]
+                        [end_col_name (second col_range)]
+                        [col_end_index (sub1 (abc->number end_col_name))]
+                        [row_range (regexp-match* #rx"([0-9]+)" range_str)]
+                        [row_start_index (string->number (first row_range))]
+                        [row_end_index (string->number (second row_range))]
+                        [direction (if (string=? start_col_name end_col_name) 'vertical 'horizontal)])
+                   (if (eq? direction 'vertical)
+                       (let loop ([loop_list (DATA-SHEET-rows data_sheet)]
+                                  [row_count 1]
+                                  [result_list '()])
+                         (if (not (null? loop_list))
+                             (if (and (>= row_count row_start_index) (<= row_count row_end_index))
+                                 (loop (cdr loop_list) (add1 row_count) 
+                                       (cons (list-ref (car loop_list) col_start_index) result_list))
+                                 (loop (cdr loop_list) (add1 row_count) result_list))
+                             (reverse result_list)))
+                       (let loop ([loop_list (list-ref (DATA-SHEET-rows data_sheet) (sub1 row_start_index))]
+                                  [col_index 0]
+                                  [result_list '()])
+                         (if (not (null? loop_list))
+                             (if (and (>= col_index col_start_index) (<= col_index col_end_index))
+                                 (loop (cdr loop_list) (add1 col_index) (cons (car loop_list) result_list))
+                                 (loop (cdr loop_list) (add1 col_index) result_list))
+                             (reverse result_list)))))))
+
          (define/public (add-chart-sheet #:sheet_name sheet_name #:chart_type [chart_type 'line] #:topic [topic ""] #:x_topic [x_topic ""])
            (if (not (hash-has-key? sheet_name_map sheet_name))
                (let* ([sheet_length (length sheets)]
@@ -138,6 +169,34 @@
                                   chart_type topic x_topic (DATA-RANGE "" "") '())))
                  (hash-set! sheet_name_map sheet_name (sub1 seq)))
                (error (format "duplicate sheet name[~a]" sheet_name))))
+
+         (define/public (check-data-range-valid #:sheet_name sheet_name #:range_str range_str)
+           (when (only-one-row/col-data? range_str)
+                 (let* ([rows (DATA-SHEET-rows (get-sheet-by-name sheet_name))]
+                        [first_row (first rows)]
+                        [col_name (first (regexp-match* #rx"([A-Z]+)" range_str))]
+                        [col_number (sub1 (abc->number col_name))]
+                        [row_range (regexp-match* #rx"([0-9]+)" range_str)]
+                        [row_start_index (string->number (first row_range))]
+                        [row_end_index (string->number (second row_range))])
+                   (cond
+                    [(< (length first_row) (add1 col_number))
+                     (error (format "no such column[~a]" col_name))]
+                    [(> row_end_index (length rows))
+                     (error (format "end index beyond data range[~a]" row_end_index))]
+                    [else
+                     #t]))))
+         
+         (define/public (set-chart-x-data! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range)
+           (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
+                 (set-CHART-SHEET-x_data_range! (get-sheet-by-name sheet_name) (DATA-RANGE data_sheet_name data_range))))
+
+         (define/public 
+           (add-chart-serial! #:sheet_name sheet_name #:data_sheet_name data_sheet_name #:data_range data_range #:y_topic [y_topic ""])
+           (when (check-data-range-valid #:sheet_name data_sheet_name #:range_str data_range)
+                 (set-CHART-SHEET-y_data_range_list!
+                  (get-sheet-by-name sheet_name)
+                  `(,@(CHART-SHEET-y_data_range_list (get-sheet-by-name sheet_name)) ,(DATA-SERIAL y_topic (DATA-RANGE data_sheet_name data_range))))))
 
          (define/public (sheet-ref sheet_seq)
            (list-ref sheets sheet_seq))

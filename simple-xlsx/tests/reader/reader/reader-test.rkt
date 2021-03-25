@@ -54,8 +54,17 @@
       (check-equal? (hash-ref (XLSX-shared_strings_map xlsx) "1") "")
       (check-equal? (hash-ref (XLSX-shared_strings_map xlsx) "18") "month/brand")
       
-      (check-equal? (get-sheet-names xlsx) '("DataSheet"))
-
+      (check-equal? (get-sheet-names xlsx)
+                    '("DataSheet"
+                      "DataSheetWithStyle"
+                      "DataSheetWithStyle2"
+                      "LineChart1"
+                      "LineChart2"
+                      "LineChart3D"
+                      "BarChart"
+                      "BarChart3D"
+                      "PieChart"
+                      "PieChart3D"))
       ))
     
     )))

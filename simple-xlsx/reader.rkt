@@ -38,7 +38,7 @@
 (define (get-sheet-names xlsx)
   (let loop ([index 0]
              [result_list '()])
-    (if (not (null? result_list))
+    (if (< index (XLSX-sheet_count xlsx))
         (loop
          (add1 index)
          (cons
@@ -53,7 +53,7 @@
 (define (load-sheet-ref sheet_index xlsx)
   (set-XLSX-sheet_list!
    xlsx
-   `(,@sheet_list
+   `(,@(XLSX-sheet_list xlsx)
      ,(if (regexp-match #rx"worksheets" (XLSX-sheet_index_rel_map xlsx))
           (load-data-sheet-file
            (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))
