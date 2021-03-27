@@ -70,7 +70,7 @@
   (XLSX "" 0
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
         (make-hash) (make-hash)
-        #f))
+        '()))
 
 (define xlsx%
   (class object%

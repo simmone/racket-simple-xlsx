@@ -5,8 +5,8 @@
           [with-input-from-xlsx-file (-> path-string? (-> XLSX? any) any)]
           [sheet-name-rows (-> path-string? string? list?)]
           [get-sheet-names (-> XLSX? list?)]
-          [load-sheet (-> string? XLSX? void?)]
-          [load-sheet-ref (-> exact-nonnegative-integer? XLSX? void?)]
+          [load-sheet (->* (string? XLSX?) (procedure?) void?)]
+          [load-sheet-ref (->* (natural? XLSX?) (procedure?) void?)]
           [get-sheet-rows (-> XLSX? list?)]
           ))
 
@@ -46,19 +46,24 @@
           result_list))
         (reverse result_list))))
 
-(define (load-sheet sheet_name xlsx)
-  (let ([sheet_index (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name)])
-    (load-sheet-ref sheet_index xlsx)))
+(define (load-sheet sheet_name xlsx [user_procedure #f])
+  (let ([sheet_index (hash-ref (XLSX-sheet_name_index_map xlsx) sheet_name 0)])
+    (load-sheet-ref sheet_index xlsx user_procedure)))
 
-(define (load-sheet-ref sheet_index xlsx)
+(define (load-sheet-ref sheet_index xlsx [user_procedure #f])
+  (let ([sheet 
+         (if (regexp-match #rx"worksheets" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index))
+             (load-data-sheet-file
+              (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))
+             (load-chart-sheet-file
+              (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index))))])
+
   (set-XLSX-sheet_list!
    xlsx
    `(,@(XLSX-sheet_list xlsx)
-     ,(if (regexp-match #rx"worksheets" (XLSX-sheet_index_rel_map xlsx))
-          (load-data-sheet-file
-           (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))
-          (load-chart-sheet-file
-           (build-path (XLSX-xlsx_dir xlsx) "xl" (hash-ref (XLSX-sheet_index_rel_map xlsx) sheet_index)))))))
+     ,sheet))
+
+  (when user_procedure (user_procedure sheet))))
 
 (define (sheet-name-rows xlsx_file_path sheet_name)
   (with-input-from-xlsx-file

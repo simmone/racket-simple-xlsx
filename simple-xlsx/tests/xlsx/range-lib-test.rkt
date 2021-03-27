@@ -7,6 +7,12 @@
 (define test-range-lib
   (test-suite
    "test-range-lib"
+   
+   (test-case
+    "test-dimension->pair"
+    
+    (check-equal? (dimension->pair "A1:F4") '(4 . 6))
+    )
 
    (test-case 
     "test-AZ-NUMBER"

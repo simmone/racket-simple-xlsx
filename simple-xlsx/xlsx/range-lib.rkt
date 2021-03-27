@@ -22,7 +22,14 @@
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
           [expand-col-style-to-cell (-> hash? hash? void?)]
+          [dimension->pair (-> string? (cons/c natural? natural?))]
           ))
+
+(define (dimension->pair dimension)
+  (let ([parts (regexp-match #rx"([A-Za-z]+)([1-9]+):([A-Za-z]+)([1-9]+)" dimension)])
+    (cons
+     (add1 (- (string->number (list-ref parts 4)) (string->number (list-ref parts 2))))
+     (add1 (- (abc->number (list-ref parts 3)) (abc->number (list-ref parts 1)))))))
 
 (define (abc->number abc)
   (let ([sum 0])

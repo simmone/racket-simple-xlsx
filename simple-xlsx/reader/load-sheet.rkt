@@ -27,9 +27,7 @@
 
       (set-DATA-SHEET-dimension!
        sheet
-       (cons
-        (hash-ref xml_hash "worksheet.sheetData.row's count")
-        (hash-ref xml_hash "worksheet.cols.col's count")))
+       (dimension->pair (hash-ref xml_hash "worksheet.dimension.ref")))
 
       (let loop-row ([row_count 1])
         (when (<= row_count (hash-ref xml_hash "worksheet.sheetData.row's count"))
