@@ -4,10 +4,7 @@
           [struct DATA-SHEET
                   (
                    (dimension (cons/c natural? natural?))
-                   (v_map (hash/c string? (or/c number? string?)))
-                   (t_map (hash/c string? string?))
-                   (f_map (hash/c string? string?))
-                   (s_map (hash/c string? string?))
+                   (rvtsf_map (hash/c string? (listof (or/c string? #f) (or/c string? #f) (or/c string? #f) (or/c string? #f))))
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
@@ -36,14 +33,14 @@
                    (topic string?)
                    (data_range DATA-RANGE?)
                    )]
+          [*CURRENT_SHEET* (parameter/c (or/c DATA-SHEET? CHART-SHEET? #f))]
           ))
+
+(define *CURRENT_SHEET* (make-parameter #f))
 
 (struct DATA-SHEET (
                     [dimension #:mutable]
-                    [v_map #:mutable]
-                    [t_map #:mutable]
-                    [f_map #:mutable]
-                    [s_map #:mutable]
+                    [rvtsf_map #:mutable]
                     [width_hash #:mutable]
                     [height_hash #:mutable]
                     [freeze_range #:mutable]

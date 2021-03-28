@@ -5,7 +5,6 @@
 (require file/zip)
 
 (provide (contract-out
-          [number->list (-> number? list?)]
           [format-date (-> date? string?)]
           [format-complete-time (-> date? string?)]
           [format-time (-> number? string?)]
@@ -31,13 +30,6 @@
                    (not (string=? (car loop_lines) (list-ref test_lines line_no))))
                   (fail-check (format "error! line[~a] expected:[~a] actual:[~a]" (add1 line_no) (car loop_lines) (list-ref test_lines line_no))))
             (loop (cdr loop_lines) (add1 line_no))))))
-
-(define (number->list num)
-  (let loop ([s_list '()]
-             [index 1])
-    (if (<= index num)
-        `(,@s_list ,@(cons index (loop s_list (add1 index))))
-        s_list)))
 
 (define (format-date the_date)
   (format "~a~a~a"

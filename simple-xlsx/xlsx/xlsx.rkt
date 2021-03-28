@@ -36,7 +36,10 @@
                    (border_list list?)
                    (alignment_code_to_alignment_hash hash?)
                    )]
+          [*CURRENT_XLSX* (parameter/c (or/c XLSX? #f))]
           ))
+
+(define *CURRENT_XLSX* (make-parameter #f))
 
 (struct xlsx-style (
                     [style_code_to_style_index_hash #:mutable]
