@@ -4,7 +4,7 @@
           [struct DATA-SHEET
                   (
                    (dimension (cons/c natural? natural?))
-                   (rvtsf_map (hash/c string? (listof (or/c string? #f) (or/c string? #f) (or/c string? #f) (or/c string? #f))))
+                   (rvtsf_map (hash/c string? (list/c (or/c string? #f) (or/c string? #f) (or/c string? #f) (or/c string? #f))))
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))

@@ -19,7 +19,7 @@
     (let ([sheet (load-data-sheet-file sheet_file)])
 
       (check-equal? (DATA-SHEET-dimension sheet) '(4 . 6))
-      (check-equal? (hash-count (DATA-SHEET-v_map sheet)) 16)
+      (check-equal? (hash-count (DATA-SHEET-rvtsf_map sheet)) 16)
 
       ))))
 
