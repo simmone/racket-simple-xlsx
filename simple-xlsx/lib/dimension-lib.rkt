@@ -3,9 +3,10 @@
 (require "../lib/lib.rkt")
 
 (provide (contract-out
-          [abc->number (-> string? natural?)]
+          [dimension->pair (-> string? (cons/c natural? natural?))]
+          [col_abc->number (-> string? natural?)]
+          [col_number->abc (-> natural? string?)]
           [abc->range (-> string? pair?)]
-          [number->abc (-> natural? string?)]
           [get-dimension (-> list? string?)]
           [check-cell-range (-> string? (or/c #f string?))]
           [check-col-range (-> string? string?)]
@@ -22,16 +23,15 @@
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
           [expand-col-style-to-cell (-> hash? hash? void?)]
-          [dimension->pair (-> string? (cons/c natural? natural?))]
           ))
 
 (define (dimension->pair dimension)
   (let ([parts (regexp-match #rx"([A-Za-z]+)([1-9]+):([A-Za-z]+)([1-9]+)" dimension)])
     (cons
      (add1 (- (string->number (list-ref parts 4)) (string->number (list-ref parts 2))))
-     (add1 (- (abc->number (list-ref parts 3)) (abc->number (list-ref parts 1)))))))
+     (add1 (- (col_abc->number (list-ref parts 3)) (col_abc->number (list-ref parts 1)))))))
 
-(define (abc->number abc)
+(define (col_abc->number abc)
   (let ([sum 0])
     (let loop ([char_list (reverse (string->list abc))]
                [base 0])
@@ -42,41 +42,7 @@
             (loop (cdr char_list) (add1 base))))
     sum))
 
-(define (abc->range abc_range)
-  (cond
-   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" abc_range)
-    (let ([abc_items (regexp-split #rx"-" abc_range)])
-      (if (= (length abc_items) 2)
-          (let* ([first_item (first abc_items)]
-                 [second_item (second abc_items)]
-                 [start_index
-                  (cond
-                   [(regexp-match #rx"^[0-9]+$" first_item)
-                    (string->number first_item)]
-                   [(regexp-match #rx"^[A-Z]+$" first_item)
-                    (abc->number first_item)]
-                   [else
-                    1])]
-                 [end_index
-                  (cond
-                   [(regexp-match #rx"^[0-9]+$" second_item)
-                    (string->number second_item)]
-                   [(regexp-match #rx"^[A-Z]+$" second_item)
-                    (abc->number second_item)]
-                   [else
-                    1])])
-            (if (<= start_index end_index)
-                (cons start_index end_index)
-                (cons 1 1)))
-          (cons 1 1)))]
-   [(regexp-match #rx"^[0-9]+$" abc_range)
-    (cons (string->number abc_range) (string->number abc_range))]
-   [(regexp-match #rx"^[A-Z]+$" abc_range)
-    (cons (abc->number abc_range) (abc->number abc_range))]
-   [else
-    (cons 1 1)]))
-
-(define (number->abc num)
+(define (col_number->abc num)
   (let ([abc ""])
     (let loop ([loop_num num])
       (if (> loop_num 26)
@@ -91,6 +57,40 @@
           (set! abc (string-append (string (integer->char (+ 64 loop_num))) abc))))
     abc))
 
+(define (abc->range abc_range)
+  (cond
+   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" abc_range)
+    (let ([abc_items (regexp-split #rx"-" abc_range)])
+      (if (= (length abc_items) 2)
+          (let* ([first_item (first abc_items)]
+                 [second_item (second abc_items)]
+                 [start_index
+                  (cond
+                   [(regexp-match #rx"^[0-9]+$" first_item)
+                    (string->number first_item)]
+                   [(regexp-match #rx"^[A-Z]+$" first_item)
+                    (col_abc->number first_item)]
+                   [else
+                    1])]
+                 [end_index
+                  (cond
+                   [(regexp-match #rx"^[0-9]+$" second_item)
+                    (string->number second_item)]
+                   [(regexp-match #rx"^[A-Z]+$" second_item)
+                    (col_abc->number second_item)]
+                   [else
+                    1])])
+            (if (<= start_index end_index)
+                (cons start_index end_index)
+                (cons 1 1)))
+          (cons 1 1)))]
+   [(regexp-match #rx"^[0-9]+$" abc_range)
+    (cons (string->number abc_range) (string->number abc_range))]
+   [(regexp-match #rx"^[A-Z]+$" abc_range)
+    (cons (col_abc->number abc_range) (col_abc->number abc_range))]
+   [else
+    (cons 1 1)]))
+
 (define (get-dimension data_list)
   (let ([rows (length data_list)]
         [cols 0])
@@ -100,7 +100,7 @@
                   (set! cols (length (car loop_list))))
             (loop (cdr loop_list))))
 
-    (string-append (number->abc cols) (number->string rows))))
+    (string-append (col_number->abc cols) (number->string rows))))
 
 (define (check-cell-range cell_range_str)
   (cond
@@ -183,7 +183,7 @@
                 (error (format "range's direction is vertical, index is invalid.[~a][~a]" start_row_index end_row_index))
                 #t)
             (if (string=? start_row_index end_row_index)
-                (if (> (abc->number start_col_name) (abc->number end_col_name))
+                (if (> (col_abc->number start_col_name) (col_abc->number end_col_name))
                     (error (format "range's direction is horizontal, col name is invalid.[~a][~a]" start_col_name end_col_name))
                     #t)
                 (error (format "range's direction confused. should like A1-A20 or A2-Z2, but get ~a" range_str)))))
@@ -207,15 +207,15 @@
 
     (if (string=? start_col_name end_col_name)
         (add1 (- (string->number end_row_index) (string->number start_row_index)))
-        (add1 (- (abc->number end_col_name) (abc->number start_col_name))))))
+        (add1 (- (col_abc->number end_col_name) (col_abc->number start_col_name))))))
 
 (define (range-to-cell-hash range_str val)
   (let ([flat_map (make-hash)])
     (when (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)
           (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" range_str)]
-                 [start_col_index (abc->number (list-ref range_items 1))]
+                 [start_col_index (col_abc->number (list-ref range_items 1))]
                  [start_row_index (string->number (list-ref range_items 2))]
-                 [end_col_index (abc->number (list-ref range_items 3))]
+                 [end_col_index (col_abc->number (list-ref range_items 3))]
                  [end_row_index (string->number (list-ref range_items 4))])
             (let range-loop ([loop_col_index start_col_index]
                              [loop_row_index start_row_index])
@@ -223,7 +223,7 @@
                      (<= loop_col_index end_col_index)
                      (<= loop_row_index end_row_index))
                     (hash-set! flat_map 
-                               (string-append (number->abc loop_col_index) (number->string loop_row_index))
+                               (string-append (col_number->abc loop_col_index) (number->string loop_row_index))
                                val)
                     (cond
                      [(< loop_col_index end_col_index)
@@ -345,7 +345,7 @@
 (define (cell->rowcol cell_str)
   (let ([split_items (regexp-match #rx"^([a-zA-Z]+)([0-9]+)$" cell_str)])
     (if split_items
-        (cons (string->number (third split_items)) (abc->number (second split_items)))
+        (cons (string->number (third split_items)) (col_abc->number (second split_items)))
         '(0 . 0))))
 
 (define (cross-cell-style row_map col_map type)
@@ -369,7 +369,7 @@
              (lambda (style val)
                (hash-set! style_map style val)))
             
-            (hash-set! cross_cell_map (string-append (number->abc col_seq) (number->string row_seq)) style_map))))))
+            (hash-set! cross_cell_map (string-append (col_number->abc col_seq) (number->string row_seq)) style_map))))))
     cross_cell_map))
 
 (define (expand-row-style-to-cell row_style_map cell_style_map)

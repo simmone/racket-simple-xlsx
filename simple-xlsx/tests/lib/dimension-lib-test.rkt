@@ -2,11 +2,11 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "../../xlsx/range-lib.rkt")
+(require rackunit "../../lib/dimension-lib.rkt")
 
-(define test-range-lib
+(define test-dimension-lib
   (test-suite
-   "test-range-lib"
+   "test-dimension-lib"
    
    (test-case
     "test-dimension->pair"
@@ -16,33 +16,33 @@
 
    (test-case 
     "test-AZ-NUMBER"
-    (check-equal? (abc->number "A") 1)
-    (check-equal? (abc->number "B") 2)
-    (check-equal? (abc->number "Z") 26)
-    (check-equal? (abc->number "AA") 27)
-    (check-equal? (abc->number "AB") 28)
-    (check-equal? (abc->number "AZ") 52)
-    (check-equal? (abc->number "BA") 53)
-    (check-equal? (abc->number "YZ") 676)
-    (check-equal? (abc->number "ZA") 677)
-    (check-equal? (abc->number "ZZ") 702)
-    (check-equal? (abc->number "AAA") 703)
+    (check-equal? (col_abc->number "A") 1)
+    (check-equal? (col_abc->number "B") 2)
+    (check-equal? (col_abc->number "Z") 26)
+    (check-equal? (col_abc->number "AA") 27)
+    (check-equal? (col_abc->number "AB") 28)
+    (check-equal? (col_abc->number "AZ") 52)
+    (check-equal? (col_abc->number "BA") 53)
+    (check-equal? (col_abc->number "YZ") 676)
+    (check-equal? (col_abc->number "ZA") 677)
+    (check-equal? (col_abc->number "ZZ") 702)
+    (check-equal? (col_abc->number "AAA") 703)
    )
 
    (test-case 
     "test-NUMBER-AZ"
-    (check-equal? (number->abc 1) "A")
-    (check-equal? (number->abc 26) "Z")
-    (check-equal? (number->abc 27) "AA")
-    (check-equal? (number->abc 28) "AB")
-    (check-equal? (number->abc 29) "AC")
-    (check-equal? (number->abc 51) "AY")
-    (check-equal? (number->abc 52) "AZ")
-    (check-equal? (number->abc 53) "BA")
-    (check-equal? (number->abc 676) "YZ")
-    (check-equal? (number->abc 677) "ZA")
-    (check-equal? (number->abc 702) "ZZ")
-    (check-equal? (number->abc 703) "AAA")
+    (check-equal? (col_number->abc 1) "A")
+    (check-equal? (col_number->abc 26) "Z")
+    (check-equal? (col_number->abc 27) "AA")
+    (check-equal? (col_number->abc 28) "AB")
+    (check-equal? (col_number->abc 29) "AC")
+    (check-equal? (col_number->abc 51) "AY")
+    (check-equal? (col_number->abc 52) "AZ")
+    (check-equal? (col_number->abc 53) "BA")
+    (check-equal? (col_number->abc 676) "YZ")
+    (check-equal? (col_number->abc 677) "ZA")
+    (check-equal? (col_number->abc 702) "ZZ")
+    (check-equal? (col_number->abc 703) "AAA")
     )
 
    (test-case
@@ -423,4 +423,4 @@
 
    ))
 
-(run-tests test-range-lib)
+(run-tests test-dimension-lib)
