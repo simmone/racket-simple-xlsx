@@ -9,7 +9,7 @@
 
 (require "../lib/lib.rkt")
 (require "../sheet/sheet.rkt")
-(require "../xlsx/range-lib.rkt")
+(require "../lib/dimension-lib.rkt")
 
 (define (load-chart-sheet-file sheet_file)
   (void))

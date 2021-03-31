@@ -2,7 +2,7 @@
 
 (require "../lib/lib.rkt")
 (require "xlsx-lib.rkt")
-(require "range-lib.rkt")
+(require "../lib/dimension-lib.rkt")
 (require "../sheet/sheet.rkt")
 
 (provide (contract-out
