@@ -7,7 +7,9 @@
           [get-sheet-names (-> list?)]
           [load-sheet (->* (string?) (procedure?) void?)]
           [load-sheet-ref (->* (natural?) (procedure?) void?)]
-          [get-sheet-rows (-> list?)]
+          [get-rows (-> list?)]
+          [sheet-name-rows (-> path-string? string? list?)]
+          [sheet-ref-rows (-> path-string? natural? list?)]
           ))
 
 (require file/unzip)
@@ -71,6 +73,23 @@
          ([*CURRENT_SHEET* sheet])
          (user_procedure)))))
 
+(define (get-cell-value item_name)
+  (let ([rvtsf_map (DATA-SHEET-rvtsf_map (*CURRENT_SHEET*))]
+        [shared_strings_map (XLSX-shared_strings_map (*CURRENT_XLSX*))])
+    (if (hash-has-key? rvtsf_map item_name)
+        (let* ([vtsf (hash-ref rvtsf_map item_name)]
+               [v (first vtsf)]
+               [t (second vtsf)]
+               [s (third vtsf)])
+          (cond
+           [(string=? t "s")
+            (hash-ref shared_strings_map v)]
+           [(or (string=? t "n") (string=? t ""))
+            (string->number v)]
+           [else
+            ""]))
+        "")))
+
 (define (sheet-ref-row row_index)
   (let loop-col ([col_index 1]
                  [row '()])
@@ -105,9 +124,9 @@
             (string->number value)]))
         "")))
 
-(define (get-rows sheet)
+(define (get-rows)
   (let ([dimension
-         (DATA-SHEET-dimension sheet)])
+         (DATA-SHEET-dimension (*CURRENT_SHEET*))])
     
     (let loop-row ([row_index 1]
                    [row_list '()])
@@ -121,7 +140,7 @@
                   (loop-col
                    (add1 col_index)
                    (cons
-                    (get-cell-value (string-append (number->abc col_index) (number->string row_index)) xlsx)
+                    (get-cell-value (string-append (col_number->abc col_index) (number->string row_index)))
                     col_list))
                   (reverse col_list)))
             row_list))
@@ -131,6 +150,17 @@
   (with-input-from-xlsx-file
    xlsx_file_path
    (lambda (xlsx)
-     (load-sheet sheet_name xlsx)
-     
-     (get-sheet-rows xlsx))))
+     (load-sheet 
+      sheet_name
+      (lambda ()
+        (get-rows))))))
+
+(define (sheet-ref-rows xlsx_file_path sheet_index)
+  (with-input-from-xlsx-file
+   xlsx_file_path
+   (lambda (xlsx)
+     (load-sheet-ref
+      sheet_index
+      (lambda ()
+        (get-rows))))))
+
