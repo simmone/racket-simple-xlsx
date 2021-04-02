@@ -20,9 +20,9 @@
       (load-shared-strings sharedStrings_file _xlsx)
 
       (check-equal? (hash-count (XLSX-shared_strings_map _xlsx)) 17)
-      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) "1") "")
-      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) "2") "201601")
-      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) "17") "month/brand")
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 0) "")
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 1) "201601")
+      (check-equal? (hash-ref (XLSX-shared_strings_map _xlsx) 16) "month/brand")
       ))))
 
 (run-tests test-load-shared-strings)

@@ -3,11 +3,13 @@
 
 (provide (contract-out
           [with-input-from-xlsx-file (-> path-string? (-> any) any)]
-          [sheet-name-rows (-> path-string? string? list?)]
-          [get-sheet-names (-> list?)]
+          [xlsx-sheet-count (-> natural?)]
+          [xlsx-sheet-names (-> list?)]
           [load-sheet (->* (string?) (procedure?) void?)]
           [load-sheet-ref (->* (natural?) (procedure?) void?)]
+          [sheet-dimension (-> (cons/c natural? natural?))]
           [get-rows (-> list?)]
+          [get-cell-value (-> string? any)]
           [sheet-name-rows (-> path-string? string? list?)]
           [sheet-ref-rows (-> path-string? natural? list?)]
           ))
@@ -40,7 +42,10 @@
         ([*CURRENT_XLSX* _xlsx])
         (user_proc))))))
 
-(define (get-sheet-names)
+(define (xlsx-sheet-count)
+  (XLSX-sheet_count (*CURRENT_XLSX*)))
+
+(define (xlsx-sheet-names)
   (let loop ([index 0]
              [result_list '()])
     (if (< index (XLSX-sheet_count (*CURRENT_XLSX*)))
@@ -74,21 +79,25 @@
          (user_procedure)))))
 
 (define (get-cell-value item_name)
-  (let ([rvtsf_map (DATA-SHEET-rvtsf_map (*CURRENT_SHEET*))]
+  (let ([r (string-upcase item_name)]
+        [rvtsf_map (DATA-SHEET-rvtsf_map (*CURRENT_SHEET*))]
         [shared_strings_map (XLSX-shared_strings_map (*CURRENT_XLSX*))])
-    (if (hash-has-key? rvtsf_map item_name)
-        (let* ([vtsf (hash-ref rvtsf_map item_name)]
+    (if (hash-has-key? rvtsf_map r)
+        (let* ([vtsf (hash-ref rvtsf_map r)]
                [v (first vtsf)]
                [t (second vtsf)]
                [s (third vtsf)])
           (cond
            [(string=? t "s")
-            (hash-ref shared_strings_map v)]
+            (hash-ref shared_strings_map (string->number v))]
            [(or (string=? t "n") (string=? t ""))
             (string->number v)]
            [else
             ""]))
         "")))
+
+(define (sheet-dimension)
+  (DATA-SHEET-dimension (*CURRENT_SHEET*)))
 
 (define (sheet-ref-row row_index)
   (let loop-col ([col_index 1]

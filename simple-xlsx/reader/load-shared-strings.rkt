@@ -14,7 +14,7 @@
       (when (<= loop_count (hash-ref xml_hash "sst.si's count" 0))
             (let ([t (hash-ref xml_hash (format "sst.si~a.t" loop_count))])
               (hash-set! (XLSX-shared_strings_map _xlsx)
-                         (number->string loop_count)
+                         (sub1 loop_count)
                          (cond
                           [(string? t)
                            t]

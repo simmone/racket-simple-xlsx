@@ -19,10 +19,10 @@
 
     (with-input-from-xlsx-file
      test1_file
-     (lambda (xlsx)
-       (load-sheet "DataSheet" xlsx)
+     (lambda ()
+       (load-sheet "DataSheet")
        
-       (check-equal? (length (XLSX-sheet_list xlsx)) 1)
+       (check-equal? (length (XLSX-sheet_list (*CURRENT_XLSX*))) 1)
       )))
 
    (test-case
@@ -30,11 +30,15 @@
 
     (with-input-from-xlsx-file
      test1_file
-     (lambda (xlsx)
+     (lambda ()
        (load-sheet 
-        "DataSheet" xlsx
-        (lambda (sheet)
-          (check-equal? (DATA-SHEET-dimension sheet) '(4 . 6))
+        "DataSheet"
+        (lambda ()
+          (check-equal? (sheet-dimension) '(4 . 6))
+
+          (check-equal? (get-cell-value "A1") "month/brand")
+          (check-equal? (get-cell-value "a1") "month/brand")
+          (check-equal? (get-cell-value "a") "")
           )))))
     ))
 

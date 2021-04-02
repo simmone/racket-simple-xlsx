@@ -16,7 +16,7 @@
                    (sheet_index_rid_map (hash/c natural? string?))
                    (sheet_rid_rel_map (hash/c string? string?))
                    (sheet_index_rel_map (hash/c natural? string?))
-                   (shared_strings_map (hash/c string? string?))
+                   (shared_strings_map (hash/c natural? string?))
                    (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
                    )
                   ]
