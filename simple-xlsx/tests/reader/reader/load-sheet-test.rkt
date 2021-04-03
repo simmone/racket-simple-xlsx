@@ -39,7 +39,36 @@
           (check-equal? (get-cell-value "A1") "month/brand")
           (check-equal? (get-cell-value "a1") "month/brand")
           (check-equal? (get-cell-value "a") "")
+          
+          (check-equal? (get-rows)
+                        (list
+                         (list "month/brand" "201601" "201602" "201603" "201604" "201605")
+                         (list "CAT"   100 300 200 0.6934 43360)
+                         (list "Puma"  200 400 300 139999.89223 43361)
+                         (list "Asics" 300 500 400 23.34 43362)
+                         ))
+
+          (check-equal? (get-row 0) (list "month/brand" "201601" "201602" "201603" "201604" "201605"))
+          (check-equal? (get-row 3) (list "Asics" 300 500 400 23.34 43362))
           )))))
+
+   (test-case
+    "test-sheet-rows"
+
+    (let ([data
+           (list
+            (list "month/brand" "201601" "201602" "201603" "201604" "201605")
+            (list "CAT"   100 300 200 0.6934 43360)
+            (list "Puma"  200 400 300 139999.89223 43361)
+            (list "Asics" 300 500 400 23.34 43362)
+            )])
+
+    (check-equal? (sheet-name-rows test1_file "DataSheet") data)
+
+    (check-equal? (sheet-ref-rows test1_file 0) data)
+
+    ))
+
     ))
 
 (run-tests test-load-sheet)

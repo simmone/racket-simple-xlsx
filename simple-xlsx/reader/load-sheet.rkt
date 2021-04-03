@@ -28,9 +28,9 @@
        (dimension->pair (hash-ref xml_hash "worksheet.dimension.ref")))
 
       (let loop-row ([row_count 1])
-        (when (<= row_count (hash-ref xml_hash "worksheet.sheetData.row's count"))
+        (when (<= row_count (car (DATA-SHEET-dimension sheet)))
           (let loop-col ([col_count 1])
-            (when (<= col_count (hash-ref xml_hash "worksheet.cols.col's count"))
+            (when (<= col_count (cdr (DATA-SHEET-dimension sheet)))
               (let (
                     [para_r (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.r" row_count col_count) #f)]
                     [para_v (hash-ref xml_hash (format "worksheet.sheetData.row~a.c~a.v" row_count col_count) #f)]

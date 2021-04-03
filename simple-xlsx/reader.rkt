@@ -8,7 +8,8 @@
           [load-sheet (->* (string?) (procedure?) void?)]
           [load-sheet-ref (->* (natural?) (procedure?) void?)]
           [sheet-dimension (-> (cons/c natural? natural?))]
-          [get-rows (-> list?)]
+          [get-rows (-> (listof list?))]
+          [get-row (-> natural? list?)]
           [get-cell-value (-> string? any)]
           [sheet-name-rows (-> path-string? string? list?)]
           [sheet-ref-rows (-> path-string? natural? list?)]
@@ -88,9 +89,9 @@
                [t (second vtsf)]
                [s (third vtsf)])
           (cond
-           [(string=? t "s")
+           [(and t (string=? t "s"))
             (hash-ref shared_strings_map (string->number v))]
-           [(or (string=? t "n") (string=? t ""))
+           [(or (false? t) (string=? t "n"))
             (string->number v)]
            [else
             ""]))
@@ -99,66 +100,35 @@
 (define (sheet-dimension)
   (DATA-SHEET-dimension (*CURRENT_SHEET*)))
 
-(define (sheet-ref-row row_index)
-  (let loop-col ([col_index 1]
-                 [row '()])
-    (if (<= col_index (cdr (DATA-SHEET-dimension (*CURRENT_SHEET*))))
-        (loop-col
-         (add1 col_index)
-         (cons
-          (sheet-ref-cell row_index col_index)
-          row))
-        (reverse row))))
-
-(define (sheet-ref-cell row_index col_index)
-  (sheet-cell (format "~a~a" (col_number->abc col_index) row_index) (*CURRENT_SHEET*)))
-
-(define (sheet-cell item_name)
-  (let ([sheet_map (get-field sheet_map (*CURRENT_XLSX*))]
-        [data_type_map (get-field data_type_map (*CURRENT_XLSX*))]
-        [shared_map (get-field shared_map (*CURRENT_XLSX*))])
-    (if (and
-         (hash-has-key? sheet_map item_name)
-         (not (null? (hash-ref data_type_map item_name))))
-        (let* ([type (hash-ref data_type_map item_name)]
-               [type_t (car type)]
-               [type_s (cdr type)]
-               [value (hash-ref sheet_map item_name)])
-          (cond
-           [(string=? type_t "s")
-            (hash-ref shared_map value)]
-           [(string=? type_t "n")
-            (string->number value)]
-           [(string=? type_t "")
-            (string->number value)]))
-        "")))
-
 (define (get-rows)
   (let ([dimension
          (DATA-SHEET-dimension (*CURRENT_SHEET*))])
     
-    (let loop-row ([row_index 1]
+    (let loop-row ([row_index 0]
                    [row_list '()])
-      (if (<= row_index (car dimension))
+      (if (< row_index (car dimension))
           (loop-row
            (add1 row_index)
            (cons
-            (let loop-col ([col_index 1]
-                           [col_list '()])
-              (if (<= col_index (cdr dimension))
-                  (loop-col
-                   (add1 col_index)
-                   (cons
-                    (get-cell-value (string-append (col_number->abc col_index) (number->string row_index)))
-                    col_list))
-                  (reverse col_list)))
+            (get-row row_index)
             row_list))
           (reverse row_list)))))
+
+(define (get-row row_index)
+  (let loop-col ([col_index 0]
+                 [row '()])
+    (if (< col_index (cdr (DATA-SHEET-dimension (*CURRENT_SHEET*))))
+        (loop-col
+         (add1 col_index)
+         (cons
+          (get-cell-value (string-append (col_number->abc (add1 col_index)) (number->string (add1 row_index))))
+          row))
+        (reverse row))))
 
 (define (sheet-name-rows xlsx_file_path sheet_name)
   (with-input-from-xlsx-file
    xlsx_file_path
-   (lambda (xlsx)
+   (lambda ()
      (load-sheet 
       sheet_name
       (lambda ()
@@ -167,7 +137,7 @@
 (define (sheet-ref-rows xlsx_file_path sheet_index)
   (with-input-from-xlsx-file
    xlsx_file_path
-   (lambda (xlsx)
+   (lambda ()
      (load-sheet-ref
       sheet_index
       (lambda ()
