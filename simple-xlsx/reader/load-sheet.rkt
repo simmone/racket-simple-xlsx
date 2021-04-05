@@ -12,7 +12,12 @@
 (require "../lib/dimension-lib.rkt")
 
 (define (load-chart-sheet-file sheet_file)
-  (void))
+  (CHART-SHEET
+   'PIE
+   ""
+   ""
+   (DATA-RANGE "DataSheet" "A1-C2")
+   '()))
 
 (define (load-data-sheet-file sheet_file)
   (let ([sheet 

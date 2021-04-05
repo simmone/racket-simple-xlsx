@@ -51,8 +51,8 @@
       (check-equal? (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) 12) "sharedStrings.xml")
 
       (check-equal? (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 18)
-      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) "1") "")
-      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) "18") "month/brand")
+      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) 0) "")
+      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) 17) "month/brand")
       
       (check-equal? (xlsx-sheet-names)
                     '("DataSheet"
@@ -66,6 +66,34 @@
                       "PieChart"
                       "PieChart3D"))
       ))
+
+   (test-case
+    "test-read"
+
+    (let ([data
+           (list
+            (list "month/brand" "201601" "201602" "201603" "201604" "201605")
+            (list "CAT"   100 300 200 0.6934 43360)
+            (list "Puma"  200 400 300 139999.89223 43361)
+            (list "Asics" 300 500 400 23.34 43362)
+            )])
+
+      (with-input-from-xlsx-file
+       test1_file
+       (lambda ()
+         (load-sheet 
+          "DataSheet"
+          (lambda ()
+            (check-equal? (get-cell-value "A1") "month/brand")
+            (check-equal? (get-cell-value "b2") 100)
+            (check-equal? (get-cell-value "e3") 139999.89223)
+
+            (check-equal? (get-row 0) (list "month/brand" "201601" "201602" "201603" "201604" "201605"))
+            (check-equal? (get-row 3) (list "Asics" 300 500 400 23.34 43362))
+
+            (check-equal? (sheet-name-rows test1_file "DataSheet") data)
+
+            (check-equal? (sheet-ref-rows test1_file 0) data)))))))
     
     )))
 

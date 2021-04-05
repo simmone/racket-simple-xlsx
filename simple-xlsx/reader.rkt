@@ -7,6 +7,7 @@
           [xlsx-sheet-names (-> list?)]
           [load-sheet (->* (string?) (procedure?) void?)]
           [load-sheet-ref (->* (natural?) (procedure?) void?)]
+          [load-sheets (-> void?)]
           [sheet-dimension (-> (cons/c natural? natural?))]
           [get-rows (-> (listof list?))]
           [get-row (-> natural? list?)]
@@ -57,26 +58,36 @@
           result_list))
         (reverse result_list))))
 
+(define (load-sheets)
+  (let loop ([sheet_index 0])
+    (when (< sheet_index (XLSX-sheet_count (*CURRENT_XLSX*)))
+          (load-sheet-ref sheet_index)
+          (loop (add1 sheet_index)))))
+
 (define (load-sheet sheet_name [user_procedure #f])
   (let ([sheet_index (hash-ref (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name 0)])
     (load-sheet-ref sheet_index user_procedure)))
 
 (define (load-sheet-ref sheet_index [user_procedure #f])
-  (let ([sheet 
-         (if (regexp-match #rx"worksheets" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index))
-             (load-data-sheet-file
-              (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index)))
-             (load-chart-sheet-file
-              (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index))))])
+  (let ([_sheet #f])
+    (if (< sheet_index (length (XLSX-sheet_list (*CURRENT_XLSX*))))
+        (set! _sheet (list-ref (XLSX-sheet_list (*CURRENT_XLSX*)) sheet_index))
+        (begin
+          (set! _sheet
+                (if (regexp-match #rx"worksheets" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index))
+                    (load-data-sheet-file
+                     (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index)))
+                    (load-chart-sheet-file
+                     (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" (hash-ref (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index)))))
 
-  (set-XLSX-sheet_list!
-   (*CURRENT_XLSX*)
-   `(,@(XLSX-sheet_list (*CURRENT_XLSX*))
-     ,sheet))
+          (set-XLSX-sheet_list!
+           (*CURRENT_XLSX*)
+           `(,@(XLSX-sheet_list (*CURRENT_XLSX*))
+             ,_sheet))))
 
   (when user_procedure
         (parameterize
-         ([*CURRENT_SHEET* sheet])
+         ([*CURRENT_SHEET* _sheet])
          (user_procedure)))))
 
 (define (get-cell-value item_name)
@@ -142,4 +153,3 @@
       sheet_index
       (lambda ()
         (get-rows))))))
-
