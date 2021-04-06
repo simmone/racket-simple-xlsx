@@ -9,8 +9,8 @@
 (require rackunit "../../../writer/content-type/content-type.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path test1_file "content-type-test1.dat")
-(define-runtime-path test2_file "content-type-test2.dat")
+(define-runtime-path test1_file "content-type-test1.xml")
+(define-runtime-path test2_file "content-type-test2.xml")
 
 (define test-content-type
   (test-suite
@@ -19,10 +19,10 @@
    (test-case
     "test-content-type"
     
-    (let ([xlsx (new xlsx%)])
-      (send xlsx add-data-sheet #:sheet_name "Sheet1" #:sheet_data '((1)))
-      (send xlsx add-data-sheet #:sheet_name "Sheet2" #:sheet_data '((1)))
-      (send xlsx add-data-sheet #:sheet_name "Sheet3" #:sheet_data '((1)))
+    (let ([xlsx (new-xlsx)])
+      (add-data-sheet "Sheet1" '((1)))
+      (add-data-sheet "Sheet2" '((1)))
+      (add-data-sheet "Sheet3" '((1)))
       (send xlsx add-chart-sheet #:sheet_name "Chart1" #:topic "Chart1" #:x_topic "")
       (send xlsx add-chart-sheet #:sheet_name "Chart2" #:topic "Chart2" #:x_topic "")
       (send xlsx add-chart-sheet #:sheet_name "Chart3" #:topic "Chart3" #:x_topic "")
@@ -34,7 +34,7 @@
            (lambda (actual)
              (check-lines? expected actual))))))
 
-    (let ([xlsx (new xlsx%)])
+    (let ([xlsx (new-xlsx)])
       (send xlsx add-data-sheet #:sheet_name "Sheet1" #:sheet_data '(("1")))
       (send xlsx add-data-sheet #:sheet_name "Sheet2" #:sheet_data '((1)))
       (send xlsx add-data-sheet #:sheet_name "Sheet3" #:sheet_data '((1)))
