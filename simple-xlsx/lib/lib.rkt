@@ -16,7 +16,25 @@
           [prefix-each-line (-> string? string? string?)]
           [date->oa_date_number (->* (date?) (boolean?) number?)]
           [oa_date_number->date (->* (number?) (boolean?) date?)]
+          [check-data-integrity (-> (listof list?) void?)]
           ))
+
+(define (check-data-integrity data_list)
+  (when (equal? data_list '())
+        (error "data list is empty"))
+  
+  (let loop ([loop_list data_list]
+             [child_length -1])
+    (when (not (null? loop_list))
+          (when (not (list? (car loop_list)))
+                (error "data's children is not list type"))
+          
+          (when (and
+                 (not (= child_length -1))
+                 (not (= child_length (length (car loop_list)))))
+                (error "data's children's length is not consistent."))
+          
+          (loop (cdr loop_list) (length (car loop_list))))))
 
 (define-check (check-lines? expected_port test_port)
   (let* ([expected_lines (port->lines expected_port)]

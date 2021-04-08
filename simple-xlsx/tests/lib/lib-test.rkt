@@ -10,6 +10,16 @@
    "test-lib"
 
    (test-case
+    "test-check-data-integrity"
+    
+    (check-exn exn:fail? (lambda () (check-data-integrity '())))
+    (check-exn exn:fail? (lambda () (check-data-integrity '((1) 4))))
+    (check-exn exn:fail? (lambda () (check-data-integrity '((1) (1 2)))))
+    
+    (check-not-exn (lambda () (check-data-integrity '((1 2) (3 4)))))
+    )
+
+   (test-case
     "test-check-lines1"
     (call-with-input-string 
      "abc"
@@ -39,13 +49,6 @@
         (lambda (test_port)
           (check-lines? expected_port test_port))))))
 
-
-   (test-case 
-    "test-number->list"
-    (check-equal? (number->list 1) '(1))
-    (check-equal? (number->list 2) '(1 2))
-    (check-equal? (number->list 5) '(1 2 3 4 5)))
-   
    (test-case
     "test-format-hour"
     (check-equal? (format-time 0.5560763888888889) "13:20:45")

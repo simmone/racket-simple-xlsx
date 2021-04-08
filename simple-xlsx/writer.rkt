@@ -2,6 +2,7 @@
 
 (provide (contract-out
           [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
+          [add-data-sheet! (-> XLSX? string? (listof list?) void?)]
           ))
 
 (require racket/date)
@@ -89,3 +90,44 @@
           (zip-xlsx xlsx_file_name tmp_dir))
         (lambda ()
           (delete-directory/files tmp_dir)))))
+
+(define (add-data-sheet! xlsx sheet_name sheet_data)
+  (check-data-integrity sheet_data)
+
+  (if (not (hash-has-key? (XLSX-sheet_name_index_map xlsx) sheet_name))
+      (let* ([seq (add1 (length (XLSX-sheet_list xlsx)))]
+             [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) (XLSX-sheet_list xlsx))))]
+             [transformed_sheet_data 
+              (let row-loop ([rows sheet_data]
+                             [row_list '()])
+                (if (not (null? rows))
+                    (row-loop
+                     (cdr loop_list)
+                     (cons
+                      (let col-loop ([cols (car rows)]
+                                     [col_result '()])
+                        (if (not (null? cols))
+                            (col-loop
+                             (cdr cols)
+                             (cons
+                              (cond
+                               [(string? (car cols))
+                                (hash-set! shared_string_map (car inner_loop_list) "")
+                                               (car inner_loop_list)]
+                                              [(date? (car inner_loop_list))
+                                               (date->oa_date_number (car inner_loop_list))]
+                                              [else
+                                               (car inner_loop_list)])
+                                             inner_result))
+                                           (reverse inner_result)))
+                                     result))
+                                   (reverse result)))])
+
+                       (set! sheets `(,@sheets
+                                      ,(DATA-SHEET
+                                        sheet_name
+                                        transformed_sheet_data
+                                        (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
+                       (hash-set! sheet_name_map sheet_name (sub1 seq)))
+                     (error (format "duplicate sheet name[~a]" sheet_name)))))
+
