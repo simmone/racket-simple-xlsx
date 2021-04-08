@@ -99,7 +99,7 @@
              [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) (XLSX-sheet_list xlsx))))]
              [transformed_sheet_data 
               (let row-loop ([rows sheet_data]
-                             [row_list '()])
+                             [row_result '()])
                 (if (not (null? rows))
                     (row-loop
                      (cdr loop_list)
@@ -112,22 +112,22 @@
                              (cons
                               (cond
                                [(string? (car cols))
-                                (hash-set! shared_string_map (car inner_loop_list) "")
-                                               (car inner_loop_list)]
-                                              [(date? (car inner_loop_list))
-                                               (date->oa_date_number (car inner_loop_list))]
-                                              [else
-                                               (car inner_loop_list)])
-                                             inner_result))
-                                           (reverse inner_result)))
-                                     result))
-                                   (reverse result)))])
+                                (hash-set! (XLSX-shared_strings_map xlsx) (car cols) 0)
+                                (car cols)]
+                               [(date? (car cols))
+                                (date->oa_date_number (car cols))]
+                               [else
+                                (car cols)])
+                              col_result))
+                            (reverse col_result)))
+                      row_result))
+                    (reverse row_result)))])
 
-                       (set! sheets `(,@sheets
-                                      ,(DATA-SHEET
-                                        sheet_name
-                                        transformed_sheet_data
-                                        (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
-                       (hash-set! sheet_name_map sheet_name (sub1 seq)))
-                     (error (format "duplicate sheet name[~a]" sheet_name)))))
+        (set! sheets `(,@sheets
+                       ,(DATA-SHEET
+                         sheet_name
+                         transformed_sheet_data
+                         (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
+        (hash-set! sheet_name_map sheet_name (sub1 seq)))
+      (error (format "duplicate sheet name[~a]" sheet_name))))
 
