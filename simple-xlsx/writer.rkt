@@ -97,6 +97,7 @@
   (if (not (hash-has-key? (XLSX-sheet_name_index_map xlsx) sheet_name))
       (let* ([seq (add1 (length (XLSX-sheet_list xlsx)))]
              [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) (XLSX-sheet_list xlsx))))]
+             [shared_string_index (hash-cont (XLSX-shared_strings_map xlsx))]
              [transformed_sheet_data 
               (let row-loop ([rows sheet_data]
                              [row_result '()])
@@ -112,7 +113,7 @@
                              (cons
                               (cond
                                [(string? (car cols))
-                                (hash-set! (XLSX-shared_strings_map xlsx) (car cols) 0)
+                                (set! shared_string_index (add-shared-strings-map (XLSX-shared_strings_map xlsx) (car cols) shared_string_index))
                                 (car cols)]
                                [(date? (car cols))
                                 (date->oa_date_number (car cols))]

@@ -8,6 +8,21 @@
 (define test-lib
   (test-suite
    "test-lib"
+   
+   (test-case
+    "test-add-shared-strings-map"
+    
+    (let* ([shared_strings_map (make-hash)]
+           [index (hash-count shared_strings_map)])
+      (set! index (add-shared-strings-map shared_strings_map "a" index))
+      (set! index (add-shared-strings-map shared_strings_map "b" index))
+      (set! index (add-shared-strings-map shared_strings_map "a" index))
+      (set! index (add-shared-strings-map shared_strings_map "c" index))
+      
+      (check-equal? (hash-count shared_strings_map) 3)
+      (check-equal? (hash-ref shared_strings_map "a") 0)
+      (check-equal? (hash-ref shared_strings_map "b") 1)
+      (check-equal? (hash-ref shared_strings_map "c") 2)))
 
    (test-case
     "test-check-data-integrity"

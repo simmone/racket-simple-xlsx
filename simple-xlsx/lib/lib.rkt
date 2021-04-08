@@ -17,7 +17,15 @@
           [date->oa_date_number (->* (date?) (boolean?) number?)]
           [oa_date_number->date (->* (number?) (boolean?) date?)]
           [check-data-integrity (-> (listof list?) void?)]
+          [add-shared-strings-map (-> (hash/c string? natural?) string? natural? natural?)]
           ))
+
+(define (add-shared-strings-map shared_map key index)
+  (if (hash-has-key? shared_map key)
+      index
+      (begin
+        (hash-set! shared_map key index)
+        (add1 index))))
 
 (define (check-data-integrity data_list)
   (when (equal? data_list '())
