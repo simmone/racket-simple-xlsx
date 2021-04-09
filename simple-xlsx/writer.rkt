@@ -114,7 +114,7 @@
                               (cond
                                [(string? (car cols))
                                 (set! shared_string_index (add-shared-strings-map (XLSX-shared_strings_map xlsx) (car cols) shared_string_index))
-                                (car cols)]
+                                shared_string_index]
                                [(date? (car cols))
                                 (date->oa_date_number (car cols))]
                                [else
@@ -123,12 +123,25 @@
                             (reverse col_result)))
                       row_result))
                     (reverse row_result)))])
+        
+        (set-XLSX-sheet_count! xlsx (add1 (XLSX-sheet_count xlsx)))
 
-        (set! sheets `(,@sheets
-                       ,(DATA-SHEET
-                         sheet_name
-                         transformed_sheet_data
-                         (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
+        (set-XLSX-sheet_list! xlsx
+                              `(,@(XLSX-sheet_list xlsx)
+                                ,(new-data-sheet 
+                                  transformed_sheet_data
+                                  (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
         (hash-set! sheet_name_map sheet_name (sub1 seq)))
       (error (format "duplicate sheet name[~a]" sheet_name))))
+
+                   (sheet_count natural?)
+                   (sheet_index_id_map (hash/c natural? string?))
+                   (sheet_index_name_map (hash/c natural? string?))
+                   (sheet_name_index_map (hash/c string? natural?))
+                   (sheet_index_rid_map (hash/c natural? string?))
+                   (sheet_rid_rel_map (hash/c string? string?))
+                   (sheet_index_rel_map (hash/c natural? string?))
+                   (shared_strings_map (hash/c natural? string?))
+                   (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
+
 

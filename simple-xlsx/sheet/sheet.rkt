@@ -15,6 +15,10 @@
                    (col_to_origin_style_hash hash?)
                    (col_to_style_index_hash hash?)
                    )]
+          [new-data-sheet (->
+                           (cons/c natural? natural?)
+                           (hash/c string? (list/c (or/c string? #f) (or/c string? #f) (or/c string? #f) (or/c string? #f)))
+                           DATA-SHEET?)]
           [struct CHART-SHEET
                   (
                    (chart_type symbol?)
@@ -51,6 +55,12 @@
                     [col_to_origin_style_hash #:mutable]
                     [col_to_style_index_hash #:mutable]
                     ))
+
+(define (new-data-sheet dimension rvtsf_map)
+  (DATA-SHEET
+   dimension
+   rvtsf_map
+   (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)))
 
 (struct COL-ATTR ([width #:mutable] [back_color #:mutable]))
 
