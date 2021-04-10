@@ -4,6 +4,8 @@
 (require rackunit)
 (require file/zip)
 
+(require "dimension.rkt")
+
 (provide (contract-out
           [format-date (-> date? string?)]
           [format-complete-time (-> date? string?)]

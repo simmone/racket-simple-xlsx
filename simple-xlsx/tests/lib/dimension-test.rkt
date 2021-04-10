@@ -2,17 +2,30 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "../../lib/dimension-lib.rkt")
+(require rackunit "../../lib/dimension.rkt")
 
 (define test-dimension-lib
   (test-suite
    "test-dimension-lib"
    
    (test-case
+    "test-get-dimension"
+    
+    (check-equal? (get-dimension '((1 2) (3 4))) '(2 . 2))
+    (check-equal? (get-dimension '((1 2 3) (3 4 6))) '(2 . 3)))
+   
+   (test-case
     "test-dimension->pair"
     
     (check-equal? (dimension->pair "A1:F4") '(4 . 6))
     )
+   
+   (test-case
+    "test-row_col->dimension"
+    
+    (check-equal? (row_col->dimension 1 1) "A1")
+    (check-equal? (row_col->dimension 2 1) "A2")
+    (check-equal? (row_col->dimension 2 5) "E2"))
 
    (test-case 
     "test-AZ-NUMBER"
@@ -61,12 +74,6 @@
     (check-equal? (abc->range "sdksjdkf-%^%$#") '(1 . 1))
     )
 
-   (test-case
-    "test-get-dimension"
-    (check-equal? (get-dimension '(("1" "2") ("1") () ("1" "2" "3" "4"))) "D4")
-    (check-equal? (get-dimension '(("1" "2" "3" "4") ("3" "4" "5" "6"))) "D2")
-    )
-   
    (test-case
     "test-convert-range"
     

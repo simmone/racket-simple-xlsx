@@ -1,13 +1,12 @@
 #lang racket
 
-(require "../lib/lib.rkt")
-
 (provide (contract-out
           [dimension->pair (-> string? (cons/c natural? natural?))]
+          [get-dimension (-> (listof list?) (cons/c natural? natural?))]
+          [row_col->dimension (-> natural? natural? string?)]
           [col_abc->number (-> string? natural?)]
           [col_number->abc (-> natural? string?)]
           [abc->range (-> string? pair?)]
-          [get-dimension (-> list? string?)]
           [check-cell-range (-> string? (or/c #f string?))]
           [check-col-range (-> string? string?)]
           [check-row-range (-> string? string?)]
@@ -23,7 +22,14 @@
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
           [expand-col-style-to-cell (-> hash? hash? void?)]
+
           ))
+
+(define (row_col->dimension row col)
+  (format "~a~a" (col_number->abc col) row))
+
+(define (get-dimension data_list)
+  (cons (length data_list) (length (car data_list))))
 
 (define (dimension->pair dimension)
   (let ([parts (regexp-match #rx"([A-Za-z]+)([1-9]+):([A-Za-z]+)([1-9]+)" dimension)])
@@ -90,17 +96,6 @@
     (cons (col_abc->number abc_range) (col_abc->number abc_range))]
    [else
     (cons 1 1)]))
-
-(define (get-dimension data_list)
-  (let ([rows (length data_list)]
-        [cols 0])
-    (let loop ([loop_list data_list])
-      (when (not (null? loop_list))
-            (when (> (length (car loop_list)) cols)
-                  (set! cols (length (car loop_list))))
-            (loop (cdr loop_list))))
-
-    (string-append (col_number->abc cols) (number->string rows))))
 
 (define (check-cell-range cell_range_str)
   (cond

@@ -45,13 +45,13 @@
           ;; docProps
           (write-docprops-app-file (build-path tmp_dir "docProps") xlsx)
           (write-docprops-core-file (build-path tmp_dir "docProps") (current-date))
-                
+
           ;; xl
           (write-workbook-xml-rels-file (build-path tmp_dir "xl" "_rels") xlsx)
 
           ;; printerSettings
           (create-printer-settings (build-path tmp_dir "xl" "printerSettings") xlsx)
-                  
+
           ;; theme
           (write-theme-file (build-path tmp_dir "xl" "theme"))
 
@@ -60,10 +60,10 @@
 
           ;; styles
           (send xlsx burn-styles!)
-          (write-styles-file 
-           (build-path tmp_dir "xl") 
-           (send xlsx get-style-list) 
-           (send xlsx get-fill-list) 
+          (write-styles-file
+           (build-path tmp_dir "xl")
+           (send xlsx get-style-list)
+           (send xlsx get-fill-list)
            (send xlsx get-font-list)
            (send xlsx get-numFmt-list)
            (send xlsx get-border-list)
@@ -95,42 +95,59 @@
   (check-data-integrity sheet_data)
 
   (if (not (hash-has-key? (XLSX-sheet_name_index_map xlsx) sheet_name))
-      (let* ([seq (add1 (length (XLSX-sheet_list xlsx)))]
-             [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) (XLSX-sheet_list xlsx))))]
-             [shared_string_index (hash-cont (XLSX-shared_strings_map xlsx))]
-             [transformed_sheet_data 
-              (let row-loop ([rows sheet_data]
-                             [row_result '()])
-                (if (not (null? rows))
-                    (row-loop
-                     (cdr loop_list)
-                     (cons
-                      (let col-loop ([cols (car rows)]
-                                     [col_result '()])
-                        (if (not (null? cols))
-                            (col-loop
-                             (cdr cols)
-                             (cons
-                              (cond
-                               [(string? (car cols))
-                                (set! shared_string_index (add-shared-strings-map (XLSX-shared_strings_map xlsx) (car cols) shared_string_index))
-                                shared_string_index]
-                               [(date? (car cols))
-                                (date->oa_date_number (car cols))]
-                               [else
-                                (car cols)])
-                              col_result))
-                            (reverse col_result)))
-                      row_result))
-                    (reverse row_result)))])
-        
+      (let ([seq (add1 (length (XLSX-sheet_list xlsx)))]
+            [type_seq (add1 (length (filter (lambda (rec) (DATA-SHEET? rec)) (XLSX-sheet_list xlsx))))]
+            [shared_string_index (hash-cont (XLSX-shared_strings_map xlsx))]
+            [rvtsf_map (make-hash)])
+        (let row-loop ([rows sheet_data]
+                       [row_index 1])
+          (when (not (null? rows))
+                (let col-loop ([cols (car rows)]
+                               [col_index 1])
+                  (when (not (null? cols))
+                        (cond
+                         [(string? (car cols))
+                          (set! shared_string_index (add-shared-strings-map (XLSX-shared_strings_map xlsx) (car cols) shared_string_index))
+                          (hash-set! rvtsf_map
+                                     (row_col->dimension row_index col_index) ;; r
+                                     (list
+                                      shared_string_index ;; v t s f
+                                      "s"
+                                      #f
+                                      #f))
+                          shared_string_index]
+                         [(date? (car cols))
+                          (let ([date_v (date->oa_date_number (car cols))])
+                            (hash-set! rvtsf_map
+                                       (row_col->dimension row_index col_index) ;; r
+                                       (list
+                                        date_v ;; v t s f
+                                        "n"
+                                        #f
+                                        #f))
+                            date_v)]
+                         [(number? (car cols))
+                          (hash-set! rvtsf_map
+                                     (row_col->dimension row_index col_index) ;; r
+                                     (list
+                                      (car cols) ;; v t s f
+                                      "n"
+                                      #f
+                                      #f))
+                          (car cols)])
+
+                      (col-loop (cdr cols) (add1 col_index))))
+
+                (row-loop (cdr rows) (add1 row_index))))
+
         (set-XLSX-sheet_count! xlsx (add1 (XLSX-sheet_count xlsx)))
 
         (set-XLSX-sheet_list! xlsx
                               `(,@(XLSX-sheet_list xlsx)
-                                ,(new-data-sheet 
-                                  transformed_sheet_data
-                                  (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash))))
+                                ,(new-data-sheet
+                                  (cons (length transformed_sheet_data) (length (car transformed_sheet_data)))
+                                  rvtsf_map)))
+
         (hash-set! sheet_name_map sheet_name (sub1 seq)))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 

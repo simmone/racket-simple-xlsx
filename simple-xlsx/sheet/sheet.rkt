@@ -17,7 +17,7 @@
                    )]
           [new-data-sheet (->
                            (cons/c natural? natural?)
-                           (hash/c string? (list/c (or/c string? #f) (or/c string? #f) (or/c string? #f) (or/c string? #f)))
+                           (listof list?)
                            DATA-SHEET?)]
           [struct CHART-SHEET
                   (
