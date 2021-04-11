@@ -4,7 +4,7 @@
 (require racket/date)
 
 (require rackunit "../../xlsx/xlsx.rkt")
-(require rackunit "../../xlsx/sheet.rkt")
+(require rackunit "../../sheet/sheet.rkt")
 
 (define test-xlsx
   (test-suite

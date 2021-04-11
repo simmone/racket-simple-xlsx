@@ -7,13 +7,12 @@
 
 (require "../../xlsx/xlsx.rkt")
 (require "../../sheet/sheet.rkt")
-
 (require "../../lib/lib.rkt")
 
 (provide (contract-out
-          [write-content-type (-> (is-a?/c xlsx%) string?)]
-          [xlsx->content-type (-> (is-a?/c xlsx%) string?)]
-          [write-content-type-file (-> path-string? (is-a?/c xlsx%) void?)]
+          [write-content-type (-> string?)]
+          [xlsx->content-type (-> string?)]
+          [write-content-type-file (-> path-string? void?)]
           ))
 
 (define S string-append)
@@ -34,27 +33,27 @@
   <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
 })
 
-(define (xlsx->content-type xlsx)
-  (let ([sheet_list (get-field sheets xlsx)])
+(define (xlsx->content-type)
+  (let ([sheet_list (XLSX-sheet_list (*CURRENT_XLSX*))])
     (with-output-to-string 
       (lambda ()
         (let loop ([loop_list sheet_list]
                    [count 1])
           (when (not (null? loop_list))
                 (let ([sheet (car loop_list)])
-                  (if (eq? (sheet-type sheet) 'data)
+                  (if (DATA-SHEET? sheet)
                       (begin
                         (printf "<Override PartName=\"/xl/worksheets/sheet~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>\n" count)
                         (loop (cdr loop_list) (add1 count)))
                       (loop (cdr loop_list) count)))))
 
         (printf "\n")
-        
+
         (let loop ([loop_list sheet_list]
                    [count 1])
           (when (not (null? loop_list))
                 (let ([sheet (car loop_list)])
-                  (if (eq? (sheet-type sheet) 'chart)
+                  (if (CHART-SHEET? sheet)
                       (begin
                         (printf "<Override PartName=\"/xl/charts/chart~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawingml.chart+xml\"/>\n" count)
                         (printf "<Override PartName=\"/xl/drawings/drawing~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawing+xml\"/>\n" count)
@@ -63,30 +62,29 @@
                               (printf "\n"))
 
                         (loop (cdr loop_list) (add1 count)))
-                      (loop (cdr loop_list) count)))))
-        ))))
+                      (loop (cdr loop_list) count)))))))))
 
-(define (xlsx->shared-string xlsx)
+(define (xlsx->shared-string)
   (with-output-to-string
     (lambda ()
-      (when (> (hash-count (get-field string_item_map xlsx)) 0)
+      (when (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
             (printf "<Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\"/>")))))
 
 (define (write-footer) @S{
 </Types>
 })
 
-(define (write-content-type xlsx) @S{
+(define (write-content-type) @S{
 @|(write-header)|
 
-@|(prefix-each-line (xlsx->content-type xlsx) "  ")|
-@|(prefix-each-line (xlsx->shared-string xlsx) "  ")|
+@|(prefix-each-line (xlsx->content-type) "  ")|
+@|(prefix-each-line (xlsx->shared-string) "  ")|
 
 @|(write-footer)|
 })
 
-(define (write-content-type-file dir xlsx)
+(define (write-content-type-file dir)
   (with-output-to-file (build-path dir "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-content-type xlsx)))))
+      (printf "~a" (write-content-type)))))
