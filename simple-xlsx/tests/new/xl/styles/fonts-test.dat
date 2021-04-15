@@ -1,0 +1,35 @@
+<fonts count="4">
+  <font>
+    <sz val="11"/>
+    <color theme="1"/>
+    <name val="宋体"/>
+    <family val="2"/>
+    <charset val="134"/>
+    <scheme val="minor"/>
+  </font>
+
+  <font>
+    <sz val="20"/>
+    <color theme="1"/>
+    <name val="宋体"/>
+    <family val="2"/>
+    <charset val="134"/>
+    <scheme val="minor"/>
+  </font>
+
+  <font>
+    <sz val="30"/>
+    <color rgb="FF0000"/>
+    <name val="Impact"/>
+    <family val="2"/>
+  </font>
+
+  <font>
+    <sz val="40"/>
+    <color rgb="0000FF"/>
+    <name val="宋体"/>
+    <family val="2"/>
+    <charset val="134"/>
+    <scheme val="minor"/>
+  </font>
+</fonts>
