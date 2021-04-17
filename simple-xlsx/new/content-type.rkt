@@ -5,9 +5,9 @@
 (require racket/list)
 (require racket/contract)
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "../../lib/lib.rkt")
+(require "../xlsx/xlsx.rkt")
+(require "../sheet/sheet.rkt")
+(require "../lib/lib.rkt")
 
 (provide (contract-out
           [write-content-type (-> string?)]
@@ -84,7 +84,7 @@
 @|(write-footer)|
 })
 
-(define (write-content-type-file dir)
+(define (write-content-type-file)
   (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")
     #:exists 'replace
     (lambda ()

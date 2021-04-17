@@ -28,7 +28,7 @@
 (require "reader/load-sheet.rkt")
 
 (require "new/content-type.rkt")
-(require "new/rels/rels.rkt")
+(require "new/rels.rkt")
 
 (define (with-input-from-xlsx-file xlsx_file user_proc)
   (call-with-unzip

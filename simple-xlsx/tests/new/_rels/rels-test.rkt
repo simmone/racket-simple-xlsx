@@ -2,7 +2,7 @@
 
 (require rackunit/text-ui)
 
-(require rackunit "../../../writer/_rels/rels.rkt")
+(require rackunit "../../../new/rels.rkt")
 
 (define test-rels
   (test-suite

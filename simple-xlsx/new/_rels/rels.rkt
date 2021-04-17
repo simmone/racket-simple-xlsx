@@ -9,7 +9,8 @@
 
 (provide (contract-out
           [write-rels (-> string?)]
-          [write-rels-file (-> path-string? void?)]
+          [write-rels-file (-> void?)]
+          [read-rels (-> void?)]
           ))
 
 (define S string-append)
@@ -20,10 +21,13 @@
 })
 
 (define (write-rels-file)
-  (let ([rels_dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) ".rels")])
+  (let ([rels_dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)))])
     (make-directory* rels_dir)
 
-    (with-output-to-file resl_dir
+    (with-output-to-file (build-path rels_dir ".rels")
       #:exists 'replace
       (lambda ()
         (printf "~a" (write-rels))))))
+
+(define (read-rels)
+  (void))

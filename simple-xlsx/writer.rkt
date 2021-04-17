@@ -12,7 +12,9 @@
 (require "lib/lib.rkt")
 (require "lib/dimension.rkt")
 (require "new/content-type.rkt")
-(require "new/rels/rels.rkt")
+(require "new/_rels/rels.rkt")
+(require "new/docProps/docprops-app.rkt")
+(require "new/docProps/docprops-core.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -27,9 +29,13 @@
         ;; _rels
         (write-rels-file)
 
-        (zip-xlsx xlsx_file_name tmp_dir))
+        ;; docProps
+        (write-docprops-app-file)
+        (write-docprops-core-file (current-date))
+
+        (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
-        (delete-directory/files tmp_dir))))
+        (delete-directory/files (XLSX-xlsx_dir (*CURRENT_XLSX*))))))
 
 (define (add-data-sheet sheet_name sheet_data)
   (check-data-integrity sheet_data)
