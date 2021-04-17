@@ -8,7 +8,7 @@
 
 (require "../../../writer.rkt")
 
-(require rackunit "../../../new/content-type/content-type.rkt")
+(require rackunit "../../../new/content-type.rkt")
 
 (require racket/runtime-path)
 (define-runtime-path test1_file "content-type-test1.xml")

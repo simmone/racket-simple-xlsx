@@ -11,22 +11,25 @@
 (require "sheet/sheet.rkt")
 (require "lib/lib.rkt")
 (require "lib/dimension.rkt")
-(require "new/content-type/content-type.rkt")
+(require "new/content-type.rkt")
+(require "new/rels/rels.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
         (delete-file xlsx_file_name))
 
-  (let ([tmp_dir #f])
-    (dynamic-wind
-        (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
-        (lambda ()
-          ;; [Content_Types].xml
-          (write-content-type-file tmp_dir (*CURRENT_XLSX*))
+  (dynamic-wind
+      (lambda () (set-XLSX-xlsx_dir! (*CURRENT_XLSX*) (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
+      (lambda ()
+        ;; [Content_Types].xml
+        (write-content-type-file)
 
-          (zip-xlsx xlsx_file_name tmp_dir))
-        (lambda ()
-          (delete-directory/files tmp_dir)))))
+        ;; _rels
+        (write-rels-file)
+
+        (zip-xlsx xlsx_file_name tmp_dir))
+      (lambda ()
+        (delete-directory/files tmp_dir))))
 
 (define (add-data-sheet sheet_name sheet_data)
   (check-data-integrity sheet_data)

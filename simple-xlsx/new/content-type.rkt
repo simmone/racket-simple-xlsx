@@ -12,7 +12,8 @@
 (provide (contract-out
           [write-content-type (-> string?)]
           [xlsx->content-type (-> string?)]
-          [write-content-type-file (-> path-string? void?)]
+          [write-content-type-file (-> void?)]
+          [read-content-type (-> void?)]
           ))
 
 (define S string-append)
@@ -84,7 +85,10 @@
 })
 
 (define (write-content-type-file dir)
-  (with-output-to-file (build-path dir "[Content_Types].xml")
+  (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
       (printf "~a" (write-content-type)))))
+
+(define (read-content-type)
+  (void))

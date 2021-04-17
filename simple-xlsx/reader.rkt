@@ -27,12 +27,19 @@
 (require "reader/load-workbook-rels.rkt")
 (require "reader/load-sheet.rkt")
 
+(require "new/content-type.rkt")
+(require "new/rels/rels.rkt")
+
 (define (with-input-from-xlsx-file xlsx_file user_proc)
   (call-with-unzip
    xlsx_file
    (lambda (xlsx_dir)
-     (let ([_xlsx (new-xlsx)])
-       (set-XLSX-xlsx_dir! _xlsx xlsx_dir)
+     (parameterize ([*CURRENT_XLSX* (new-xlsx)])
+       (set-XLSX-xlsx_dir! (*CURRENT_XLSX*) xlsx_dir)
+       
+       (read-content-type)
+
+       (read-rels)
 
        (load-workbook (build-path xlsx_dir "xl" "workbook.xml") _xlsx)
 
