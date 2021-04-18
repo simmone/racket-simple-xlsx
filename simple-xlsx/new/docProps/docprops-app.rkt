@@ -12,6 +12,7 @@
 (provide (contract-out
           [write-docprops-app (-> string?)]
           [write-docprops-app-file (-> void?)]
+          [read-docpros-app (-> void?)]
           ))
 
 (define S string-append)
@@ -49,3 +50,5 @@
       (lambda ()
         (printf "~a" (write-docprops-app (get-field sheets xlsx)))))))
 
+(define (read-docpros-app)
+  (void))
