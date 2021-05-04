@@ -1,94 +1,96 @@
-#lang at-exp racket/base
+#lang racket
 
-(require racket/port)
-(require racket/class)
-(require racket/list)
-(require racket/contract)
+(require simple-xml)
 
 (require "../xlsx/xlsx.rkt")
 (require "../sheet/sheet.rkt")
 (require "../lib/lib.rkt")
 
 (provide (contract-out
-          [write-content-type (-> string?)]
-          [xlsx->content-type (-> string?)]
+          [content-type (-> list?)]
           [write-content-type-file (-> void?)]
           [read-content-type (-> void?)]
           ))
 
-(define S string-append)
-
-(define (write-header) @S{
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-
-  <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings"/>
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-
-  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-  <Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
-  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-})
+(define (header)
+  '("Types"
+    ("xmlns" . "http://schemas.openxmlformats.org/package/2006/content-types")
+    ("Default" ("Extension" . "bin") ("ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings"))
+    ("Default" ("Extension" . "rels") ("ContentType" . "application/vnd.openxmlformats-package.relationships+xml"))
+    ("Default" ("Extension" . "xml") ("ContentType" . "application/xml"))
+    ("Override" ("PartName" . "/xl/workbook.xml") ("ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"))
+    ("Override" ("PartName" . "/xl/theme/theme1.xml") ("ContentType" . "application/vnd.openxmlformats-officedocument.theme+xml"))
+    ("Override" ("PartName" . "/xl/styles.xml") ("ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"))
+    ("Override" ("PartName" . "/docProps/core.xml") ("ContentType" . "application/vnd.openxmlformats-package.core-properties+xml"))
+    ("Override" ("PartName" . "/docProps/app.xml") ("ContentType" . "application/vnd.openxmlformats-officedocument.extended-properties+xml"))))
 
 (define (xlsx->content-type)
-  (let ([sheet_list (XLSX-sheet_list (*CURRENT_XLSX*))])
-    (with-output-to-string 
-      (lambda ()
-        (let loop ([loop_list sheet_list]
-                   [count 1])
-          (when (not (null? loop_list))
-                (let ([sheet (car loop_list)])
-                  (if (DATA-SHEET? sheet)
-                      (begin
-                        (printf "<Override PartName=\"/xl/worksheets/sheet~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>\n" count)
-                        (loop (cdr loop_list) (add1 count)))
-                      (loop (cdr loop_list) count)))))
+  (let loop ([loop_list (XLSX-sheet_list (*CURRENT_XLSX*))]
+             [data_sheet_count 1]
+             [chart_sheet_count 1]
+             [xml_list '()])
+    (if (not (null? loop_list))
+        (let ([sheet (car loop_list)])
+          (cond
+           [(DATA-SHEET? sheet)
+            (loop
+             (cdr loop_list)
+             (add1 data_sheet_count)
+             chart_sheet_count
+             (cons 
+              (list "Override"
+                    (cons
+                     "PartName"
+                     (format "/xl/worksheets/sheet~a.xml" data_sheet_count))
+                    (cons "ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"))
+              xml_list))]
+           [(CHART-SHEET? sheet)
+            (loop
+             (cdr loop_list)
+             data_sheet_count
+             (add1 chart_sheet_count)
+             `(
+               ,(list "Override"
+                      (cons
+                       "PartName"
+                       (format "/xl/charts/chart~a.xml" chart_sheet_count))
+                      (cons "ContentType" . "application/vnd.openxmlformats-officedocument.drawingml.chart+xml"))
 
-        (printf "\n")
+               ,(list "Override"
+                      (cons
+                       "PartName"
+                       (format "/xl/drawings/drawing~a.xml" chart_sheet_count)
+                       (cons "ContentType" . "application/vnd.openxmlformats-officedocument.drawing+xml")))
 
-        (let loop ([loop_list sheet_list]
-                   [count 1])
-          (when (not (null? loop_list))
-                (let ([sheet (car loop_list)])
-                  (if (CHART-SHEET? sheet)
-                      (begin
-                        (printf "<Override PartName=\"/xl/charts/chart~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawingml.chart+xml\"/>\n" count)
-                        (printf "<Override PartName=\"/xl/drawings/drawing~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawing+xml\"/>\n" count)
-                        (printf "<Override PartName=\"/xl/chartsheets/sheet~a.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml\"/>\n" count)
-                        (when (not (null? (cdr loop_list)))
-                              (printf "\n"))
-
-                        (loop (cdr loop_list) (add1 count)))
-                      (loop (cdr loop_list) count)))))))))
+               ,(list "Override"
+                      (cons
+                       "PartName"
+                       (format "/xl/chartsheets/sheet~a.xml" chart_sheet_count)
+                       (cons "ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml")))
+               
+               ,@xml_list))]
+           [else
+            (loop (cdr loop_list) data_sheet_count chart_sheet_count xml_list)]))
+        (reverse xml_list))))
 
 (define (xlsx->shared-string)
-  (with-output-to-string
-    (lambda ()
-      (when (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
-            (printf "<Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\"/>")))))
+  (if (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
+      '("Override"
+        ("PartName" . "/xl/sharedStrings.xml")
+        ("ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"))
+      '()))
 
-(define (write-footer) @S{
-</Types>
-})
-
-(define (write-content-type) @S{
-@|(write-header)|
-
-@|(prefix-each-line (xlsx->content-type) "  ")|
-@|(prefix-each-line (xlsx->shared-string) "  ")|
-
-@|(write-footer)|
-})
+(define (content-type)
+  `(
+    ,@header
+    ,@(xlsx->content-type)
+    ,@(xlasx->shared-string)))
 
 (define (write-content-type-file)
   (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-content-type)))))
+      (printf "~a" (lists->compact_xml (content-type))))))
 
 (define (read-content-type)
   (void))
