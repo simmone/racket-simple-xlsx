@@ -7,7 +7,7 @@
 (require racket/contract)
 
 (require "../../xlsx/xlsx.rkt")
-(require "../../xlsx/sheet.rkt")
+(require "../../sheet/sheet.rkt")
 
 (provide (contract-out
           [write-docprops-app (-> string?)]
@@ -32,7 +32,7 @@
  
 (define (write-docprops-app) @S{
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>@|(print-sheet-variant sheet_list)|</vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="@|(number->string (length (XLSX-sheet_list (*CURRENT_XLSX*))))|" baseType="lpstr">@|(with-output-to-string
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Excel</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>@|(print-sheet-variant (XLSX-sheet_list (*CURRENT_XLSX*)))|</vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="@|(number->string (length (XLSX-sheet_list (*CURRENT_XLSX*))))|" baseType="lpstr">@|(with-output-to-string
   (lambda ()
     (let loop ([sheets (XLSX-sheet_list (*CURRENT_XLSX*))]
                [index 0])
@@ -48,7 +48,7 @@
     (with-output-to-file (build-path docprops_dir "app.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (write-docprops-app (get-field sheets xlsx)))))))
+        (printf "~a" (write-docprops-app))))))
 
 (define (read-docpros-app)
   (void))

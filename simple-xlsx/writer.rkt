@@ -12,7 +12,6 @@
 (require "lib/lib.rkt")
 (require "lib/dimension.rkt")
 (require "new/content-type.rkt")
-(require "new/_rels/rels.rkt")
 (require "new/docProps/docprops-app.rkt")
 (require "new/docProps/docprops-core.rkt")
 
@@ -25,9 +24,6 @@
       (lambda ()
         ;; [Content_Types].xml
         (write-content-type-file)
-
-        ;; _rels
-        (write-rels-file)
 
         ;; docProps
         (write-docprops-app-file)

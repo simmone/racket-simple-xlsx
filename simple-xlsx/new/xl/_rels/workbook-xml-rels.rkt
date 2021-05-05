@@ -1,57 +1,81 @@
-#lang at-exp racket/base
+#lang racket
 
-(require racket/port)
-(require racket/file)
-(require racket/class)
-(require racket/list)
-(require racket/contract)
+(require simple-xml)
 
 (require "../../../xlsx/xlsx.rkt")
-(require "../../../xlsx/sheet.rkt")
+(require "../../../sheet/sheet.rkt")
 
 (provide (contract-out
-          [write-workbook-xml-rels (-> (is-a?/c xlsx%) string?)]
-          [write-workbook-xml-rels-file (-> path-string? (is-a?/c xlsx%) void?)]
+          [xl-rels (-> list?)]
+          [write-workbook-xml-rels-file (-> void?)]
           ))
 
-(define S string-append)
- 
-(define (write-workbook-xml-rels xlsx) @S{
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">@|(with-output-to-string
-    (lambda ()
-      (let loop ([loop_list (get-field sheets xlsx)])
-        (when (not (null? loop_list))
-              (let ([sheet (car loop_list)])
-                (if (eq? (sheet-type sheet) 'data)
-                    (printf 
-                     "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet~a.xml\"/>"
-                     (sheet-seq sheet) (sheet-typeSeq sheet))
-                    (printf 
-                     "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet\" Target=\"chartsheets/sheet~a.xml\"/>"
-                     (sheet-seq sheet) (sheet-typeSeq sheet))))
-              (loop (cdr loop_list))))
+(define (header)
+  '("Relationships"
+    ("xmlns" . "http://schemas.openxmlformats.org/package/2006/relationships")))
 
-          (let ([seq (add1 (length (get-field sheets xlsx)))])
-            (printf 
-              "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/>"
-              seq)
-            (set! seq (add1 seq))
-            (printf
-              "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>"
-              seq)
-            (set! seq (add1 seq))
-            (when (> (hash-count (get-field string_item_map xlsx)) 0)
-              (printf
-                "<Relationship Id=\"rId~a\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\" Target=\"sharedStrings.xml\"/>"
-                seq)))))|</Relationships>
-})
+(define (rels)
+  (let loop ([loop_list (XLSX-sheet_list (*CURRENT_XLSX*))]
+             [count 1]
+             [data_sheet_count 1]
+             [chart_sheet_count 1]
+             [xml_list '()])
+    (if (not (null? loop_list))
+        (cond
+         [(DATA-SHEET? (car loop_list))
+          (loop
+           (cdr loop_list)
+           (add1 count)
+           (add1 data_sheet_count)
+           chart_sheet_count
+           (cons 
+            (list "Relationship"
+                  (cons "Id" (format "rId~a" count))
+                  (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet")
+                  (cons "Target" (format "worksheets/sheet~a.xml" data_sheet_count)))
+            xml_list))]
+         [(CHART-SHEET? (car loop_list))
+          (loop
+           (cdr loop_list)
+           (add1 count)
+           data_sheet_count
+           (add1 chart_sheet_count)
+           (cons 
+            (list "Relationship"
+                  (cons "Id" (format "rId~a" count))
+                  (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet")
+                  (cons "Target" (format "chaertsheets/sheet~a.xml" data_sheet_count)))
+            xml_list))]
+         [else
+          (loop (cdr loop_list) count data_sheet_count chart_sheet_count)])
+        (reverse xml_list))))
 
-(define (write-workbook-xml-rels-file dir xlsx)
-  (make-directory* dir)
+(define (footer)
+  (let ([seq (XLSX-sheet_count (*CURRENT_XLSX*))])
+    (list
+     (list "Relationship"
+           (cons "Id" (format "rId~a" (add1 seq)))
+           (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme")
+           (cons "Target" "theme/theme1.xml"))
+     (list "Relationship"
+           (cons "Id" (format "rId~a" (+ seq 2)))
+           (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles")
+           (cons "Target" "styles.xml"))
+     (if (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
+         (list "Relationship"
+               (cons "Id" (format "rId~a" (+ seq 3)))
+               (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings")
+               (cons "Target" "sharedStrings.xml"))
+         '()))))
 
-  (with-output-to-file (build-path dir "workbook.xml.rels")
+(define (xl-rels)
+  `(
+    ,@(header)
+    ,@(rels)
+    ,@(footer)))
+
+(define (write-workbook-xml-rels-file)
+  (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "workbook.xml.rels")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-workbook-xml-rels xlsx)))))
-
+      (printf "~a" (lists->compact_xml (xl-rels))))))

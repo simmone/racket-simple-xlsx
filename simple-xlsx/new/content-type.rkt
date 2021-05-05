@@ -42,7 +42,7 @@
                     (cons
                      "PartName"
                      (format "/xl/worksheets/sheet~a.xml" data_sheet_count))
-                    (cons "ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"))
+                    (cons "ContentType" "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"))
               xml_list))]
            [(CHART-SHEET? sheet)
             (loop
@@ -54,19 +54,19 @@
                       (cons
                        "PartName"
                        (format "/xl/charts/chart~a.xml" chart_sheet_count))
-                      (cons "ContentType" . "application/vnd.openxmlformats-officedocument.drawingml.chart+xml"))
+                      (cons "ContentType" "application/vnd.openxmlformats-officedocument.drawingml.chart+xml"))
 
                ,(list "Override"
                       (cons
                        "PartName"
                        (format "/xl/drawings/drawing~a.xml" chart_sheet_count)
-                       (cons "ContentType" . "application/vnd.openxmlformats-officedocument.drawing+xml")))
+                       (cons "ContentType" "application/vnd.openxmlformats-officedocument.drawing+xml")))
 
                ,(list "Override"
                       (cons
                        "PartName"
                        (format "/xl/chartsheets/sheet~a.xml" chart_sheet_count)
-                       (cons "ContentType" . "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml")))
+                       (cons "ContentType" "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml")))
                
                ,@xml_list))]
            [else
@@ -82,9 +82,9 @@
 
 (define (content-type)
   `(
-    ,@header
+    ,@(header)
     ,@(xlsx->content-type)
-    ,@(xlasx->shared-string)))
+    ,(xlsx->shared-string)))
 
 (define (write-content-type-file)
   (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")

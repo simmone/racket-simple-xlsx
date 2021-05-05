@@ -1,14 +1,17 @@
 #lang at-exp racket/base
 
+(require racket/file)
 (require racket/port)
 (require racket/list)
 (require racket/contract)
 
+(require "../../xlsx/xlsx.rkt")
+(require "../../sheet/sheet.rkt")
 (require "../../lib/lib.rkt")
 
 (provide (contract-out
-          [write-docprops-core (-> string?)]
-          [write-docprops-core-file (-> path-string? date? void?)]
+          [write-docprops-core (-> date? string?)]
+          [write-docprops-core-file (-> date? void?)]
           ))
 
 (define S string-append)
