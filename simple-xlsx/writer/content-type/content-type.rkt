@@ -76,8 +76,7 @@
 </Types>
 })
 
-(define (write-content-type xlsx) @S{
-@|(write-header)|
+(define (write-content-type)@|(write-header)|
 
 @|(prefix-each-line (xlsx->content-type xlsx) "  ")|
 @|(prefix-each-line (xlsx->shared-string xlsx) "  ")|
@@ -85,8 +84,8 @@
 @|(write-footer)|
 })
 
-(define (write-content-type-file dir xlsx)
-  (with-output-to-file (build-path dir "[Content_Types].xml")
+(define (write-content-type-file)
+  (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (write-content-type xlsx)))))
+      (printf "~a" (lists->compact_xml (write-content-type xlsx)))))
