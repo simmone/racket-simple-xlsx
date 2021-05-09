@@ -1,4 +1,6 @@
-#lang at-exp racket/base
+#lang racket
+
+(require simple-xml)
 
 (require racket/file)
 (require racket/port)
