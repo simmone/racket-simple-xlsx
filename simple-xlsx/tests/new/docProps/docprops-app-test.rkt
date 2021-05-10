@@ -1,9 +1,14 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 (require rackunit "../../../writer/docProps/docprops-app.rkt")
 
 (require "../../../xlsx/xlsx.rkt")
+
+(require racket/runtime-path)
+(define-runtime-path test_file "app.xml")
 
 (define test-docprops-app
   (test-suite
@@ -11,6 +16,13 @@
 
    (test-case
     "test-docprops-app"
+
+    (parameterize 
+     ([*CURRENT_XLSX* (new-xlsx)])
+      (add-data-sheet "数据页面" '((1)))
+      (add-data-sheet "Sheet2" '((1)))
+      (add-data-sheet "Sheet3" '((1)))
+
 
     (let ([xlsx (new xlsx%)])
       (send xlsx add-data-sheet #:sheet_name "数据页面" #:sheet_data '((1)))

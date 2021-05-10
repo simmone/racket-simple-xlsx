@@ -11,19 +11,6 @@
           [read-docpros-app (-> void?)]
           ))
 
-(define (print-sheet-variant)
-  (with-output-to-string
-    (lambda ()
-      (printf "<HeadingPairs><vt:vector size=\"~a\" baseType=\"variant\">" (length (XLSX-sheet_list (*CURRENT_XLSX*))))
-
-      (let ([data_sheet_count (length (filter (lambda (sheet) (DATA-SHEET? sheet)) (XLSX-sheet_list (*CURRENT_XLSX*))))])
-        (when (> data_sheet_count 0)
-              (printf "<vt:variant><vt:lpstr>工作表</vt:lpstr></vt:variant><vt:variant><vt:i4>~a</vt:i4></vt:variant>" data_sheet_count)))
-
-      (let ([chart_sheet_count (length (filter (lambda (sheet) (CHART-SHEET? sheet)) (XLSX-sheet_list (*CURRENT_XLSX*))))])
-        (when (> chart_sheet_count 0)
-           (printf "<vt:variant><vt:lpstr>图表</vt:lpstr></vt:variant><vt:variant><vt:i4>~a</vt:i4></vt:variant>" chart_sheet_count))))))
- 
 (define (docprops-app)
   (append
    '("Properties"

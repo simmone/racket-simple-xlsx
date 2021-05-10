@@ -3,6 +3,7 @@
 (provide (contract-out
           [write-xlsx-file (-> path-string? void?)]
           [add-data-sheet (-> string? (listof list?) void?)]
+          [add-chart-sheet (-> 
           ))
 
 (require racket/date)
@@ -86,18 +87,18 @@
 
                 (row-loop (cdr rows) (add1 row_index))))
 
-        (set-XLSX-sheet_count! (*CURRENT_XLSX*) (add1 (XLSX-sheet_count (*CURRENT_XLSX*))))
-
-        (set-XLSX-sheet_list! (*CURRENT_XLSX*)
-                              `(,@(XLSX-sheet_list (*CURRENT_XLSX*))
-                                ,(new-data-sheet
-                                  (get-dimension sheet_data)
-                                  rvtsf_map)))
-
         (let* ([sheet_index (XLSX-sheet_count (*CURRENT_XLSX*))]
                [id (number->string (add1 sheet_index))]
                [rId (format "rId~a" id)]
                [rel (format "worksheets/sheet~a" id)])
+
+          (set-XLSX-sheet_count! (*CURRENT_XLSX*) (add1 (XLSX-sheet_count (*CURRENT_XLSX*))))
+          
+          (set-XLSX-sheet_list! (*CURRENT_XLSX*)
+                                `(,@(XLSX-sheet_list (*CURRENT_XLSX*))
+                                  ,(new-data-sheet
+                                    (get-dimension sheet_data)
+                                    rvtsf_map)))
 
           (hash-set! (XLSX-sheet_index_id_map (*CURRENT_XLSX*)) sheet_index id)
           (hash-set! (XLSX-sheet_index_name_map (*CURRENT_XLSX*)) sheet_index sheet_name)
@@ -106,3 +107,21 @@
           (hash-set! (XLSX-sheet_rid_rel_map (*CURRENT_XLSX*)) rId rel)
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel)))
       (error (format "duplicate sheet name[~a]" sheet_name))))
+
+(define (add-chart-sheet sheet_name chart_sheet)
+  (if (not (hash-has-key? (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name))
+        (let* ([sheet_index (XLSX-sheet_count (*CURRENT_XLSX*))]
+               [id (number->string (add1 sheet_index))]
+               [rId (format "rId~a" id)]
+               [rel (format "chartsheets/sheet~a" id)])
+
+          (set-XLSX-sheet_count! (*CURRENT_XLSX*) (add1 sheet_index))
+          (set-XLSX-sheet_list! (*CURRENT_XLSX*) `(,@(XLSX-sheet_list (*CURRENT_XLSX*)) ,chart_sheet))
+          (hash-set! (XLSX-sheet_index_id_map (*CURRENT_XLSX*)) sheet_index id)
+          (hash-set! (XLSX-sheet_index_name_map (*CURRENT_XLSX*)) sheet_index sheet_name)
+          (hash-set! (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name sheet_index)
+          (hash-set! (XLSX-sheet_index_rid_map (*CURRENT_XLSX*)) sheet_index rId)
+          (hash-set! (XLSX-sheet_rid_rel_map (*CURRENT_XLSX*)) rId rel)
+          (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel))
+      (error (format "duplicate sheet name[~a]" sheet_name))))
+
