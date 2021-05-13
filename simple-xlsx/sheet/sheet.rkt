@@ -21,21 +21,18 @@
                            DATA-SHEET?)]
           [struct CHART-SHEET
                   (
-                   (chart_type symbol?)
+                   (chart_type (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D))
                    (topic string?)
                    (x_topic string?)
-                   (x_data_range DATA-RANGE?)
+                   (ref_sheet_name string?)
+                   (ref_range string?)
                    (y_data_range_list list?)
                    )]
+          [new-chart-sheet (-> (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D) string? CHART-SHEET?)]
           [struct DATA-RANGE
                   (
                    (sheet_name string?)
                    (range_str string?)
-                   )]
-          [struct DATA-SERIAL
-                  (
-                   (topic string?)
-                   (data_range DATA-RANGE?)
                    )]
           [*CURRENT_SHEET* (parameter/c (or/c DATA-SHEET? CHART-SHEET? #f))]
           ))
@@ -68,7 +65,12 @@
                      [chart_type #:mutable] 
                      [topic #:mutable] 
                      [x_topic #:mutable] 
-                     [x_data_range #:mutable] 
+                     [ref_sheet_name #:mutable]
+                     [ref_range #:mutable]
                      [y_data_range_list #:mutable]))
+
 (struct DATA-RANGE ([sheet_name #:mutable] [range_str #:mutable]))
-(struct DATA-SERIAL ([topic #:mutable] [data_range #:mutable]))
+
+(define (new-chart-sheet chart_type topic)
+  (CHART-SHEET
+   chart_type topic "" "" "" '()))

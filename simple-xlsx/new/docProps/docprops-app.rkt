@@ -63,7 +63,7 @@
     (with-output-to-file (build-path docprops_dir "app.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->compact_xml (docprops-app))))))
+        (printf "~a" (lists->compact_xml (docprops-app)))))))
 
 (define (read-docpros-app)
   (void))

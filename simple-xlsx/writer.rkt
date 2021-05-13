@@ -3,7 +3,7 @@
 (provide (contract-out
           [write-xlsx-file (-> path-string? void?)]
           [add-data-sheet (-> string? (listof list?) void?)]
-          [add-chart-sheet (-> 
+          [add-chart-sheet (-> string? (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D) string? void?)]
           ))
 
 (require racket/date)
@@ -15,7 +15,6 @@
 (require "new/content-type.rkt")
 (require "new/_rels/rels.rkt")
 (require "new/docProps/docprops-app.rkt")
-(require "new/docProps/docprops-core.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -30,9 +29,8 @@
         ;; _rels
         (write-rels-file)
 
-        ;; docProps
+        ;; docProps-app
         (write-docprops-app-file)
-        (write-docprops-core-file (current-date))
 
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
@@ -108,7 +106,7 @@
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel)))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
-(define (add-chart-sheet sheet_name chart_sheet)
+(define (add-chart-sheet sheet_name chart_type topic)
   (if (not (hash-has-key? (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name))
         (let* ([sheet_index (XLSX-sheet_count (*CURRENT_XLSX*))]
                [id (number->string (add1 sheet_index))]
@@ -116,7 +114,7 @@
                [rel (format "chartsheets/sheet~a" id)])
 
           (set-XLSX-sheet_count! (*CURRENT_XLSX*) (add1 sheet_index))
-          (set-XLSX-sheet_list! (*CURRENT_XLSX*) `(,@(XLSX-sheet_list (*CURRENT_XLSX*)) ,chart_sheet))
+          (set-XLSX-sheet_list! (*CURRENT_XLSX*) `(,@(XLSX-sheet_list (*CURRENT_XLSX*)) ,(new-chart-sheet chart_type topic)))
           (hash-set! (XLSX-sheet_index_id_map (*CURRENT_XLSX*)) sheet_index id)
           (hash-set! (XLSX-sheet_index_name_map (*CURRENT_XLSX*)) sheet_index sheet_name)
           (hash-set! (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name sheet_index)
