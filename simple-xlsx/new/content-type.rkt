@@ -53,21 +53,18 @@
                ,(list "Override"
                       (cons
                        "PartName"
+                       (format "/xl/chartsheets/sheet~a.xml" chart_sheet_count))
+                      (cons "ContentType" "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml"))
+               ,(list "Override"
+                      (cons
+                       "PartName"
+                       (format "/xl/drawings/drawing~a.xml" chart_sheet_count))
+                      (cons "ContentType" "application/vnd.openxmlformats-officedocument.drawing+xml"))
+               ,(list "Override"
+                      (cons
+                       "PartName"
                        (format "/xl/charts/chart~a.xml" chart_sheet_count))
                       (cons "ContentType" "application/vnd.openxmlformats-officedocument.drawingml.chart+xml"))
-
-               ,(list "Override"
-                      (cons
-                       "PartName"
-                       (format "/xl/drawings/drawing~a.xml" chart_sheet_count)
-                       (cons "ContentType" "application/vnd.openxmlformats-officedocument.drawing+xml")))
-
-               ,(list "Override"
-                      (cons
-                       "PartName"
-                       (format "/xl/chartsheets/sheet~a.xml" chart_sheet_count)
-                       (cons "ContentType" "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml")))
-               
                ,@xml_list))]
            [else
             (loop (cdr loop_list) data_sheet_count chart_sheet_count xml_list)]))

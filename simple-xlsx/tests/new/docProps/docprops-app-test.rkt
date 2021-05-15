@@ -27,8 +27,6 @@
       (add-chart-sheet "Chart1" 'LINE "Chart1")
       (add-chart-sheet "Chart4" 'LINE "Chart4")
       
-      (printf "~a\n" (docprops-app))
-
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string

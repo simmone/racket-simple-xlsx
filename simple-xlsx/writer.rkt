@@ -15,6 +15,7 @@
 (require "new/content-type.rkt")
 (require "new/_rels/rels.rkt")
 (require "new/docProps/docprops-app.rkt")
+(require "new/docProps/docprops-core.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -31,6 +32,9 @@
 
         ;; docProps-app
         (write-docprops-app-file)
+
+        ;; docProps-core
+        (write-docprops-core-file)
 
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
