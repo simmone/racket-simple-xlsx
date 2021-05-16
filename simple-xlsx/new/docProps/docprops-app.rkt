@@ -7,7 +7,7 @@
 
 (provide (contract-out
           [docprops-app (-> list?)]
-          [write-docprops-app-file (-> void?)]
+          [write-docprops-app (-> void?)]
           [read-docpros-app (-> void?)]
           ))
 
@@ -64,7 +64,7 @@
     
     `(,@properties_list ,heading_pairs_list ,titles_of_parts_list)))
 
-(define (write-docprops-app-file)
+(define (write-docprops-app)
   (let ([docprops_dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "docProps")])
     (make-directory* docprops_dir)
 

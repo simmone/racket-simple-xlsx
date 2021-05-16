@@ -7,7 +7,9 @@
 
 (provide (contract-out
           [xl-rels (-> list?)]
-          [write-workbook-xml-rels-file (-> void?)]
+          [write-workbook-rels (-> void?)]
+          [read-workbook-rels-file (-> path-string? void?)]
+          [read-workbook-rels (-> void?)]
           ))
 
 (define (header)
@@ -44,7 +46,7 @@
             (list "Relationship"
                   (cons "Id" (format "rId~a" count))
                   (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet")
-                  (cons "Target" (format "chaertsheets/sheet~a.xml" data_sheet_count)))
+                  (cons "Target" (format "chartsheets/sheet~a.xml" chart_sheet_count)))
             xml_list))]
          [else
           (loop (cdr loop_list) count data_sheet_count chart_sheet_count)])
@@ -74,8 +76,27 @@
     ,@(rels)
     ,@(footer)))
 
-(define (write-workbook-xml-rels-file)
+(define (write-workbook-rels)
   (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "workbook.xml.rels")
     #:exists 'replace
     (lambda ()
       (printf "~a" (lists->compact_xml (xl-rels))))))
+
+(define (read-workbook-rels-file rels_file)
+  (let ([xml_hash (xml->hash rels_file)])
+
+    (let ([relation_ship_count (hash-ref xml_hash "Relationships.Relationship's count" 0)])
+      (let loop ([loop_count 1])
+        (when (<= loop_count relation_ship_count)
+              (let* (
+                     [relation_ship_id (hash-ref xml_hash (format "Relationships.Relationship~a.Id" loop_count))]
+                     [relation_ship_target (hash-ref xml_hash (format "Relationships.Relationship~a.Target" loop_count))]
+                     )
+                (hash-set! (XLSX-sheet_rid_rel_map (*CURRENT_XLSX*)) relation_ship_id relation_ship_target)
+                (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) (sub1 loop_count) relation_ship_target)
+
+                (loop (add1 loop_count))))))))
+
+(define (read-workbook-rels)
+  (read-workbook-rels-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "workbook.xml.rels")))
+

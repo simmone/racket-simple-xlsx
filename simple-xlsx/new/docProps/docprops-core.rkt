@@ -8,7 +8,7 @@
 
 (provide (contract-out
           [docprops-core (-> date? list?)]
-          [write-docprops-core-file (-> date? void?)]
+          [write-docprops-core (-> date? void?)]
           [read-docpros-core (-> void?)]
           ))
 
@@ -29,7 +29,7 @@
          (cons "xsi:type" "dcterms:W3CDTF")
          (format-w3cdtf the_date))))
 
-(define (write-docprops-core-file the_date)
+(define (write-docprops-core the_date)
   (let ([docprops_dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "docProps")])
     (make-directory* docprops_dir)
 

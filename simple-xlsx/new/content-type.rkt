@@ -8,7 +8,7 @@
 
 (provide (contract-out
           [content-type (-> list?)]
-          [write-content-type-file (-> void?)]
+          [write-content-type (-> void?)]
           [read-content-type (-> void?)]
           ))
 
@@ -83,7 +83,7 @@
     ,@(xlsx->content-type)
     ,(xlsx->shared-string)))
 
-(define (write-content-type-file)
+(define (write-content-type)
   (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "[Content_Types].xml")
     #:exists 'replace
     (lambda ()

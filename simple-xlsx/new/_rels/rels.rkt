@@ -6,7 +6,7 @@
 
 (provide (contract-out
           [rels (-> list?)]
-          [write-rels-file (-> void?)]
+          [write-rels (-> void?)]
           ))
 
 (define (rels)
@@ -25,7 +25,7 @@
      ("Type" . "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument")
      ("Target" . "xl/workbook.xml"))))
 
-(define (write-rels-file)
+(define (write-rels)
   (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "_rels")])
     (make-directory* dir)
 

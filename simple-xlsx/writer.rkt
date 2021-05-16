@@ -16,6 +16,7 @@
 (require "new/_rels/rels.rkt")
 (require "new/docProps/docprops-app.rkt")
 (require "new/docProps/docprops-core.rkt")
+(require "new/xl/_rels/workbook-xml-rels.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -25,16 +26,19 @@
       (lambda () (set-XLSX-xlsx_dir! (*CURRENT_XLSX*) (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
       (lambda ()
         ;; [Content_Types].xml
-        (write-content-type-file)
+        (write-content-type)
 
         ;; _rels
-        (write-rels-file)
+        (write-rels)
 
         ;; docProps-app
-        (write-docprops-app-file)
+        (write-docprops-app)
 
         ;; docProps-core
-        (write-docprops-core-file)
+        (write-docprops-core)
+
+        ;; xl rels
+        (write-workbook-rels)
 
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
