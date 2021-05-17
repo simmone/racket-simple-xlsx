@@ -77,10 +77,13 @@
     ,@(footer)))
 
 (define (write-workbook-rels)
-  (with-output-to-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "workbook.xml.rels")
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (lists->compact_xml (xl-rels))))))
+  (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "_rels")])
+    (make-directory* dir)
+
+    (with-output-to-file (build-path dir "workbook.xml.rels")
+      #:exists 'replace
+      (lambda ()
+        (printf "~a" (lists->compact_xml (xl-rels)))))))
 
 (define (read-workbook-rels-file rels_file)
   (let ([xml_hash (xml->hash rels_file)])
