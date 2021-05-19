@@ -18,6 +18,7 @@
 (require "new/docProps/docprops-core.rkt")
 (require "new/xl/_rels/workbook-xml-rels.rkt")
 (require "new/xl/printerSettings/printerSettings.rkt")
+(require "new/xl/theme/theme.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -43,6 +44,9 @@
 
         ;; printerSettings
         (write-printer-settings)
+        
+        ;; themme
+        (write-theme)
 
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
