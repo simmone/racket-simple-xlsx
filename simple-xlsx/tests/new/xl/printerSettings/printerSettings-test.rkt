@@ -23,12 +23,9 @@
     (parameterize 
      ([*CURRENT_XLSX* (new-xlsx)])
 
-      (call-with-input-file rels1_file
+      (call-with-input-file template_file
         (lambda (expected)
-          (call-with-input-string
-           (lists->xml (xl-rels))
-           (lambda (actual)
-             (check-lines? expected actual)))))))
+          (check-equal? (port->bytes expected) (printer-settings))))))
    ))
 
 (run-tests test-printerSettings)
