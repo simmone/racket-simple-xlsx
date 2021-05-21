@@ -102,49 +102,33 @@
        ("a:font" ("script" . "Mong") ("typeface" . "Mongolian Baiti"))
        ("a:font" ("script" . "Viet") ("typeface" . "Times New Roman"))
        ("a:font" ("script" . "Uigh") ("typeface" . "Microsoft Uighur"))))
-      <a:fmtScheme name="Office">
-        <a:fillStyleLst>
-          <a:solidFill>
-            <a:schemeClr val="phClr"/>
-          </a:solidFill>
-          <a:gradFill rotWithShape="1">
-            <a:gsLst>
-              <a:gs pos="0">
-                <a:schemeClr val="phClr">
-                  <a:tint val="50000"/>
-                  <a:satMod val="300000"/>
-                </a:schemeClr>
-              </a:gs>
-              <a:gs pos="35000">
-                <a:schemeClr val="phClr">
-                  <a:tint val="37000"/>
-                  <a:satMod val="300000"/>
-                </a:schemeClr>
-              </a:gs>
-              <a:gs pos="100000">
-                <a:schemeClr val="phClr">
-                  <a:tint val="15000"/>
-                  <a:satMod val="350000"/>
-                </a:schemeClr>
-              </a:gs>
-            </a:gsLst>
-            <a:lin ang="16200000" scaled="1"/>
-          </a:gradFill>
-          <a:gradFill rotWithShape="1">
-            <a:gsLst>
-              <a:gs pos="0">
-                <a:schemeClr val="phClr">
-                  <a:shade val="51000"/>
-                  <a:satMod val="130000"/>
-                </a:schemeClr>
-              </a:gs>
-              <a:gs pos="80000">
-                <a:schemeClr val="phClr">
-                  <a:shade val="93000"/>
-                  <a:satMod val="130000"/>
-                </a:schemeClr>
-              </a:gs>
-              <a:gs pos="100000">
+     ("a:fmtScheme"
+      ("name". "Office")
+      ("a:fillStyleLst"
+       ("a:solidFill" ("a:schemeClr" ("val" . "phClr")))
+       ("a:gradFill"
+        ("rotWithShape" . "1")
+        ("a:gsLst"
+         ("a:gs" ("pos" . "0") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "50000")) ("a:satMod" ("val" . "300000"))))
+         ("a:gs" ("pos". "35000") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "37000")) ("a:satMod" ("val" . "300000"))))
+         ("a:gs" ("pos" . "100000") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "15000")) ("a:satMod" ("val" . "350000")))))
+        ("a:lin" ("ang" . "16200000") ("scaled" . "1")))
+       ("a:gradFill"
+        ("rotWithShape" . "1")
+        ("a:gsLst"
+         ("a:gs"
+          ("pos" . "0")
+          ("a:schemeClr"
+           ("val" . "phClr")
+           ("a:shade" ("val" . "51000"))
+           ("a:satMod" ("val" . "130000"))))
+         ("a:gs"
+          ("pos" . "80000")
+          ("a:schemeClr"
+           ("val" . "phClr")
+           ("a:shade" ("val" . "93000"))
+           ("a:satMod" ("val" . "130000"))))
+         <a:gs pos="100000">
                 <a:schemeClr val="phClr">
                   <a:shade val="94000"/>
                   <a:satMod val="135000"/>
