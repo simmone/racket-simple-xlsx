@@ -25,104 +25,83 @@
       ("a:dk1" ("a:sysClr" ("val" . "windowText") ("lastClr" . "000000")))
       ("a:lt1" ("a:sysClr" ("val" . "window") ("lastClr" . "FFFFFF")))
       ("a:dk2" ("a:srgbClr" ("val". "1F497D")))
-      <a:lt2>
-        <a:srgbClr val="EEECE1"/>
-      </a:lt2>
-      <a:accent1>
-        <a:srgbClr val="4F81BD"/>
-      </a:accent1>
-      <a:accent2>
-        <a:srgbClr val="C0504D"/>
-      </a:accent2>
-      <a:accent3>
-        <a:srgbClr val="9BBB59"/>
-      </a:accent3>
-      <a:accent4>
-        <a:srgbClr val="8064A2"/>
-      </a:accent4>
-      <a:accent5>
-        <a:srgbClr val="4BACC6"/>
-      </a:accent5>
-      <a:accent6>
-        <a:srgbClr val="F79646"/>
-      </a:accent6>
-      <a:hlink>
-        <a:srgbClr val="0000FF"/>
-      </a:hlink>
-      <a:folHlink>
-        <a:srgbClr val="800080"/>
-      </a:folHlink>
-      </a:clrScheme>
-      <a:fontScheme name="Office">
-        <a:majorFont>
-          <a:latin typeface="Cambria"/>
-          <a:ea typeface=""/>
-          <a:cs typeface=""/>
-          <a:font script="Jpan" typeface="ＭＳ Ｐゴシック"/>
-          <a:font script="Hang" typeface="맑은 고딕"/>
-          <a:font script="Hans" typeface="宋体"/>
-          <a:font script="Hant" typeface="新細明體"/>
-          <a:font script="Arab" typeface="Times New Roman"/>
-          <a:font script="Hebr" typeface="Times New Roman"/>
-          <a:font script="Thai" typeface="Tahoma"/>
-          <a:font script="Ethi" typeface="Nyala"/>
-          <a:font script="Beng" typeface="Vrinda"/>
-          <a:font script="Gujr" typeface="Shruti"/>
-          <a:font script="Khmr" typeface="MoolBoran"/>
-          <a:font script="Knda" typeface="Tunga"/>
-          <a:font script="Guru" typeface="Raavi"/>
-          <a:font script="Cans" typeface="Euphemia"/>
-          <a:font script="Cher" typeface="Plantagenet Cherokee"/>
-          <a:font script="Yiii" typeface="Microsoft Yi Baiti"/>
-          <a:font script="Tibt" typeface="Microsoft Himalaya"/>
-          <a:font script="Thaa" typeface="MV Boli"/>
-          <a:font script="Deva" typeface="Mangal"/>
-          <a:font script="Telu" typeface="Gautami"/>
-          <a:font script="Taml" typeface="Latha"/>
-          <a:font script="Syrc" typeface="Estrangelo Edessa"/>
-          <a:font script="Orya" typeface="Kalinga"/>
-          <a:font script="Mlym" typeface="Kartika"/>
-          <a:font script="Laoo" typeface="DokChampa"/>
-          <a:font script="Sinh" typeface="Iskoola Pota"/>
-          <a:font script="Mong" typeface="Mongolian Baiti"/>
-          <a:font script="Viet" typeface="Times New Roman"/>
-          <a:font script="Uigh" typeface="Microsoft Uighur"/>
-        </a:majorFont>
-        <a:minorFont>
-          <a:latin typeface="Calibri"/>
-          <a:ea typeface=""/>
-          <a:cs typeface=""/>
-          <a:font script="Jpan" typeface="ＭＳ Ｐゴシック"/>
-          <a:font script="Hang" typeface="맑은 고딕"/>
-          <a:font script="Hans" typeface="宋体"/>
-          <a:font script="Hant" typeface="新細明體"/>
-          <a:font script="Arab" typeface="Arial"/>
-          <a:font script="Hebr" typeface="Arial"/>
-          <a:font script="Thai" typeface="Tahoma"/>
-          <a:font script="Ethi" typeface="Nyala"/>
-          <a:font script="Beng" typeface="Vrinda"/>
-          <a:font script="Gujr" typeface="Shruti"/>
-          <a:font script="Khmr" typeface="DaunPenh"/>
-          <a:font script="Knda" typeface="Tunga"/>
-          <a:font script="Guru" typeface="Raavi"/>
-          <a:font script="Cans" typeface="Euphemia"/>
-          <a:font script="Cher" typeface="Plantagenet Cherokee"/>
-          <a:font script="Yiii" typeface="Microsoft Yi Baiti"/>
-          <a:font script="Tibt" typeface="Microsoft Himalaya"/>
-          <a:font script="Thaa" typeface="MV Boli"/>
-          <a:font script="Deva" typeface="Mangal"/>
-          <a:font script="Telu" typeface="Gautami"/>
-          <a:font script="Taml" typeface="Latha"/>
-          <a:font script="Syrc" typeface="Estrangelo Edessa"/>
-          <a:font script="Orya" typeface="Kalinga"/>
-          <a:font script="Mlym" typeface="Kartika"/>
-          <a:font script="Laoo" typeface="DokChampa"/>
-          <a:font script="Sinh" typeface="Iskoola Pota"/>
-          <a:font script="Mong" typeface="Mongolian Baiti"/>
-          <a:font script="Viet" typeface="Arial"/>
-          <a:font script="Uigh" typeface="Microsoft Uighur"/>
-        </a:minorFont>
-      </a:fontScheme>
+      ("a:lt2" ("a:srgbClr" ("val" . "EEECE1")))
+      ("a:accent1" ("a:srgbClr" ("val" . "4F81BD")))
+      ("a:accent2" ("a:srgbClr" ("val" . "C0504D")))
+      ("a:accent3" ("a:srgbClr" ("val" . "9BBB59")))
+      ("a:accent4" ("a:srgbClr" ("val" . "8064A2")))
+      ("a:accent5" ("a:srgbClr" ("val" . "4BACC6")))
+      ("a:accent6" ("a:srgbClr" ("val" . "F79646")))
+      ("a:hlink" ("a:srgbClr" ("val" . "0000FF")))
+      ("a:folHlink" ("a:srgbClr" ("val" . "800080"))))
+     ("a:fontScheme"
+      ("name" . "Office")
+      ("a:majorFont"
+       ("a:latin" ("typeface" . "Cambria"))
+       ("a:ea" ("typeface" . ""))
+       ("a:cs" ("typeface" . ""))
+       ("a:font" ("script" . "Jpan") ("typeface" . "ＭＳ Ｐゴシック"))
+       ("a:font" ("script" . "Hang") ("typeface" . "맑은 고딕"))
+       ("a:font" ("script" . "Hans") ("typeface" . "宋体"))
+       ("a:font" ("script" . "Hant") ("typeface" . "新細明體"))
+       ("a:font" ("script" . "Arab") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Hebr") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Thai") ("typeface" . "Tahoma"))
+       ("a:font" ("script" . "Ethi") ("typeface" . "Nyala"))
+       ("a:font" ("script" . "Beng") ("typeface" . "Vrinda"))
+       ("a:font" ("script" . "Gujr") ("typeface" . "Shruti"))
+       ("a:font" ("script" . "Khmr") ("typeface" . "MoolBoran"))
+       ("a:font" ("script" . "Knda") ("typeface" . "Tunga"))
+       ("a:font" ("script" . "Guru") ("typeface" . "Raavi"))
+       ("a:font" ("script" . "Cans") ("typeface" . "Euphemia"))
+       ("a:font" ("script". "Cher") ("typeface" . "Plantagenet Cherokee"))
+       ("a:font" ("script" . "Yiii") ("typeface" . "Microsoft Yi Baiti"))
+       ("a:font" ("script". "Tibt") ("typeface" . "Microsoft Himalaya"))
+       ("a:font" ("script" . "Thaa") ("typeface" . "MV Boli"))
+       ("a:font" ("script" . "Deva") ("typeface". "Mangal"))
+       ("a:font" ("script" . "Telu") ("typeface" . "Gautami"))
+       ("a:font" ("script" . "Taml") ("typeface" . "Latha"))
+       ("a:font" ("script" . "Syrc") ("typeface" . "Estrangelo Edessa"))
+       ("a:font" ("script" . "Orya") ("typeface" . "Kalinga"))
+       ("a:font" ("script" . "Mlym") ("typeface" . "Kartika"))
+       ("a:font" ("script" . "Laoo") ("typeface" . "DokChampa"))
+       ("a:font" ("script" . "Sinh") ("typeface" . "Iskoola Pota"))
+       ("a:font" ("script" . "Mong") ("typeface" . "Mongolian Baiti"))
+       ("a:font" ("script" . "Viet") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Uigh") ("typeface" . "Microsoft Uighur")))
+      ("a:minorFont"
+       ("a:latin" ("typeface" . "Calibri"))
+       ("a:ea" ("typeface" . ""))
+       ("a:cs" ("typeface" . ""))
+       ("a:font" ("script" . "Jpan") ("typeface" . "ＭＳ Ｐゴシック"))
+       ("a:font" ("script" . "Hang") ("typeface" . "맑은 고딕"))
+       ("a:font" ("script" . "Hans") ("typeface" . "宋体"))
+       ("a:font" ("script" . "Hant") ("typeface" . "新細明體"))
+       ("a:font" ("script" . "Arab") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Hebr") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Thai") ("typeface" . "Tahoma"))
+       ("a:font" ("script" . "Ethi") ("typeface" . "Nyala"))
+       ("a:font" ("script" . "Beng") ("typeface" . "Vrinda"))
+       ("a:font" ("script" . "Gujr") ("typeface" . "Shruti"))
+       ("a:font" ("script" . "Khmr") ("typeface" . "MoolBoran"))
+       ("a:font" ("script" . "Knda") ("typeface" . "Tunga"))
+       ("a:font" ("script" . "Guru") ("typeface" . "Raavi"))
+       ("a:font" ("script" . "Cans") ("typeface" . "Euphemia"))
+       ("a:font" ("script". "Cher") ("typeface" . "Plantagenet Cherokee"))
+       ("a:font" ("script" . "Yiii") ("typeface" . "Microsoft Yi Baiti"))
+       ("a:font" ("script". "Tibt") ("typeface" . "Microsoft Himalaya"))
+       ("a:font" ("script" . "Thaa") ("typeface" . "MV Boli"))
+       ("a:font" ("script" . "Deva") ("typeface". "Mangal"))
+       ("a:font" ("script" . "Telu") ("typeface" . "Gautami"))
+       ("a:font" ("script" . "Taml") ("typeface" . "Latha"))
+       ("a:font" ("script" . "Syrc") ("typeface" . "Estrangelo Edessa"))
+       ("a:font" ("script" . "Orya") ("typeface" . "Kalinga"))
+       ("a:font" ("script" . "Mlym") ("typeface" . "Kartika"))
+       ("a:font" ("script" . "Laoo") ("typeface" . "DokChampa"))
+       ("a:font" ("script" . "Sinh") ("typeface" . "Iskoola Pota"))
+       ("a:font" ("script" . "Mong") ("typeface" . "Mongolian Baiti"))
+       ("a:font" ("script" . "Viet") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Uigh") ("typeface" . "Microsoft Uighur"))))
       <a:fmtScheme name="Office">
         <a:fillStyleLst>
           <a:solidFill>
