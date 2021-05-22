@@ -116,117 +116,45 @@
        ("a:gradFill"
         ("rotWithShape" . "1")
         ("a:gsLst"
-         ("a:gs"
-          ("pos" . "0")
-          ("a:schemeClr"
-           ("val" . "phClr")
-           ("a:shade" ("val" . "51000"))
-           ("a:satMod" ("val" . "130000"))))
-         ("a:gs"
-          ("pos" . "80000")
-          ("a:schemeClr"
-           ("val" . "phClr")
-           ("a:shade" ("val" . "93000"))
-           ("a:satMod" ("val" . "130000"))))
-         <a:gs pos="100000">
-                <a:schemeClr val="phClr">
-                  <a:shade val="94000"/>
-                  <a:satMod val="135000"/>
-                </a:schemeClr>
-              </a:gs>
-            </a:gsLst>
-            <a:lin ang="16200000" scaled="0"/>
-          </a:gradFill>
-        </a:fillStyleLst>
-        <a:lnStyleLst>
-          <a:ln w="9525" cap="flat" cmpd="sng" algn="ctr">
-            <a:solidFill>
-              <a:schemeClr val="phClr">
-                <a:shade val="95000"/>
-                <a:satMod val="105000"/>
-                </a:schemeClr>
-              </a:solidFill>
-            <a:prstDash val="solid"/>
-          </a:ln>
-          <a:ln w="25400" cap="flat" cmpd="sng" algn="ctr">
-            <a:solidFill>
-              <a:schemeClr val="phClr"/>
-            </a:solidFill>
-            <a:prstDash val="solid"/>
-          </a:ln>
-          <a:ln w="38100" cap="flat" cmpd="sng" algn="ctr">
-            <a:solidFill>
-              <a:schemeClr val="phClr"/>
-            </a:solidFill>
-            <a:prstDash val="solid"/>
-          </a:ln>
-        </a:lnStyleLst>
-        <a:effectStyleLst>
-          <a:effectStyle>
-            <a:effectLst>
-              <a:outerShdw blurRad="40000" dist="20000" dir="5400000" rotWithShape="0">
-                <a:srgbClr val="000000">
-                  <a:alpha val="38000"/>
-                </a:srgbClr>
-              </a:outerShdw>
-            </a:effectLst>
-          </a:effectStyle>
-          <a:effectStyle>
-            <a:effectLst>
-              <a:outerShdw blurRad="40000" dist="23000" dir="5400000" rotWithShape="0">
-                <a:srgbClr val="000000">
-                  <a:alpha val="35000"/>
-                </a:srgbClr>
-              </a:outerShdw>
-            </a:effectLst>
-          </a:effectStyle>
-        <a:effectStyle>
-          <a:effectLst>
-            <a:outerShdw blurRad="40000" dist="23000" dir="5400000" rotWithShape="0">
-              <a:srgbClr val="000000">
-                <a:alpha val="35000"/>
-              </a:srgbClr>
-            </a:outerShdw>
-          </a:effectLst>
-          <a:scene3d>
-            <a:camera prst="orthographicFront">
-              <a:rot lat="0" lon="0" rev="0"/>
-            </a:camera>
-            <a:lightRig rig="threePt" dir="t">
-              <a:rot lat="0" lon="0" rev="1200000"/>
-            </a:lightRig>
-          </a:scene3d>
-          <a:sp3d>
-            <a:bevelT w="63500" h="25400"/>
-          </a:sp3d>
-        </a:effectStyle>
-      </a:effectStyleLst>
-      <a:bgFillStyleLst>
-        <a:solidFill>
-          <a:schemeClr val="phClr"/>
-        </a:solidFill>
-        <a:gradFill rotWithShape="1">
-          <a:gsLst>
-            <a:gs pos="0">
-              <a:schemeClr val="phClr">
-                <a:tint val="40000"/>
-                <a:satMod val="350000"/>
-              </a:schemeClr>
-            </a:gs>
-            <a:gs pos="40000">
-              <a:schemeClr val="phClr">
-                <a:tint val="45000"/>
-                <a:shade val="99000"/>
-                <a:satMod val="350000"/>
-              </a:schemeClr>
-            </a:gs>
-            <a:gs pos="100000">
-              <a:schemeClr val="phClr">
-                <a:shade val="20000"/>
-                <a:satMod val="255000"/>
-              </a:schemeClr>
-            </a:gs>
-          </a:gsLst>
+         ("a:gs" ("pos" . "0") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "51000")) ("a:satMod" ("val" . "130000"))))
+         ("a:gs" ("pos" . "80000") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "93000")) ("a:satMod" ("val" . "130000"))))
+         ("a:gs" ("pos" . "100000") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "94000")) ("a:satMod" ("val" . "135000")))))
+        ("a:lin" ("ang" . "16200000") ("scaled" . "0"))))
+      ("a:lnStyleLst"
+       ("a:ln" ("w" . "9525") ("cap" . "flat") ("cmpd" . "sng") ("algn" . "ctr")
+        ("a:solidFill" ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "95000")) ("a:satMod" ("val" . "105000"))))
+        ("a:prstDash" ("val" . "solid")))
+       ("a:ln" ("w" . "25400") ("cap" . "flat") ("cmpd" . "sng") ("algn" . "ctr")
+        ("a:solidFill" ("a:schemeClr" ("val" . "phClr")))
+        ("a:prstDash" ("val" . "solid")))
+       ("a:ln" ("w" . "38100") ("cap" . "flat") ("cmpd" . "sng") ("algn" . "ctr")
+        ("a:solidFill" ("a:schemeClr" ("val" . "phClr")))
+        ("a:prstDash" ("val" . "solid"))))
+      ("a:effectStyleLst"
+       ("a:effectStyle"
+        ("a:effectLst"
+         ("a:outerShdw" ("blurRad" . "40000") ("dist" . "20000") ("dir" . "5400000") ("rotWithShape" . "0")
+          ("a:srgbClr" ("val" . "000000") ("a:alpha" ("val" . "38000"))))))
+       ("a:effectStyle"
+        ("a:effectLst"
+         ("a:outerShdw" ("blurRad" . "40000") ("dist" . "23000") ("dir" . "5400000") ("rotWithShape" . "0")
+          ("a:srgbClr" ("val" . "000000") ("a:alpha" ("val" . "35000"))))))
+       ("a:effectStyle"
+        ("a:effectLst"
+         ("a:outerShdw" ("blurRad" . "40000") ("dist" . "23000") ("dir" . "5400000") ("rotWithShape" . "0")
+          ("a:srgbClr" ("val" . "000000") ("a:alpha" ("val" . "35000")))))
+        ("a:scene3d"
+         ("a:camera" ("prst" . "orthographicFront") ("a:rot" ("lat" . "0") ("lon" . "0") ("rev" . "0")))
+         ("a:lightRig" ("rig" . "threePt") ("dir" . "t")
+          ("a:rot" ("lat" . "0") ("lon" . "0") ("rev" . "1200000"))))
+        ("a:sp3d" ("a:bevelT" ("w". "63500") ("h". "25400")))))
+      ("a:bgFillStyleLst"
+        ("a:solidFill" ("a:schemeClr" ("val" . "phClr")))
+        ("a:gradFill" ("rotWithShape" . "1")
+         ("a:gsLst"
+          ("a:gs" ("pos" . "0") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "40000")) ("a:satMod" ("val" . "350000"))))
+          ("a:gs" ("pos" . "40000") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "45000")) ("a:shade" ("val" . "99000")) ("a:satMod" ("val" . "350000"))))
+          ("a:gs" ("pos" . "100000") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "20000")) ("a:satMod" ("val" . "255000")))))
           <a:path path="circle">
             <a:fillToRect l="50000" t="-80000" r="50000" b="180000"/>
           </a:path>
