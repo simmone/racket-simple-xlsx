@@ -1,10 +1,15 @@
 #lang racket
 
+(require simple-xml)
+
 (provide (contract-out
           [theme (-> list?)]
           [write-theme (-> void?)]
           [read-theme (-> void?)]
           ))
+
+(require "../../../xlsx/xlsx.rkt")
+(require "../../../sheet/sheet.rkt")
 
 (define (write-theme)
   (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "theme")])
@@ -77,13 +82,13 @@
        ("a:font" ("script" . "Hang") ("typeface" . "맑은 고딕"))
        ("a:font" ("script" . "Hans") ("typeface" . "宋体"))
        ("a:font" ("script" . "Hant") ("typeface" . "新細明體"))
-       ("a:font" ("script" . "Arab") ("typeface" . "Times New Roman"))
-       ("a:font" ("script" . "Hebr") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Arab") ("typeface" . "Arial"))
+       ("a:font" ("script" . "Hebr") ("typeface" . "Arial"))
        ("a:font" ("script" . "Thai") ("typeface" . "Tahoma"))
        ("a:font" ("script" . "Ethi") ("typeface" . "Nyala"))
        ("a:font" ("script" . "Beng") ("typeface" . "Vrinda"))
        ("a:font" ("script" . "Gujr") ("typeface" . "Shruti"))
-       ("a:font" ("script" . "Khmr") ("typeface" . "MoolBoran"))
+       ("a:font" ("script" . "Khmr") ("typeface" . "DaunPenh"))
        ("a:font" ("script" . "Knda") ("typeface" . "Tunga"))
        ("a:font" ("script" . "Guru") ("typeface" . "Raavi"))
        ("a:font" ("script" . "Cans") ("typeface" . "Euphemia"))
@@ -100,7 +105,7 @@
        ("a:font" ("script" . "Laoo") ("typeface" . "DokChampa"))
        ("a:font" ("script" . "Sinh") ("typeface" . "Iskoola Pota"))
        ("a:font" ("script" . "Mong") ("typeface" . "Mongolian Baiti"))
-       ("a:font" ("script" . "Viet") ("typeface" . "Times New Roman"))
+       ("a:font" ("script" . "Viet") ("typeface" . "Arial"))
        ("a:font" ("script" . "Uigh") ("typeface" . "Microsoft Uighur"))))
      ("a:fmtScheme"
       ("name". "Office")
@@ -155,32 +160,14 @@
           ("a:gs" ("pos" . "0") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "40000")) ("a:satMod" ("val" . "350000"))))
           ("a:gs" ("pos" . "40000") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "45000")) ("a:shade" ("val" . "99000")) ("a:satMod" ("val" . "350000"))))
           ("a:gs" ("pos" . "100000") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "20000")) ("a:satMod" ("val" . "255000")))))
-          <a:path path="circle">
-            <a:fillToRect l="50000" t="-80000" r="50000" b="180000"/>
-          </a:path>
-        </a:gradFill>
-        <a:gradFill rotWithShape="1">
-          <a:gsLst>
-            <a:gs pos="0">
-              <a:schemeClr val="phClr">
-                <a:tint val="80000"/>
-                <a:satMod val="300000"/>
-              </a:schemeClr>
-            </a:gs>
-            <a:gs pos="100000">
-              <a:schemeClr val="phClr">
-                <a:shade val="30000"/>
-                <a:satMod val="200000"/>
-              </a:schemeClr>
-            </a:gs>
-          </a:gsLst>
-          <a:path path="circle">
-            <a:fillToRect l="50000" t="50000" r="50000" b="50000"/>
-          </a:path>
-        </a:gradFill>
-      </a:bgFillStyleLst>
-    </a:fmtScheme>
-  </a:themeElements>
-  <a:objectDefaults/>
-  <a:extraClrSchemeLst/>
-</a:theme>
+          ("a:path" ("path" . "circle") ("a:fillToRect" ("l" . "50000") ("t" . "-80000") ("r" . "50000") ("b" . "180000"))))
+        ("a:gradFill" ("rotWithShape" . "1")
+         ("a:gsLst"
+          ("a:gs" ("pos" . "0") ("a:schemeClr" ("val" . "phClr") ("a:tint" ("val" . "80000")) ("a:satMod" ("val" . "300000"))))
+          ("a:gs" ("pos" . "100000") ("a:schemeClr" ("val" . "phClr") ("a:shade" ("val" . "30000")) ("a:satMod" ("val" . "200000")))))
+          ("a:path" ("path" . "circle") ("a:fillToRect" ("l" . "50000") ("t" . "50000") ("r" . "50000") ("b" . "50000")))))))
+    ("a:objectDefaults")
+    ("a:extraClrSchemeLst")))
+
+(define (read-theme)
+  (void))
