@@ -1,34 +1,35 @@
-#lang at-exp racket/base
-
-(require racket/port)
-(require racket/class)
-(require racket/file)
-(require racket/list)
-(require racket/contract)
+#lang racket
 
 (require simple-xml)
 
 (require "../../xlsx/xlsx.rkt")
 
-;; strings list convert to (string . place) hash
 (provide (contract-out
-          [write-shared-strings (-> list? string?)]
-          [write-shared-strings-file (-> path-string? XLSX? void?)]
+          [shared-strings (-> list?)]
+          [write-shared-strings-file (-> void?)]
           [filter-string (-> string? string?)]
-          [load-shared-strings (-> path-string? XLSX? void?)]
+          [read-shared-strings (-> void?)]
           ))
 
-(define S string-append)
-
-(define (write-shared-strings string_item_list) @S{
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="@|(number->string (length string_item_list))|" uniqueCount="@|(number->string (length string_item_list))|">@|(with-output-to-string
-    (lambda () 
-      (let loop ([strings string_item_list])
-        (when (not (null? strings))
-          (printf "<si><t>~a</t><phoneticPr fontId=\"1\" type=\"noConversion\"/></si>" (filter-string (car strings)))
-          (loop (cdr strings))))))|</sst>
-})
+(define (shared-strings)
+  (append
+   ("sst" ("xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+   (list
+    (cons "count" (format "~a" (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*)))))
+    (cons "uniqueCount" (format "~a" (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))))))
+   (list
+    (let loop ([strings (map car (sort (hash->list (XLSX->shared_strings_map (*CURRENT_XLSX*))) < #:key cdr))]
+               [result_list '()])
+      (if (not (null? strings))
+          (loop
+           (cdr strings)
+           (cons
+            (list
+             "si"
+             (list "t" (filter-string (car strings)))
+             (list "phoneticPr" (cons "fontId" "1") (cons "type" "noConversion")))
+            result_list)
+           (reverse result_list)))))))
 
 (define (filter-string str)
   (regexp-replace*
@@ -44,15 +45,16 @@
    )
 
 (define (write-shared-strings-file)
-  (when (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
-        (make-directory* dir)
+  (let ([dir (build-path (XlSX-xlsx_dir (*CURRENT_XLSX*)) "xl")])
+    (make-directory* dir)
 
-        (with-output-to-file (build-path (XlSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "sharedStrings.xml")
+    (when (> (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 0)
+        (with-output-to-file (build-path dir "sharedStrings.xml")
           #:exists 'replace
           (lambda ()
-            (printf "~a" (write-shared-strings (send xlsx get-string-item-list)))))))
+            (printf "~a" (lists->compact_xml (shared-strings (send xlsx get-string-item-list)))))))))
 
-(define (load-shared-strings)
+(define (read-shared-strings)
   (let ([xml_hash (xml->hash (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "sharedStrings.xml"))])
     (let loop ([loop_count 1])
       (when (<= loop_count (hash-ref xml_hash "sst.si's count" 0))

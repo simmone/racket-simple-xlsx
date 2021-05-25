@@ -19,6 +19,7 @@
 (require "new/xl/_rels/workbook-xml-rels.rkt")
 (require "new/xl/printerSettings/printerSettings.rkt")
 (require "new/xl/theme/theme.rkt")
+(require "new/xl/sharedStrings.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)
@@ -47,6 +48,9 @@
         
         ;; themme
         (write-theme)
+        
+        ;; shared_string
+        (write-shared-strings)
 
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
