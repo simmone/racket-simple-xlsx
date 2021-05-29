@@ -35,7 +35,19 @@
     "test-filter-string"
     (check-equal? (filter-string "<a>") "&lt;a&gt;")
     (check-equal? (filter-string "<&a>") "&lt;&amp;a&gt;")
-    (check-equal? (filter-string "<<a>>") "&lt;&lt;a&gt;&gt;")
-   )))
+    (check-equal? (filter-string "<<a>>") "&lt;&lt;a&gt;&gt;"))
+
+   (test-case
+    "test-read-shared-strings"
+
+    (parameterize 
+     ([*CURRENT_XLSX* (new-xlsx)])
+      (read-shared-strings-file shared_strings_file)
+
+      (check-equal? (hash-count (XLSX-shared_strings_map (*CURRENT_XLSX*))) 3)
+      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) "chenxiao") 0)
+      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) "love") 1)
+      (check-equal? (hash-ref (XLSX-shared_strings_map (*CURRENT_XLSX*)) "陈思衡") 2)
+      ))))
 
 (run-tests test-shared-strings)

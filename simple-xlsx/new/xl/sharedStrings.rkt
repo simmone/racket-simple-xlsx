@@ -8,6 +8,7 @@
           [shared-strings (-> list?)]
           [write-shared-strings (-> void?)]
           [filter-string (-> string? string?)]
+          [read-shared-strings-file (-> path-string? void?)]
           [read-shared-strings (-> void?)]
           ))
 
@@ -53,18 +54,22 @@
           (lambda ()
             (printf "~a" (lists->compact_xml (shared-strings))))))))
 
-(define (read-shared-strings)
-  (let ([xml_hash (xml->hash (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "sharedStrings.xml"))])
+(define (read-shared-strings-file shared_strings_file)
+  (let ([xml_hash (xml->hash shared_strings_file)])
     (let loop ([loop_count 1])
       (when (<= loop_count (hash-ref xml_hash "sst.si's count" 0))
             (let ([t (hash-ref xml_hash (format "sst.si~a.t" loop_count))])
               (hash-set! (XLSX-shared_strings_map (*CURRENT_XLSX*))
-                         (sub1 loop_count)
                          (cond
                           [(string? t)
                            t]
                           [(integer? t)
                            (string (integer->char t))]
                           [else
-                           ""])))
+                           ""])
+                         (sub1 loop_count)
+                         ))
             (loop (add1 loop_count))))))
+
+(define (read-shared-strings)
+  (read-shared-strings-file (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl" "sharedStrings.xml")))
