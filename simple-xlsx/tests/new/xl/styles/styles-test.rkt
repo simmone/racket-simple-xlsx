@@ -1,8 +1,11 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 
 (require "../../../../lib/lib.rkt")
+(require "../../../../xlsx/xlsx.rkt")
 
 (require rackunit "../../../../new/xl/styles/styles.rkt")
 

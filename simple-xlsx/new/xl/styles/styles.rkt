@@ -2,10 +2,10 @@
 
 (require simple-xml)
 
+(require "../../../xlsx/xlsx.rkt")
 (require "../../../lib/lib.rkt")
 
 (provide (contract-out
-          [write-header (-> string?)]
           [fonts (-> list? list?)]
           [get-numFormatCode (-> hash? string?)]
           [numFmts (-> list? list?)]
@@ -13,11 +13,10 @@
           [borders (-> list? list?)]
           [cellStyleXfs (-> list?)]
           [cellXfs (-> list? list?)]
-          [write-cellStyles (-> string?)]
-          [write-dxfs (-> string?)]
-          [write-footer (-> string?)]
-          [write-styles (-> list? list? list? list? list? string?)]
-          [write-styles-file (-> path-string? list? list? list? list? list? void?)]
+          [cellStyles (-> list?)]
+          [dxfs (-> list?)]
+          [styles (-> list? list? list? list? list? list?)]
+          [write-styles (-> list? list? list? list? list? void?)]
           ))
 
 (define (fonts font_list)
@@ -46,13 +45,13 @@
                   (list "color" (cons "rgb" fontColor))
                   (list "color" (cons "theme" "1")))
               (list "name" (cons "val" fontName))
-              (list "family" (cons val "2"))
+              '("family" ("val" "2"))
               (if (not (regexp-match #rx"^([a-zA-Z]| |-|_|[0-9])+$" fontName))
                   (list "charset" (cons "val" "134"))
                   '())
               (list "scheme" (cons "val" "minor")))
-             result_list))
-           (reverse result_list))))))
+             result_list)))
+           (reverse result_list)))))
 
 (define (get-numFormatCode format_hash)
   (cond
@@ -171,7 +170,8 @@
                                           (cons "style" borderStyle)
                                           (list "color" (cons "rgb" borderColor)))
                                          direction_result))
-                        (reverse direction_result))))))
+                        (direction-loop (cdr loop_list) direction_result))
+                    (reverse direction_result)))))
            result_list))
          (reverse result_list)))
    '("diagonal")))
@@ -211,53 +211,57 @@
                            '()))
                       '("vertical" . "center")))]
                 )
-           (printf "  <xf numFmtId=\"~a\" fontId=\"~a\" fillId=\"~a\" borderId=\"~a\" xfId=\"0\"" numFmt font fill border)
-           (when (not (= font 0)) (printf " applyFont=\"1\""))
-           (when (not (= fill 0)) (printf " applyFill=\"1\""))
-           (when (not (= border 0)) (printf " applyBorder=\"1\""))
-           (when alignment_hash (printf " applyAlignment=\"1\""))
-           (printf ">~a</xf>\n" alignment_str))
-         (loop (cdr loop_list))))))
+           (loop
+            (cdr loop_list)
+            (cons
+             (append
+              (list
+               "xf"
+               (cons "numFmtId" (format "~a" numFmt))
+               (cons "fontId" (format "~a" font))
+               (cons "fillId" (format "~a" fill))
+               (cons "borderId" (format "~a" border))
+               (cons "xfId" "0"))
+              (if (not (= font 0)) '("applyFont" . "1") '())
+              (if (not (= fill 0)) '("applyFill" . "1") '())
+              (if (not (= border 0)) '("applyBorder" . "1") '())
+              (if alignment_hash '("applyAlignment" . "1") '())
+              alignment_list)
+             result_list)))
+         (reverse result_list)))))
 
-(define (write-cellStyles) @S{
-<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
-})
+(define (cellStyles)
+  '("cellStyles" ("count" . "1")
+    ("cellStyle" ("name" . "Normal") ("xfId" . "0") ("builtinId" . "0"))))
 
-(define (write-dxfs) @S{
-<dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
-})
-
-(define (write-footer) @S{
-</styleSheet>
-})
+(define (dxfs)
+  '(
+    ("dxfs" ("count" . "0"))
+    ("tableStyles" ("count" . "0") ("defaultTableStyle" . "TableStyleMedium9") ("defaultPivotStyle" . "PivotStyleLight16"))))
 
 (define (styles style_list fill_list font_list numFmt_list border_list)
   (append
-   (list "styleSheet" (cons "xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+   '("styleSheet" ("xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
    (numFmts numFmt_list)
    (fonts font_list)
    (fills fill_list)
    (borders border_list)
    (cellStyleXfs)
-@|(prefix-each-line (write-cellXfs style_list) "  ")|
+   (cellXfs style_list)
+   (cellStyles)
+   (dxfs)))
 
-@|(prefix-each-line (write-cellStyles) "  ")|
+(define (write-styles style_list fill_list font_list numFmt_list border_list)
+  (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl")])
+    (make-directory* dir)
 
-@|(prefix-each-line (write-dxfs) "  ")|
-
-@|(write-footer)|
-})
-
-(define (write-styles-file dir style_list fill_list font_list numFmt_list border_list)
-  (make-directory* dir)
-
-  (with-output-to-file (build-path dir "styles.xml")
-    #:exists 'replace
-    (lambda ()
-      (printf "~a" (write-styles 
-                    style_list
-                    fill_list
-                    font_list
-                    numFmt_list
-                    border_list
-                    )))))
+    (with-output-to-file (build-path dir "styles.xml")
+      #:exists 'replace
+      (lambda ()
+        (printf "~a" (lists->compact_xml
+                      (styles 
+                       style_list
+                       fill_list
+                       font_list
+                       numFmt_list
+                       border_list)))))))
