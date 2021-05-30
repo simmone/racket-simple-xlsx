@@ -20,6 +20,7 @@
 (require "new/xl/printerSettings/printerSettings.rkt")
 (require "new/xl/theme/theme.rkt")
 (require "new/xl/sharedStrings.rkt")
+(require "new/xl/styles/styles.rkt")
 
 (define (write-xlsx-file xlsx_file_name)
   (when (file-exists? xlsx_file_name)

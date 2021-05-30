@@ -4,10 +4,10 @@
 
 (require "../../../../lib/lib.rkt")
 
-(require rackunit "../../../../writer/xl/styles/styles.rkt")
+(require rackunit "../../../../new/xl/styles/styles.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path test_file "styles-test.dat")
+(define-runtime-path test_file "styles-test.xml")
 
 (define test-styles
   (test-suite
@@ -47,12 +47,14 @@
             )]
           )
 
-      (call-with-input-file test_file
-        (lambda (expected)
-          (call-with-input-string
-           (write-styles style_list fill_list font_list numFmt_list border_list)
-           (lambda (actual)
-             (check-lines? expected actual)))))
-      ))))
-
+      (parameterize 
+       ([*CURRENT_XLSX* (new-xlsx)])
+       
+       (call-with-input-file test_file
+         (lambda (expected)
+           (call-with-input-string
+            (lists->xml (styles style_list fill_list font_list numFmt_list border_list))
+            (lambda (actual)
+              (check-lines? expected actual))))))))))
+    
 (run-tests test-styles)

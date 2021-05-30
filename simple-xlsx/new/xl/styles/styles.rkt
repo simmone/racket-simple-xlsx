@@ -1,24 +1,18 @@
-#lang at-exp racket/base
+#lang racket
 
-(require racket/port)
-(require racket/math)
-(require racket/format)
-(require racket/file)
-(require racket/class)
-(require racket/list)
-(require racket/contract)
+(require simple-xml)
 
 (require "../../../lib/lib.rkt")
 
 (provide (contract-out
           [write-header (-> string?)]
-          [write-fonts (-> list? string?)]
+          [fonts (-> list? list?)]
           [get-numFormatCode (-> hash? string?)]
-          [write-numFmts (-> list? string?)]
-          [write-fills (-> list? string?)]
-          [write-borders (-> list? string?)]
-          [write-cellStyleXfs (-> string?)]
-          [write-cellXfs (-> list? string?)]
+          [numFmts (-> list? list?)]
+          [fills (-> list? list?)]
+          [borders (-> list? list?)]
+          [cellStyleXfs (-> list?)]
+          [cellXfs (-> list? list?)]
           [write-cellStyles (-> string?)]
           [write-dxfs (-> string?)]
           [write-footer (-> string?)]
@@ -26,43 +20,39 @@
           [write-styles-file (-> path-string? list? list? list? list? list? void?)]
           ))
 
-(define S string-append)
-
-(define (write-header) @S{
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-})
-
-(define (write-fonts font_list) @S{
-<fonts count="@|(number->string (add1 (length font_list)))|">
-  <font>
-    <sz val="11"/>
-    <color theme="1"/>
-    <name val="宋体"/>
-    <family val="2"/>
-    <charset val="134"/>
-    <scheme val="minor"/>
-  </font>
-@|(with-output-to-string
-    (lambda ()
-      (let loop ([loop_list font_list])
-        (when (not (null? loop_list))
-          (printf "\n")
-          (let ([fontSize (hash-ref (car loop_list) 'fontSize 11)]
-                [fontColor (hash-ref (car loop_list) 'fontColor #f)]
-                [fontName (hash-ref (car loop_list) 'fontName "宋体")])
-            (printf "  <font>\n")
-            (printf "    <sz val=\"~a\"/>\n" fontSize)
-            (if fontColor (printf "    <color rgb=\"~a\"/>\n" fontColor) (printf "    <color theme=\"1\"/>\n"))
-            (printf "    <name val=\"~a\"/>\n" fontName)
-            (printf "    <family val=\"2\"/>\n")
-            (when (not (regexp-match #rx"^([a-zA-Z]| |-|_|[0-9])+$" fontName)) 
-              (printf "    <charset val=\"134\"/>\n")
-              (printf "    <scheme val=\"minor\"/>\n"))
-            (printf "  </font>\n")
-            (loop (cdr loop_list)))))))|</fonts>
-})
+(define (fonts font_list)
+  (append
+   (list "fonts" (cons "count" (number->string (add1 (length font_list)))))
+   '("font"
+     ("sz" ("val" . "11"))
+     ("color" ("theme" . "1"))
+     ("name" ("val" . "宋体"))
+     ("family" ("val" . "2"))
+     ("charset" ("val" . "134"))
+     ("scheme" ("val" . "minor")))
+   (let loop ([loop_list font_list]
+              [result_list '()])
+     (if (not (null? loop_list))
+         (let ([fontSize (hash-ref (car loop_list) 'fontSize 11)]
+               [fontColor (hash-ref (car loop_list) 'fontColor #f)]
+               [fontName (hash-ref (car loop_list) 'fontName "宋体")])
+           (loop
+            (cdr loop_list)
+            (cons
+             (list
+              "font"
+              (list "sz" (cons "val" (number->string fontSize)))
+              (if fontColor
+                  (list "color" (cons "rgb" fontColor))
+                  (list "color" (cons "theme" "1")))
+              (list "name" (cons "val" fontName))
+              (list "family" (cons val "2"))
+              (if (not (regexp-match #rx"^([a-zA-Z]| |-|_|[0-9])+$" fontName))
+                  (list "charset" (cons "val" "134"))
+                  '())
+              (list "scheme" (cons "val" "minor")))
+             result_list))
+           (reverse result_list))))))
 
 (define (get-numFormatCode format_hash)
   (cond
@@ -119,65 +109,80 @@
    [(hash-has-key? format_hash 'formatCode)
     (hash-ref format_hash 'formatCode)]))
 
-(define (write-numFmts numFmt_list) @S{
-<numFmts count="@|(number->string (add1 (length numFmt_list)))|">
-  <numFmt numFmtId="164" formatCode="General"/>
-@|(with-output-to-string
-    (lambda ()
-      (let loop ([loop_list numFmt_list]
-                 [loop_numId 164])
-        (when (not (null? loop_list))
-          (let ([formatCode (get-numFormatCode (car loop_list))])
-            (printf "  <numFmt numFmtId=\"~a\" formatCode=\"~a\"/>\n" (add1 loop_numId) formatCode))
-          (loop (cdr loop_list) (add1 loop_numId))))))|</numFmts>
-})
-
-(define (write-fills fill_list) @S{
-<fills count="@|(number->string (+ 2 (length fill_list)))|">
-  <fill><patternFill patternType="none"/></fill>
-  <fill><patternFill patternType="gray125"/></fill>
-@|(let loop ([loop_list fill_list]
-             [result_str ""])
-    (if (not (null? loop_list))
-      (let ([backgroundColor (hash-ref (car loop_list) 'fgColor "FFFFFF")])
-        (loop 
+(define (numFmts numFmt_list)
+  (append
+   (list
+    "numFmts" (cons "count" (format "~a" (add1 (length numFmt_list)))))
+   '("numFmt" ("numFmtId" . "164") ("formatCode" . "General"))
+   (let loop ([loop_list numFmt_list]
+              [loop_numId 164]
+              [result_list '()])
+     (if (not (null? loop_list))
+         (loop
           (cdr loop_list)
-          (string-append result_str (format "  <fill><patternFill patternType=\"solid\"><fgColor rgb=\"~a\"/><bgColor indexed=\"64\"/></patternFill></fill>\n" backgroundColor))))
-        result_str))|</fills>
-})
+          (add1 loop_numId)
+          (cons
+           (list "numFmt" (cons "numFmtId" (format "~a" (add1 loop_numId))) (cons "formatCode" (format "~a" (get-numFormatCode (car loop_list)))))
+           result_list))
+         (reverse result_list)))))
 
-(define (write-borders border_list) @S{
-<borders count="@|(number->string (add1 (length border_list)))|">
-  <border><left/><right/><top/><bottom/><diagonal/></border>
-@|(with-output-to-string
-    (lambda ()
-      (let loop ([loop_list border_list])
-        (when (not (null? loop_list))
-          (printf "\n")
-          (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
-                [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
-                [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
-            (printf "  <border>\n")
-            (let direction-loop ([directions '(left right top bottom)])
-              (when (not (null? directions))
-                (if (or 
-                      (eq? borderDirection 'all)
-                      (eq? (car directions) borderDirection))
-                  (printf "    <~a style=\"~a\"><color rgb=\"~a\"/></~a>\n" (car directions) borderStyle borderColor (car directions))
-                  (printf "    <~a/>\n" (car directions)))
-                (direction-loop (cdr directions))))
-            (printf "    <diagonal/>\n")
-            (printf "  </border>\n")
-          (loop (cdr loop_list)))))))|</borders>
-})
+(define (fills fill_list)
+  (append
+   (list "fills" (cons "count" (number->string (+ 2 (length fill_list)))))
+   '("fill" ("patternFill" ("patternType" . "none")))
+   '("fill" ("patternFill" ("patternType" . "gray125")))
+   (let loop ([loop_list fill_list]
+              [result_list '()])
+     (if (not (null? loop_list))
+         (let ([backgroundColor (hash-ref (car loop_list) 'fgColor "FFFFFF")])
+           (loop 
+            (cdr loop_list)
+            (list "fill"
+                  '("patternFill" ("patternType" . "solid"))
+                  (list "fgColor" (cons "rgb" backgroundColor))
+                  '("bgColor" ("indexed" . "64")))))
+         (reverse result_list)))))
 
-(define (write-cellStyleXfs) @S{
-<cellStyleXfs count="1">
-  <xf numFmtId="0" fontId="0" fillId="0" borderId="0"><alignment vertical="center"/></xf>
-</cellStyleXfs>
-})
+(define (borders border_list)
+  (append
+   (list "borders" (cons "count" (number->string (add1 (length border_list)))))
+   '("border" ("left") ("right") ("top") ("bottom") ("diagonal"))
+   (let loop ([loop_list border_list]
+              [result_list '()])
+     (if (not (null? loop_list))
+         (loop
+          (cdr loop_list)
+          (cons
+           (list
+            "border"
+            (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
+                  [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
+                  [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
+              (let direction-loop ([directions '(left right top bottom)]
+                                   [direction_result '()])
+                (if (not (null? directions))
+                    (if (or 
+                         (eq? borderDirection 'all)
+                         (eq? (car directions) borderDirection))
+                        (direction-loop (cdr loop_list)
+                                        (cons
+                                         (list
+                                          (car directions)
+                                          (cons "style" borderStyle)
+                                          (list "color" (cons "rgb" borderColor)))
+                                         direction_result))
+                        (reverse direction_result))))))
+           result_list))
+         (reverse result_list)))
+   '("diagonal")))
 
-(define (write-cellXfs style_list) @S{
+(define (cellStyleXfs)
+  '("cellStyleXfs"
+    ("count" . "1")
+    ("xf" ("numFmtId" . "0") ("fontId" . "0") ("fillId" . "0") ("borderId" . "0")
+     ("alignment" ("vertical" . "center")))))
+
+(define (cellXfs style_list)
 <cellXfs count="@|(number->string (add1 (length style_list)))|">
   <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>
 @|(with-output-to-string
@@ -223,19 +228,14 @@
 </styleSheet>
 })
 
-(define (write-styles style_list fill_list font_list numFmt_list border_list) @S{
-@|(write-header)|
-
-@|(prefix-each-line (write-numFmts numFmt_list) "  ")|
-
-@|(prefix-each-line (write-fonts font_list) "  ")|
-
-@|(prefix-each-line (write-fills fill_list) "  ")|
-
-@|(prefix-each-line (write-borders border_list) "  ")|
-
-@|(prefix-each-line (write-cellStyleXfs) "  ")|
-
+(define (styles style_list fill_list font_list numFmt_list border_list)
+  (append
+   (list "styleSheet" (cons "xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+   (numFmts numFmt_list)
+   (fonts font_list)
+   (fills fill_list)
+   (borders border_list)
+   (cellStyleXfs)
 @|(prefix-each-line (write-cellXfs style_list) "  ")|
 
 @|(prefix-each-line (write-cellStyles) "  ")|
