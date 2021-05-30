@@ -183,38 +183,41 @@
      ("alignment" ("vertical" . "center")))))
 
 (define (cellXfs style_list)
-<cellXfs count="@|(number->string (add1 (length style_list)))|">
-  <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>
-@|(with-output-to-string
-    (lambda ()
-      (let loop ([loop_list style_list])
-        (when (not (null? loop_list))
-          (let* ([fill (hash-ref (car loop_list) 'fill 0)]
-                 [font (hash-ref (car loop_list) 'font 0)]
-                 [numFmt (hash-ref (car loop_list) 'numFmt 0)]
-                 [border (hash-ref (car loop_list) 'border 0)]
-                 [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
-                 [alignment_str
-                    (format "<alignment~a/>"
-                      (if alignment_hash
-                         (format
-                           "~a~a"
-                           (if (hash-has-key? alignment_hash 'horizontalAlign) (format " horizontal=\"~a\"" (hash-ref alignment_hash 'horizontalAlign)) "")
-                           (if (hash-has-key? alignment_hash 'verticalAlign) (format " vertical=\"~a\""
-                                                                               (if (eq? (hash-ref alignment_hash 'verticalAlign) 'middle)
-                                                                                  'center
-                                                                                  (hash-ref alignment_hash 'verticalAlign)))
-                                                                             ""))
-                       " vertical=\"center\""))]
+  (append
+   (list "cellXfs" (cons "count" . (number->string (add1 (length style_list)))))
+   '("xf"
+     ("numFmtId" . "0") ("fontId" . "0") ("fillId" . "0") ("borderId" . "0") ("xfId" . "0")
+     ("alignment" ("vertical" . "center")))
+   (let loop ([loop_list style_list]
+              [result_list '()])
+     (if (not (null? loop_list))
+         (let* (
+                [fill (hash-ref (car loop_list) 'fill 0)]
+                [font (hash-ref (car loop_list) 'font 0)]
+                [numFmt (hash-ref (car loop_list) 'numFmt 0)]
+                [border (hash-ref (car loop_list) 'border 0)]
+                [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
+                [alignment_list
+                 (list
+                  "alignment"
+                  (if alignment_hash
+                      (append
+                       (if (hash-has-key? alignment_hash 'horizontalAlign) (cons "horizontal" (hash-ref alignment_hash 'horizontalAlign)) '())
+                       (if (hash-has-key? alignment_hash 'verticalAlign)
+                           (cons "vertical" 
+                                 (if (eq? (hash-ref alignment_hash 'verticalAlign) 'middle)
+                                     'center
+                                     (hash-ref alignment_hash 'verticalAlign)))
+                           '()))
+                      '("vertical" . "center")))]
                 )
-            (printf "  <xf numFmtId=\"~a\" fontId=\"~a\" fillId=\"~a\" borderId=\"~a\" xfId=\"0\"" numFmt font fill border)
-            (when (not (= font 0)) (printf " applyFont=\"1\""))
-            (when (not (= fill 0)) (printf " applyFill=\"1\""))
-            (when (not (= border 0)) (printf " applyBorder=\"1\""))
-            (when alignment_hash (printf " applyAlignment=\"1\""))
-            (printf ">~a</xf>\n" alignment_str))
-          (loop (cdr loop_list))))))|</cellXfs>
-})
+           (printf "  <xf numFmtId=\"~a\" fontId=\"~a\" fillId=\"~a\" borderId=\"~a\" xfId=\"0\"" numFmt font fill border)
+           (when (not (= font 0)) (printf " applyFont=\"1\""))
+           (when (not (= fill 0)) (printf " applyFill=\"1\""))
+           (when (not (= border 0)) (printf " applyBorder=\"1\""))
+           (when alignment_hash (printf " applyAlignment=\"1\""))
+           (printf ">~a</xf>\n" alignment_str))
+         (loop (cdr loop_list))))))
 
 (define (write-cellStyles) @S{
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
