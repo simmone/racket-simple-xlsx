@@ -106,13 +106,15 @@
         number_precision_str]
        ))]
    [(hash-has-key? format_hash 'formatCode)
-    (hash-ref format_hash 'formatCode)]))
+    (hash-ref format_hash 'formatCode)]
+   [else
+    "0.00"]))
 
 (define (numFmts numFmt_list)
   (append
    (list
     "numFmts" (cons "count" (format "~a" (add1 (length numFmt_list)))))
-   '("numFmt" ("numFmtId" . "164") ("formatCode" . "General"))
+   '(("numFmt" ("numFmtId" . "164") ("formatCode" . "General")))
    (let loop ([loop_list numFmt_list]
               [loop_numId 164]
               [result_list '()])
@@ -145,7 +147,7 @@
 (define (borders border_list)
   (append
    (list "borders" (cons "count" (number->string (add1 (length border_list)))))
-   '("border" ("left") ("right") ("top") ("bottom") ("diagonal"))
+   '(("border" ("left") ("right") ("top") ("bottom") ("diagonal")))
    (let loop ([loop_list border_list]
               [result_list '()])
      (if (not (null? loop_list))
@@ -154,27 +156,28 @@
           (cons
            (list
             "border"
-            (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
-                  [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
-                  [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
-              (let direction-loop ([directions '(left right top bottom)]
-                                   [direction_result '()])
-                (if (not (null? directions))
-                    (if (or 
-                         (eq? borderDirection 'all)
-                         (eq? (car directions) borderDirection))
-                        (direction-loop (cdr loop_list)
-                                        (cons
-                                         (list
-                                          (car directions)
-                                          (cons "style" borderStyle)
-                                          (list "color" (cons "rgb" borderColor)))
-                                         direction_result))
-                        (direction-loop (cdr loop_list) direction_result))
-                    (reverse direction_result)))))
+            (car
+             (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
+                   [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
+                   [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
+               (let direction-loop ([directions '(left right top bottom)]
+                                    [direction_result '()])
+                 (if (not (null? directions))
+                     (if (or 
+                          (eq? borderDirection 'all)
+                          (eq? (car directions) borderDirection))
+                         (direction-loop (cdr directions)
+                                         (cons
+                                          (list
+                                           (car directions)
+                                           (cons "style" borderStyle)
+                                           (list "color" (cons "rgb" borderColor)))
+                                          direction_result))
+                         (direction-loop (cdr directions) direction_result))
+                     (reverse direction_result))))))
            result_list))
          (reverse result_list)))
-   '("diagonal")))
+   '(("diagonal"))))
 
 (define (cellStyleXfs)
   '("cellStyleXfs"

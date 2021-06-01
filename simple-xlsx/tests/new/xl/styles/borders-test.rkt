@@ -1,13 +1,15 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 
 (require "../../../../lib/lib.rkt")
 
-(require rackunit "../../../../writer/xl/styles/styles.rkt")
+(require rackunit "../../../../new/xl/styles/styles.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path test_file "borders-test.dat")
+(define-runtime-path test_file "borders-test.xml")
 
 (define test-styles
   (test-suite
@@ -26,10 +28,12 @@
             '#hash((borderDirection . bottom) (borderStyle . thick) (borderColor . "0000FF"))
             )])
       
+      (printf "~a\n" (lists->xml_content (borders border_list)))
+      
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (write-borders border_list)
+           (lists->xml_content (borders border_list))
            (lambda (actual)
              (check-lines? expected actual)))))
       ))))

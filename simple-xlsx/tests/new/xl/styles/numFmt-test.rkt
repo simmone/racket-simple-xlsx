@@ -63,7 +63,7 @@
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (lists->xml #:header #f (numFmts numFmt_list))
+           (lists->xml_content (numFmts numFmt_list))
            (lambda (actual)
              (check-lines? expected actual)))))
       ))))
