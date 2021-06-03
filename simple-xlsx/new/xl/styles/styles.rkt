@@ -145,9 +145,10 @@
          (reverse result_list)))))
 
 (define (borders border_list)
-  (append
-   (list "borders" (cons "count" (number->string (add1 (length border_list)))))
-   '(("border" ("left") ("right") ("top") ("bottom") ("diagonal")))
+  (list
+   "borders"
+   (cons "count" (number->string (add1 (length border_list))))
+   '("border" ("left") ("right") ("top") ("bottom") ("diagonal"))
    (let loop ([loop_list border_list]
               [result_list '()])
      (if (not (null? loop_list))
