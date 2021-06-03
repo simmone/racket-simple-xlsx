@@ -156,25 +156,24 @@
           (cons
            (list
             "border"
-            (car
-             (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
-                   [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
-                   [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
-               (let direction-loop ([directions '(left right top bottom)]
-                                    [direction_result '()])
-                 (if (not (null? directions))
-                     (if (or 
-                          (eq? borderDirection 'all)
-                          (eq? (car directions) borderDirection))
-                         (direction-loop (cdr directions)
-                                         (cons
-                                          (list
-                                           (car directions)
-                                           (cons "style" borderStyle)
-                                           (list "color" (cons "rgb" borderColor)))
-                                          direction_result))
-                         (direction-loop (cdr directions) direction_result))
-                     (reverse direction_result))))))
+            (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
+                  [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
+                  [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
+              (let direction-loop ([directions '(left right top bottom)]
+                                   [direction_result '()])
+                (if (not (null? directions))
+                    (if (or 
+                         (eq? borderDirection 'all)
+                         (eq? (car directions) borderDirection))
+                        (direction-loop (cdr directions)
+                                        (cons
+                                         (list
+                                          (car directions)
+                                          (cons "style" borderStyle)
+                                          (list "color" (cons "rgb" borderColor)))
+                                         direction_result))
+                        (direction-loop (cdr directions) direction_result))
+                    (reverse direction_result)))))
            result_list))
          (reverse result_list)))
    '(("diagonal"))))
