@@ -145,9 +145,9 @@
          (reverse result_list)))))
 
 (define (borders border_list)
-  (list
-   "borders"
-   (cons "count" (number->string (add1 (length border_list))))
+  (append
+   '("borders")
+   (list (cons "count" (number->string (add1 (length border_list))))
    '("border" ("left") ("right") ("top") ("bottom") ("diagonal"))
    (let loop ([loop_list border_list]
               [result_list '()])
@@ -155,8 +155,8 @@
          (loop
           (cdr loop_list)
           (cons
-           (list
-            "border"
+           (append
+            '("border")
             (let ([borderDirection (hash-ref (car loop_list) 'borderDirection 'all)]
                   [borderStyle (hash-ref (car loop_list) 'borderStyle 'thin)]
                   [borderColor (hash-ref (car loop_list) 'borderColor "000000")])
@@ -174,10 +174,10 @@
                                           (list "color" (cons "rgb" borderColor)))
                                          direction_result))
                         (direction-loop (cdr directions) direction_result))
-                    (reverse direction_result)))))
+                    (reverse direction_result))))
+            '("diagonal"))
            result_list))
-         (reverse result_list)))
-   '(("diagonal"))))
+         (reverse result_list))))))
 
 (define (cellStyleXfs)
   '("cellStyleXfs"

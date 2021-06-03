@@ -27,6 +27,8 @@
             '#hash((borderDirection . top) (borderStyle . thick) (borderColor . "0000FF"))
             '#hash((borderDirection . bottom) (borderStyle . thick) (borderColor . "0000FF"))
             )])
+
+      (printf "~a\n" (borders border_list))
       
       (printf "~a\n" (lists->xml_content (borders border_list)))
       
