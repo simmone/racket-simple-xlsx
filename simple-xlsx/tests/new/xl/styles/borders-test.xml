@@ -40,33 +40,21 @@
     <left style="thick">
       <color rgb="0000FF"/>
     </left>
-    <right/>
-    <top/>
-    <bottom/>
     <diagonal/>
   </border>
   <border>
-    <left/>
     <right style="thick">
       <color rgb="0000FF"/>
     </right>
-    <top/>
-    <bottom/>
     <diagonal/>
   </border>
   <border>
-    <left/>
-    <right/>
     <top style="thick">
       <color rgb="0000FF"/>
     </top>
-    <bottom/>
     <diagonal/>
   </border>
   <border>
-    <left/>
-    <right/>
-    <top/>
     <bottom style="thick">
       <color rgb="0000FF"/>
     </bottom>
