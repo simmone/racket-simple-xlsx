@@ -28,10 +28,6 @@
             '#hash((borderDirection . bottom) (borderStyle . thick) (borderColor . "0000FF"))
             )])
 
-      (printf "~a\n" (borders border_list))
-      
-      (printf "~a\n" (lists->xml_content (borders border_list)))
-      
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string

@@ -147,8 +147,8 @@
 (define (borders border_list)
   (append
    '("borders")
-   (list (cons "count" (number->string (add1 (length border_list))))
-   '("border" ("left") ("right") ("top") ("bottom") ("diagonal"))
+   (list (cons "count" (number->string (add1 (length border_list)))))
+   '(("border" ("left") ("right") ("top") ("bottom") ("diagonal")))
    (let loop ([loop_list border_list]
               [result_list '()])
      (if (not (null? loop_list))
@@ -175,9 +175,9 @@
                                          direction_result))
                         (direction-loop (cdr directions) direction_result))
                     (reverse direction_result))))
-            '("diagonal"))
+            '(("diagonal")))
            result_list))
-         (reverse result_list))))))
+         (reverse result_list)))))
 
 (define (cellStyleXfs)
   '("cellStyleXfs"
