@@ -1,13 +1,15 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 
 (require "../../../../lib/lib.rkt")
 
-(require rackunit "../../../../writer/xl/styles/styles.rkt")
+(require rackunit "../../../../new/xl/styles/styles.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path test_file "fills-test.dat")
+(define-runtime-path test_file "fills-test.xml")
 
 (define test-styles
   (test-suite
@@ -21,7 +23,7 @@
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (write-fills fill_list)
+           (lists->xml_content (fills fill_list))
            (lambda (actual)
              (check-lines? expected actual)))))
       ))))

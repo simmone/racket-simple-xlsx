@@ -1,7 +1,0 @@
-<fills count="5">
-  <fill><patternFill patternType="none"/></fill>
-  <fill><patternFill patternType="gray125"/></fill>
-  <fill><patternFill patternType="solid"><fgColor rgb="FF0000"/><bgColor indexed="64"/></patternFill></fill>
-  <fill><patternFill patternType="solid"><fgColor rgb="00FF00"/><bgColor indexed="64"/></patternFill></fill>
-  <fill><patternFill patternType="solid"><fgColor rgb="0000FF"/><bgColor indexed="64"/></patternFill></fill>
-</fills>

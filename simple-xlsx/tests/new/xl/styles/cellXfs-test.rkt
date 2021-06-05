@@ -1,13 +1,15 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 
 (require racket/runtime-path)
-(define-runtime-path test_file "cellXfs-test.dat")
+(define-runtime-path test_file "cellXfs-test.xml")
 
 (require "../../../../lib/lib.rkt")
 
-(require rackunit "../../../../writer/xl/styles/styles.rkt")
+(require rackunit "../../../../new/xl/styles/styles.rkt")
 
 (define test-styles
   (test-suite
@@ -27,7 +29,7 @@
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (write-cellXfs style_list)
+           (lists->xml_content (cellXfs style_list))
            (lambda (actual)
              (check-lines? expected actual)))))
       ))))

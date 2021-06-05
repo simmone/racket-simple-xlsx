@@ -22,13 +22,13 @@
 (define (fonts font_list)
   (append
    (list "fonts" (cons "count" (number->string (add1 (length font_list)))))
-   '("font"
-     ("sz" ("val" . "11"))
-     ("color" ("theme" . "1"))
-     ("name" ("val" . "宋体"))
-     ("family" ("val" . "2"))
-     ("charset" ("val" . "134"))
-     ("scheme" ("val" . "minor")))
+   '(("font"
+      ("sz" ("val" . "11"))
+      ("color" ("theme" . "1"))
+      ("name" ("val" . "宋体"))
+      ("family" ("val" . "2"))
+      ("charset" ("val" . "134"))
+      ("scheme" ("val" . "minor"))))
    (let loop ([loop_list font_list]
               [result_list '()])
      (if (not (null? loop_list))
@@ -45,7 +45,7 @@
                   (list "color" (cons "rgb" fontColor))
                   (list "color" (cons "theme" "1")))
               (list "name" (cons "val" fontName))
-              '("family" ("val" "2"))
+              '("family" ("val" . "2"))
               (if (not (regexp-match #rx"^([a-zA-Z]| |-|_|[0-9])+$" fontName))
                   (list "charset" (cons "val" "134"))
                   '())
@@ -130,18 +130,22 @@
 (define (fills fill_list)
   (append
    (list "fills" (cons "count" (number->string (+ 2 (length fill_list)))))
-   '("fill" ("patternFill" ("patternType" . "none")))
-   '("fill" ("patternFill" ("patternType" . "gray125")))
+   '(("fill" ("patternFill" ("patternType" . "none"))))
+   '(("fill" ("patternFill" ("patternType" . "gray125"))))
    (let loop ([loop_list fill_list]
               [result_list '()])
      (if (not (null? loop_list))
          (let ([backgroundColor (hash-ref (car loop_list) 'fgColor "FFFFFF")])
            (loop 
             (cdr loop_list)
-            (list "fill"
-                  '("patternFill" ("patternType" . "solid"))
-                  (list "fgColor" (cons "rgb" backgroundColor))
-                  '("bgColor" ("indexed" . "64")))))
+            (cons
+             (list "fill"
+                   (list
+                    "patternFill"
+                    '("patternType" . "solid")
+                    (list "fgColor" (cons "rgb" backgroundColor))
+                    '("bgColor" ("indexed" . "64"))))
+             result_list)))
          (reverse result_list)))))
 
 (define (borders border_list)
@@ -187,10 +191,10 @@
 
 (define (cellXfs style_list)
   (append
-   (list "cellXfs" (cons "count" . (number->string (add1 (length style_list)))))
-   '("xf"
+   (list "cellXfs" (cons "count" (number->string (add1 (length style_list)))))
+   '(("xf"
      ("numFmtId" . "0") ("fontId" . "0") ("fillId" . "0") ("borderId" . "0") ("xfId" . "0")
-     ("alignment" ("vertical" . "center")))
+     ("alignment" ("vertical" . "center"))))
    (let loop ([loop_list style_list]
               [result_list '()])
      (if (not (null? loop_list))
@@ -202,33 +206,33 @@
                 [alignment_hash (hash-ref (car loop_list) 'alignment #f)]
                 [alignment_list
                  (list
-                  "alignment"
-                  (if alignment_hash
-                      (append
-                       (if (hash-has-key? alignment_hash 'horizontalAlign) (cons "horizontal" (hash-ref alignment_hash 'horizontalAlign)) '())
-                       (if (hash-has-key? alignment_hash 'verticalAlign)
-                           (cons "vertical" 
-                                 (if (eq? (hash-ref alignment_hash 'verticalAlign) 'middle)
-                                     'center
-                                     (hash-ref alignment_hash 'verticalAlign)))
-                           '()))
-                      '("vertical" . "center")))]
+                  (list
+                   "alignment"
+                   (if alignment_hash
+                       (append
+                        (if (hash-has-key? alignment_hash 'horizontalAlign) (cons "horizontal" (hash-ref alignment_hash 'horizontalAlign)) '())
+                        (if (hash-has-key? alignment_hash 'verticalAlign)
+                            (cons "vertical" 
+                                  (if (eq? (hash-ref alignment_hash 'verticalAlign) 'middle)
+                                      'center
+                                      (hash-ref alignment_hash 'verticalAlign)))
+                            '()))
+                       '("vertical" . "center"))))]
                 )
            (loop
             (cdr loop_list)
             (cons
              (append
-              (list
-               "xf"
-               (cons "numFmtId" (format "~a" numFmt))
-               (cons "fontId" (format "~a" font))
-               (cons "fillId" (format "~a" fill))
-               (cons "borderId" (format "~a" border))
-               (cons "xfId" "0"))
-              (if (not (= font 0)) '("applyFont" . "1") '())
-              (if (not (= fill 0)) '("applyFill" . "1") '())
-              (if (not (= border 0)) '("applyBorder" . "1") '())
-              (if alignment_hash '("applyAlignment" . "1") '())
+              (list "xf"
+                    (cons "numFmtId" (format "~a" numFmt))
+                    (cons "fontId" (format "~a" font))
+                    (cons "fillId" (format "~a" fill))
+                    (cons "borderId" (format "~a" border))
+                    (cons "xfId" "0"))
+              (if (not (= font 0)) '(("applyFont" . "1")) '())
+              (if (not (= fill 0)) '(("applyFill" . "1")) '())
+              (if (not (= border 0)) '(("applyBorder" . "1")) '())
+              (if alignment_hash '(("applyAlignment" . "1")) '())
               alignment_list)
              result_list)))
          (reverse result_list)))))

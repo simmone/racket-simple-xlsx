@@ -7,7 +7,6 @@
     <charset val="134"/>
     <scheme val="minor"/>
   </font>
-
   <font>
     <sz val="20"/>
     <color theme="1"/>
@@ -16,14 +15,13 @@
     <charset val="134"/>
     <scheme val="minor"/>
   </font>
-
   <font>
     <sz val="30"/>
     <color rgb="FF0000"/>
     <name val="Impact"/>
     <family val="2"/>
+    <scheme val="minor"/>
   </font>
-
   <font>
     <sz val="40"/>
     <color rgb="0000FF"/>

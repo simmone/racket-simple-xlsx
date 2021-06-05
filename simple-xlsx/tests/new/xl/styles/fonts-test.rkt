@@ -1,13 +1,15 @@
 #lang racket
 
+(require simple-xml)
+
 (require rackunit/text-ui)
 
 (require "../../../../lib/lib.rkt")
 
-(require rackunit "../../../../writer/xl/styles/styles.rkt")
+(require rackunit "../../../../new/xl/styles/styles.rkt")
 
 (require racket/runtime-path)
-(define-runtime-path test_file "fonts-test.dat")
+(define-runtime-path test_file "fonts-test.xml")
 
 (define test-styles
   (test-suite
@@ -26,7 +28,7 @@
       (call-with-input-file test_file
         (lambda (expected)
           (call-with-input-string
-           (write-fonts font_list)
+           (lists->xml_content (fonts font_list))
            (lambda (actual)
              (check-lines? expected actual)))))
       ))))
