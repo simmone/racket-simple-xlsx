@@ -242,13 +242,15 @@
     ("cellStyle" ("name" . "Normal") ("xfId" . "0") ("builtinId" . "0"))))
 
 (define (dxfs)
-  '(
-    ("dxfs" ("count" . "0"))
-    ("tableStyles" ("count" . "0") ("defaultTableStyle" . "TableStyleMedium9") ("defaultPivotStyle" . "PivotStyleLight16"))))
+  '("dxfs" ("count" . "0")))
+
+(define (tableStyles)
+  '("tableStyles" ("count" . "0") ("defaultTableStyle" . "TableStyleMedium9") ("defaultPivotStyle" . "PivotStyleLight16")))
 
 (define (styles style_list fill_list font_list numFmt_list border_list)
-  (append
-   '("styleSheet" ("xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+  (list
+   "styleSheet"
+   '("xmlns" . "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
    (numFmts numFmt_list)
    (fonts font_list)
    (fills fill_list)
@@ -256,7 +258,8 @@
    (cellStyleXfs)
    (cellXfs style_list)
    (cellStyles)
-   (dxfs)))
+   (dxfs)
+   (tableStyles)))
 
 (define (write-styles style_list fill_list font_list numFmt_list border_list)
   (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl")])
