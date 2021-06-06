@@ -17,6 +17,7 @@
           [dxfs (-> list?)]
           [styles (-> list? list? list? list? list? list?)]
           [write-styles (-> list? list? list? list? list? void?)]
+          [read-styles (-> void?)]
           ))
 
 (define (fonts font_list)
@@ -275,3 +276,6 @@
                        font_list
                        numFmt_list
                        border_list)))))))
+
+(define (read-styles)
+  (void))
