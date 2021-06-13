@@ -8,12 +8,9 @@
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
-                   (cell_to_origin_style_hash hash?)
-                   (cell_to_style_index_hash hash?)
+                   (cell->style_hash_map hash?)
                    (row_to_origin_style_hash hash?)
-                   (row_to_style_index_hash hash?)
                    (col_to_origin_style_hash hash?)
-                   (col_to_style_index_hash hash?)
                    )]
           [new-data-sheet (->
                            (cons/c natural? natural?)

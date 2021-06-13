@@ -17,6 +17,11 @@
                    (sheet_index_rel_map (hash/c natural? string?))
                    (shared_strings_map (hash/c string? natural?))
                    (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
+                   (style_hash->index_map (hash/c hash? natural?))
+                   (font_hash->index_map (hash/c hash? natural?))
+                   (num_hash->index_map (hash/c hash? natural?))
+                   (fill_hash->index_map (hash/c hash? natural?))
+                   (border_hash->index_map (hash/c hash? natural?))
                    )
                   ]
           [new-xlsx (-> XLSX?)]
