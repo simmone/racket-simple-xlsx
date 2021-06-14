@@ -42,10 +42,17 @@
          [sheet_index_rel_map #:mutable]
          [shared_strings_map #:mutable]
          [sheet_list #:mutable]
+         [style_hash->index_map #:mutable]
+         [font_hash->index_map #:mutable]
+         [num_hash->index_map #:mutable]
+         [fill_hash->index_map #:mutable]
+         [border_hash->index_map #:mutable]
          ))
 
 (define (new-xlsx)
   (XLSX "" 0
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
         (make-hash) (make-hash)
-        '()))
+        '()
+        (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
+        ))

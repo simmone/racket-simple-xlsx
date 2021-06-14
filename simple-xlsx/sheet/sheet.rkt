@@ -8,9 +8,9 @@
                    (width_hash hash?)
                    (height_hash hash?)
                    (freeze_range (cons/c natural? natural?))
-                   (cell->style_hash_map hash?)
-                   (row_to_origin_style_hash hash?)
-                   (col_to_origin_style_hash hash?)
+                   (cell->style_index_map hash?)
+                   (row->style_index_map hash?)
+                   (col->style_index_map hash?)
                    )]
           [new-data-sheet (->
                            (cons/c natural? natural?)
@@ -42,19 +42,17 @@
                     [width_hash #:mutable]
                     [height_hash #:mutable]
                     [freeze_range #:mutable]
-                    [cell_to_origin_style_hash #:mutable]
-                    [cell_to_style_index_hash #:mutable]
-                    [row_to_origin_style_hash #:mutable]
-                    [row_to_style_index_hash #:mutable]
-                    [col_to_origin_style_hash #:mutable]
-                    [col_to_style_index_hash #:mutable]
+                    [cell->style_index_map #:mutable]
+                    [row->style_index_map #:mutable]
+                    [col->style_index_map #:mutable]
                     ))
 
 (define (new-data-sheet dimension rvtsf_map)
   (DATA-SHEET
    dimension
    rvtsf_map
-   (make-hash) (make-hash) '(0 . 0) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)))
+   (make-hash) (make-hash) '(0 . 0)
+   (make-hash) (make-hash) (make-hash)))
 
 (struct COL-ATTR ([width #:mutable] [back_color #:mutable]))
 
