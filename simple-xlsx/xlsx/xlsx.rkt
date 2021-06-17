@@ -26,6 +26,8 @@
                   ]
           [new-xlsx (-> XLSX?)]
           [*CURRENT_XLSX* (parameter/c (or/c XLSX? #f))]
+          [with-sheet (-> string? procedure?)]
+          [with-sheet-ref (-> natural? procedure?)]
           ))
 
 (define *CURRENT_XLSX* (make-parameter #f))
@@ -56,3 +58,14 @@
         '()
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
         ))
+
+(define (with-sheet sheet_name user_proc)
+  (parameterize ([*CURRENT_SHEET*
+                  (list-ref (XLSX-sheet_list (*CURRENT_XLSX*))
+                            (hash-ref (XLSX-sheet_name_index_map (*CURRENT_XLSX*)) sheet_name 0))])
+    (user_proc)))
+
+(define (with-sheet-ref sheet_index user_proc)
+  (parameterize ([*CURRENT_SHEET*
+                  (list-ref (XLSX-sheet_list (*CURRENT_XLSX*)) sheet_index 0)])
+    (user_proc)))

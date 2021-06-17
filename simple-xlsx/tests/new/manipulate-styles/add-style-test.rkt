@@ -19,13 +19,23 @@
      ([*CURRENT_XLSX* (new-xlsx)])
 
      (add-data-sheet "Sheet1" '(("chenxiao" "love" "陈思衡")))
-     (add-sheet-cell-style "Sheet1" "A1" '((fontSize . 20) (fontName . "Impact")))
+     (with-sheet
+      "Sheet1"
+      (lambda ()           
+        (add-cell-style "A1" '((fontSize . 20) (fontName . "Impact")))))
      
      (let ([style_hash (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
            [font_hash (XLSX-font_hash->index_map (*CURRENT_XLSX*))])
        (check-equal? style_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
        (check-equal?  font_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
        )
+     
+     (with-sheet
+      "Sheet1"
+      (lambda ()
+        (let ([cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
+          (check-equal? (hash-count cell->style_index_map) 1)
+          (check-equal? (hash-ref cell->style_index_map "A1") 1))))
 
      ))))
     
