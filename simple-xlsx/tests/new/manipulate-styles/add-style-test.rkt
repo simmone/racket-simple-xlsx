@@ -2,6 +2,7 @@
 
 (require rackunit/text-ui)
 
+(require "../../../writer.rkt")
 (require "../../../lib/lib.rkt")
 (require "../../../sheet/sheet.rkt")
 
@@ -18,14 +19,13 @@
      ([*CURRENT_XLSX* (new-xlsx)])
 
      (add-data-sheet "Sheet1" '(("chenxiao" "love" "陈思衡")))
+     (add-sheet-cell-style "Sheet1" "A1" '((fontSize . 20) (fontName . "Impact")))
      
-     (with-sheet
-      "Sheet1"
-      (lambda ()
-        (add-cell-style "A1" '( (fontSize . 20) (fontName . "Impact")))
-        (let ([style_hash (XLSX-style_hash (*CURRENT_XLSX*))]
-              [font_hash (XLSX-font_hash (*CURRENT_XLSX*))])
-        ))
+     (let ([style_hash (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
+           [font_hash (XLSX-font_hash->index_map (*CURRENT_XLSX*))])
+       (check-equal? style_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
+       (check-equal?  font_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
+       )
 
      ))))
     

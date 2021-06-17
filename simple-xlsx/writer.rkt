@@ -53,18 +53,6 @@
         ;; shared_string
         (write-shared-strings)
 
-        ;; styles
-        (send xlsx burn-styles!)
-        (write-styles-file
-         (send xlsx get-style-list)
-         (send xlsx get-fill-list)
-         (send xlsx get-font-list)
-         (send xlsx get-numFmt-list)
-         (send xlsx get-border-list))
-
-        ;; workbook
-        (write-workbook-file (build-path tmp_dir "xl") xlsx)
-
         (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*CURRENT_XLSX*))))
       (lambda ()
         (delete-directory/files (XLSX-xlsx_dir (*CURRENT_XLSX*))))))
