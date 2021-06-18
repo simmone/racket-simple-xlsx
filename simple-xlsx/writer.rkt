@@ -144,3 +144,43 @@
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
+(define (add-cell-style cell_range style_list)
+  (let ([formated_cell_range (check-cell-range cell_range)]
+        [style_hash (make-hash)])
+
+    (let loop ([styles style_list])
+      (when (not (null? styles))
+        (let ([style_pair (car styles)])
+          (when (and
+                 (pair? style_pair)
+                 (symbol? (car style_pair))
+                 (or
+                  (eq? (car style_pair) 'backgroundColor)
+                  (eq? (car style_pair) 'fontSize)
+                  (eq? (car style_pair) 'fontColor)
+                  (eq? (car style_pair) 'fontName)
+                  (eq? (car style_pair) 'numberPrecision)
+                  (eq? (car style_pair) 'numberPercent)
+                  (eq? (car style_pair) 'numberThousands)
+                  (eq? (car style_pair) 'borderDirection)
+                  (eq? (car style_pair) 'borderStyle)
+                  (eq? (car style_pair) 'borderColor)
+                  (eq? (car style_pair) 'dateFormat)
+                  (eq? (car style_pair) 'horizontalAlign)
+                  (eq? (car style_pair) 'verticalAlign)
+                  (eq? (car style_pair) 'formatCode)
+                  ))
+            (hash-set! style_hash (caar styles) (cdar styles)))
+        (loop (cdr styles)))))
+
+    (let ([xlsx_style_hash (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
+          [sheet_cell_style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
+      (if (hash-has-key? xlsx_style_hash style_hash)
+        (hash-set! (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))
+                   cell_range 
+                   (hash-ref xlsx_style_hash style_hash))
+        (begin
+          (hash-set! xlsx_style_hash style_hash (add1 (hash-count xlsx_style_hash)))
+          (hash-set! sheet_cell_style_index_map (add1 (hash-count xlsx_style_hash))))))
+          
+        
