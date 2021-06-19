@@ -146,41 +146,77 @@
 
 (define (add-cell-style cell_range style_list)
   (let ([formated_cell_range (check-cell-range cell_range)]
-        [style_hash (make-hash)])
+        [style_hash (make-hash)]
+        [font_style_hash (make-hash)]
+        [num_style_hash (make-hash)]
+        [fill_style_hash (make-hash)]
+        [border_style_hash (make-hash)]
+        [alignment_style_hash (make-hash)])
 
     (let loop ([styles style_list])
       (when (not (null? styles))
-        (let ([style_pair (car styles)])
-          (when (and
-                 (pair? style_pair)
-                 (symbol? (car style_pair))
-                 (or
-                  (eq? (car style_pair) 'backgroundColor)
-                  (eq? (car style_pair) 'fontSize)
-                  (eq? (car style_pair) 'fontColor)
-                  (eq? (car style_pair) 'fontName)
-                  (eq? (car style_pair) 'numberPrecision)
-                  (eq? (car style_pair) 'numberPercent)
-                  (eq? (car style_pair) 'numberThousands)
-                  (eq? (car style_pair) 'borderDirection)
-                  (eq? (car style_pair) 'borderStyle)
-                  (eq? (car style_pair) 'borderColor)
-                  (eq? (car style_pair) 'dateFormat)
-                  (eq? (car style_pair) 'horizontalAlign)
-                  (eq? (car style_pair) 'verticalAlign)
-                  (eq? (car style_pair) 'formatCode)
-                  ))
-            (hash-set! style_hash (caar styles) (cdar styles)))
-        (loop (cdr styles)))))
+            (let ([style_pair (car styles)])
+              (when (and (pair? style_pair) (symbol? (car style_pair)))
+                    (cond
+                     [(eq? (car style_pair) 'backgroundColor)
+                      (hash-set! fill_style_hash 'fgColor (cdr style_pair))]
+                     [(or
+                       (eq? (car style_pair) 'fontSize)
+                       (eq? (car style_pair) 'fontColor)
+                       (eq? (car style_pair) 'fontName))
+                      (hash-set! font_style_hash (car style_pair) (cdr style_pair))]
+                     [(or
+                       (eq? (car style_pair) 'numberPrecision)
+                       (eq? (car style_pair) 'numberPercent)
+                       (eq? (car style_pair) 'numberThousands)
+                       (eq? (car style_pair) 'dateFormat)
+                       (eq? (car style_pair) 'formatCode))
+                      (hash-set! num_style_hash (car style_pair) (cdr style_pair))]
+                     [(or
+                       (eq? (car style_pair) 'borderDirection)
+                       (eq? (car style_pair) 'borderStyle)
+                       (eq? (car style_pair) 'borderColor))
+                      (hash-set! border_style_hash (car style_pair) (cdr style_pair))]
+                     [(or
+                       (eq? (car style_pair) 'horizontalAlign)
+                       (eq? (car style_pair) 'verticalAlign))
+                      (hash-set! alignment_style_hash (car style_pair) (cdr style_pair))])
+                    (hash-set! style_hash (caar styles) (cdar styles)))
+              (loop (cdr styles)))))
 
     (let ([xlsx_style_hash (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
-          [sheet_cell_style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
+          [sheet_cell_style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
+          [font_style_hash->index_map (XLSX-font_style_hash->index_map (*CURRENT_XLSX*))]
+          [num_style_hash->index_map (XLSX-num_style_hash->index_map (*CURRENT_XLSX*))]
+          [fill_style_hash->index_map (XLSX-fill_style_hash->index_map (*CURRENT_XLSX*))]
+          [border_style_hash->index_map (XLSX-border_style_hash->index_map (*CURRENT_XLSX*))]
+          [alignment_style_hash->index_map (XLSX-alignment_style_hash->index_map (*CURRENT_XLSX*))])
+
       (if (hash-has-key? xlsx_style_hash style_hash)
         (hash-set! (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))
                    cell_range 
                    (hash-ref xlsx_style_hash style_hash))
         (begin
           (hash-set! xlsx_style_hash style_hash (add1 (hash-count xlsx_style_hash)))
-          (hash-set! sheet_cell_style_index_map (add1 (hash-count xlsx_style_hash))))))
+          (hash-set! sheet_cell_style_index_map (add1 (hash-count xlsx_style_hash)))))
+      
+      (when (not (hash-has-lkey? font_style_hash->index_map font_style_hash))
+            (hash-set! font_style_hash->index_map font_style_hash (add1 (hash-count font_style_hash->index_map))))
+
+      (when (not (hash-has-lkey? num_style_hash->index_map num_style_hash))
+            (hash-set! num_style_hash->index_map num_style_hash (add1 (hash-count num_style_hash->index_map))))
+
+      (when (not (hash-has-lkey? fill_style_hash->index_map fill_style_hash))
+            (hash-set! fill_style_hash->index_map fill_style_hash (add1 (hash-count fill_style_hash->index_map))))
+
+      (when (not (hash-has-lkey? border_style_hash->index_map border_style_hash))
+            (hash-set! border_style_hash->index_map border_style_hash (add1 (hash-count border_style_hash->index_map))))
+
+      (when (not (hash-has-lkey? alignment_style_hash->index_map alignment_style_hash))
+            (hash-set! alignment_style_hash->index_map alignment_style_hash (add1 (hash-count alignment_style_hash->index_map))))
+
+
+
+
           
         
