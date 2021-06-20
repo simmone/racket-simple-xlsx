@@ -17,7 +17,6 @@
           [range-to-row-hash (-> string? any/c hash?)]
           [range-to-col-hash (-> string? any/c hash?)]
           [combine-cols-hash (-> hash? hash? list?)]
-          [combine-hash-in-hash (-> (listof hash?) hash?)]
           [cell->rowcol (-> string? (cons/c natural? natural?))]
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
@@ -316,25 +315,6 @@
                (add1 (caar loop_list))
                (cons (cons (cons last_range_start last_range_end) last_val) squeeze_list))])
             (reverse (cons (cons (cons last_range_start last_range_end) last_val) squeeze_list)))))))
-
-(define (combine-hash-in-hash hash_list)
-  (let ([result_map (make-hash)])
-    (let outer-hash-loop ([hashes hash_list])
-      (when (not (null? hashes))
-            (hash-for-each
-             (car hashes)
-             (lambda (cell_name style_hash)
-               (if (hash-has-key? result_map cell_name)
-                   (let ([old_hash (hash-copy (hash-ref result_map cell_name))])
-
-                     (hash-for-each
-                      style_hash
-                      (lambda (ik iv)
-                        (hash-set! old_hash ik iv)))
-                     (hash-set! result_map cell_name old_hash))
-                   (hash-set! result_map cell_name style_hash))))
-            (outer-hash-loop (cdr hashes))))
-    result_map))
 
 (define (cell->rowcol cell_str)
   (let ([split_items (regexp-match #rx"^([a-zA-Z]+)([0-9]+)$" cell_str)])
