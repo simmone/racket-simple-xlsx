@@ -22,7 +22,6 @@
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
           [expand-col-style-to-cell (-> hash? hash? void?)]
-
           ))
 
 (define (row_col->dimension row col)

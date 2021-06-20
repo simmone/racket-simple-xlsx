@@ -18,6 +18,7 @@
                    (shared_strings_map (hash/c string? natural?))
                    (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
                    (style_hash->index_map (hash/c hash? natural?))
+                   (style_index->hash_map (hash/c hash? natural?))
                    (font_style_hash->index_map (hash/c hash? natural?))
                    (num_style_hash->index_map (hash/c hash? natural?))
                    (fill_style_hash->index_map (hash/c hash? natural?))
@@ -46,6 +47,7 @@
          [shared_strings_map #:mutable]
          [sheet_list #:mutable]
          [style_hash->index_map #:mutable]
+         [style_index->hash_map #:mutable]
          [font_style_hash->index_map #:mutable]
          [num_style_hash->index_map #:mutable]
          [fill_style_hash->index_map #:mutable]
@@ -59,6 +61,7 @@
         (make-hash) (make-hash)
         '()
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
+        (make-hash) (make-hash)
         ))
 
 (define (with-sheet sheet_name user_proc)
