@@ -26,8 +26,8 @@
      
      (let ([style_hash (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
            [font_hash (XLSX-font_style_hash->index_map (*CURRENT_XLSX*))])
-       (check-equal? style_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
-       (check-equal?  font_hash '#hash((#hash((fontSize . 20) (fontName . "Impact")) . 1)))
+       (check-equal? (hash-count style_hash) 1)
+       (check-equal? (hash-count style_hash) 1)
        )
      
      (with-sheet
