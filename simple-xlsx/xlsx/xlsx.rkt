@@ -18,7 +18,7 @@
                    (shared_strings_map (hash/c string? natural?))
                    (sheet_list (listof (or/c DATA-SHEET? CHART-SHEET?)))
                    (style_hash->index_map (hash/c hash? natural?))
-                   (style_index->hash_map (hash/c hash? natural?))
+                   (style_index->hash_map (hash/c natural? hash?))
                    (font_style_hash->index_map (hash/c hash? natural?))
                    (num_style_hash->index_map (hash/c hash? natural?))
                    (fill_style_hash->index_map (hash/c hash? natural?))
@@ -28,8 +28,8 @@
                   ]
           [new-xlsx (-> XLSX?)]
           [*CURRENT_XLSX* (parameter/c (or/c XLSX? #f))]
-          [with-sheet (-> string? procedure?)]
-          [with-sheet-ref (-> natural? procedure?)]
+          [with-sheet (-> string? procedure? void?)]
+          [with-sheet-ref (-> natural? procedure? void?)]
           ))
 
 (define *CURRENT_XLSX* (make-parameter #f))

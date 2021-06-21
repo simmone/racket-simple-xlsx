@@ -4,6 +4,7 @@
           [write-xlsx-file (-> path-string? void?)]
           [add-data-sheet (-> string? (listof list?) void?)]
           [add-chart-sheet (-> string? (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D) string? void?)]
+          [add-cell-style (-> string? list? void?)]
           ))
 
 (require racket/date)
@@ -185,7 +186,7 @@
               (loop (cdr styles)))))
 
     (let ([xlsx_style_hash->index_map (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
-          [xlsx_style_index->style_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
+          [xlsx_style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
           [sheet_cell_style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
           [font_style_hash->index_map (XLSX-font_style_hash->index_map (*CURRENT_XLSX*))]
           [num_style_hash->index_map (XLSX-num_style_hash->index_map (*CURRENT_XLSX*))]
@@ -200,31 +201,29 @@
              [end_row_index (string->number (list-ref range_items 4))])
         (let range-loop ([loop_col_index start_col_index]
                          [loop_row_index start_row_index])
-          (when (and
-                 (<= loop_col_index end_col_index)
-                 (<= loop_row_index end_row_index))
-                (let ([cell (row_col->dimension loop_row_index loop_col_index)])
-                  (if (hash-has-key? xlsx_style_hash->index_map style_hash)
-                      (hash-set! sheet_cell_style_index_map cell (hash-ref xlsx_style_hash->index_map style_hash))
-                      (if (hash-has-key? sheet_cell_style_index_map cell)
-                          (let ([new_style_hash (hash-ref xlsx_style_index->hash (hash-ref sheet_cell_style_index_map cell))])
-                            (hash-for-each
-                             (lambda (style_k style_v)
-                               (hash-set! new_style_hash style_k _style_v))
-                             style_hash)
-                            
-                            (if (hash-has-key? xlsx_style_index->hash new_style_hash)
-                                (hash-set! sheet_cell_style_index_map cell (hash-ref xlsx_style_hash->index_map new_style_hash))
-                                (begin
-                                  (hash-set! xlsx_style_hash->index_map new_style_hash (hash-count xlsx_style_hash->index_map))
-                                  (hash-set! xlsx_style_index->hash (hash-count xlsx_style_hash->index_map) new_style_hash)
-                                  (hash-set! sheet_cell_style_index_map cell (hash-ref xlsx_style_hash->index_map new_style_hash)))))
-                          (hash-set! sheet_cell_style_index_map cell (hash-ref xlsx_style_hash->index_map style_hash)))))
-                (cond
-                 [(< loop_col_index end_col_index)
-                  (range-loop (add1 loop_col_index) loop_row_index)]
-                 [(< loop_row_index end_row_index)
-                  (range-loop start_col_index (add1 loop_row_index))]))))
+          (when (and (<= loop_col_index end_col_index) (<= loop_row_index end_row_index))
+
+            (let ([cell (row_col->dimension loop_row_index loop_col_index)])
+              (let ([final_style_hash style_hash])
+                (when (hash-has-key? sheet_cell_style_index_map cell)
+                  (let ([cell_style_hash (hash-ref xlsx_style_index->hash_map (hash-ref sheet_cell_style_index_map cell))])
+                    (hash-for-each
+                     (lambda (style_k style_v)
+                       (hash-set! final_style_hash style_k style_v))
+                     cell_style_hash)))
+                      
+                (if (hash-has-key? xlsx_style_hash->index_map final_style_hash)
+                    (hash-set! sheet_cell_style_index_map cell (hash-ref xlsx_style_hash->index_map final_style_hash))
+                    (let ([new_index (add1 (hash-count xlsx_style_hash->index_map))])
+                      (hash-set! xlsx_style_hash->index_map final_style_hash new_index)
+                      (hash-set! xlsx_style_index->hash_map new_index final_style_hash)
+                      (hash-set! sheet_cell_style_index_map cell new_index)))))
+
+            (cond
+             [(< loop_col_index end_col_index)
+              (range-loop (add1 loop_col_index) loop_row_index)]
+             [(< loop_row_index end_row_index)
+              (range-loop start_col_index (add1 loop_row_index))]))))
       
       (when (not (hash-has-key? font_style_hash->index_map font_style_hash))
             (hash-set! font_style_hash->index_map font_style_hash (add1 (hash-count font_style_hash->index_map))))
