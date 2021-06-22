@@ -20,10 +20,15 @@
                    (style_hash->index_map (hash/c hash? natural?))
                    (style_index->hash_map (hash/c natural? hash?))
                    (font_style_hash->index_map (hash/c hash? natural?))
+                   (font_style_index->hash_map (hash/c natural? hash?))
                    (num_style_hash->index_map (hash/c hash? natural?))
+                   (num_style_index->hash_map (hash/c natural? hash?))
                    (fill_style_hash->index_map (hash/c hash? natural?))
+                   (fill_style_index->hash_map (hash/c natural? hash?))
                    (border_style_hash->index_map (hash/c hash? natural?))
+                   (border_style_index->hash_map (hash/c natural? hash?))
                    (alignment_style_hash->index_map (hash/c hash? natural?))
+                   (alignment_style_index->hash_map (hash/c natural? hash?))
                    )
                   ]
           [new-xlsx (-> XLSX?)]
@@ -49,10 +54,15 @@
          [style_hash->index_map #:mutable]
          [style_index->hash_map #:mutable]
          [font_style_hash->index_map #:mutable]
+         [font_style_index->hash_map #:mutable]
          [num_style_hash->index_map #:mutable]
+         [num_style_index->hash_map #:mutable]
          [fill_style_hash->index_map #:mutable]
+         [fill_style_index->hash_map #:mutable]
          [border_style_hash->index_map #:mutable]
+         [border_style_index->hash_map #:mutable]
          [alignment_style_hash->index_map #:mutable]
+         [alignment_style_index->hash_map #:mutable]
          ))
 
 (define (new-xlsx)
@@ -61,7 +71,9 @@
         (make-hash) (make-hash)
         '()
         (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
-        (make-hash) (make-hash)
+        (make-hash)
+        (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)
+        (make-hash)
         ))
 
 (define (with-sheet sheet_name user_proc)
