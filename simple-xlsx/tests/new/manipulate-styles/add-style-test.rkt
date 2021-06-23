@@ -27,13 +27,12 @@
      (let ([style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
            [font_style_index->hash_map (XLSX-font_style_index->hash_map (*CURRENT_XLSX*))])
        (check-equal? (hash-count style_index->hash_map) 1)
-       (let ([style_hash (hash-ref style_index->hash_map 1)])
-         (check-equal? (hash-ref style_hash 'fontSize) 20)
-         (check-equal? (hash-ref style_hash 'fontName) "Impact"))
+       (check-equal? (hash-ref style_index->hash_map 1)
+                     (make-hash '((fontSize . 20) (fontName . "Impact"))))
+
        (check-equal? (hash-count font_style_index->hash_map) 1)
-       (let ([font_style_hash (hash-ref font_style_index->hash_map 1)])
-         (check-equal? (hash-ref font_style_hash 'fontSize) 20)
-         (check-equal? (hash-ref font_style_hash 'fontName) "Impact")))
+       (check-equal? (hash-ref font_style_index->hash_map 1)
+                     (make-hash '((fontSize . 20) (fontName . "Impact")))))
      
      (with-sheet
       "Sheet1"
