@@ -184,15 +184,21 @@
                       (hash-set! alignment_style_hash (car style_pair) (cdr style_pair))])
                     (hash-set! style_hash (caar styles) (cdar styles)))
               (loop (cdr styles)))))
-
+    
     (let ([xlsx_style_hash->index_map (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
           [xlsx_style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
           [sheet_cell_style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
           [font_style_hash->index_map (XLSX-font_style_hash->index_map (*CURRENT_XLSX*))]
+          [font_style_index->hash_map (XLSX-font_style_index->hash_map (*CURRENT_XLSX*))]
           [num_style_hash->index_map (XLSX-num_style_hash->index_map (*CURRENT_XLSX*))]
+          [num_style_index->hash_map (XLSX-num_style_index->hash_map (*CURRENT_XLSX*))]
           [fill_style_hash->index_map (XLSX-fill_style_hash->index_map (*CURRENT_XLSX*))]
+          [fill_style_index->hash_map (XLSX-fill_style_index->hash_map (*CURRENT_XLSX*))]
           [border_style_hash->index_map (XLSX-border_style_hash->index_map (*CURRENT_XLSX*))]
-          [alignment_style_hash->index_map (XLSX-alignment_style_hash->index_map (*CURRENT_XLSX*))])
+          [border_style_index->hash_map (XLSX-border_style_index->hash_map (*CURRENT_XLSX*))]
+          [alignment_style_hash->index_map (XLSX-alignment_style_hash->index_map (*CURRENT_XLSX*))]
+          [alignment_style_index->hash_map (XLSX-alignment_style_index->hash_map (*CURRENT_XLSX*))]
+          )
 
       (let* ([range_items (regexp-match #rx"^([A-Z]+)([0-9]+)-([A-Z]+)([0-9]+)$" formated_cell_range)]
              [start_col_index (col_abc->number (list-ref range_items 1))]
@@ -225,17 +231,27 @@
              [(< loop_row_index end_row_index)
               (range-loop start_col_index (add1 loop_row_index))]))))
       
-      (when (not (hash-has-key? font_style_hash->index_map font_style_hash))
-            (hash-set! font_style_hash->index_map font_style_hash (add1 (hash-count font_style_hash->index_map))))
+      (when (and (> (hash-count font_style_hash) 0) (not (hash-has-key? font_style_hash->index_map font_style_hash)))
+        (let ([index (add1 (hash-count font_style_hash->index_map))])
+          (hash-set! font_style_hash->index_map font_style_hash index)
+          (hash-set! font_style_index->hash_map index font_style_hash)))
 
-      (when (not (hash-has-key? num_style_hash->index_map num_style_hash))
-            (hash-set! num_style_hash->index_map num_style_hash (add1 (hash-count num_style_hash->index_map))))
+      (when (and (> (hash-count num_style_hash) 0) (not (hash-has-key? num_style_hash->index_map num_style_hash)))
+        (let ([index (add1 (hash-count num_style_hash->index_map))])
+          (hash-set! num_style_hash->index_map num_style_hash index)
+          (hash-set! num_style_index->hash_map index num_style_hash)))
 
-      (when (not (hash-has-key? fill_style_hash->index_map fill_style_hash))
-            (hash-set! fill_style_hash->index_map fill_style_hash (add1 (hash-count fill_style_hash->index_map))))
+      (when (and (> (hash-count fill_style_hash) 0) (not (hash-has-key? fill_style_hash->index_map fill_style_hash)))
+        (let ([index (add1 (hash-count fill_style_hash->index_map))])
+          (hash-set! fill_style_hash->index_map fill_style_hash index)
+          (hash-set! fill_style_index->hash_map index fill_style_hash)))
 
-      (when (not (hash-has-key? border_style_hash->index_map border_style_hash))
-            (hash-set! border_style_hash->index_map border_style_hash (add1 (hash-count border_style_hash->index_map))))
+      (when (and (> (hash-count border_style_hash) 0) (not (hash-has-key? border_style_hash->index_map border_style_hash)))
+        (let ([index (add1 (hash-count border_style_hash->index_map))])
+          (hash-set! border_style_hash->index_map border_style_hash index)
+          (hash-set! border_style_index->hash_map index border_style_hash)))
 
-      (when (not (hash-has-key? alignment_style_hash->index_map alignment_style_hash))
-            (hash-set! alignment_style_hash->index_map alignment_style_hash (add1 (hash-count alignment_style_hash->index_map)))))))
+      (when (and (> (hash-count alignment_style_hash) 0) (not (hash-has-key? alignment_style_hash->index_map alignment_style_hash)))
+        (let ([index (add1 (hash-count alignment_style_hash->index_map))])
+          (hash-set! alignment_style_hash->index_map alignment_style_hash index)
+          (hash-set! alignment_style_index->hash_map index alignment_style_hash))))))
