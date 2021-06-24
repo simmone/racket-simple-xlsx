@@ -8,21 +8,24 @@
 
 (require rackunit "../../../xlsx/xlsx.rkt")
 
-(define test-add-style
+(define test-add-one-cell-style
   (test-suite
-   "test-add-style"
+   "test-add-one-cell-style"
 
    (test-case
-    "test-add-style"
+    "test-add-one-cell-style"
 
     (parameterize 
      ([*CURRENT_XLSX* (new-xlsx)])
 
      (add-data-sheet "Sheet1" '(("chenxiao" "love" "陈思衡")))
+
      (with-sheet
       "Sheet1"
       (lambda ()           
-        (add-cell-style "A1" '((fontSize . 20) (fontName . "Impact")))))
+        (add-cell-style "A1" '((fontSize . 20) (fontName . "Impact")))
+        (add-cell-style "B1" '((fontSize . 20) (fontName . "Impact")))
+        ))
      
      (let ([style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
            [font_style_index->hash_map (XLSX-font_style_index->hash_map (*CURRENT_XLSX*))])
@@ -38,9 +41,11 @@
       "Sheet1"
       (lambda ()
         (let ([cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
-          (check-equal? (hash-count cell->style_index_map) 1)
-          (check-equal? (hash-ref cell->style_index_map "A1") 1))))
-
-     ))))
+          (check-equal? (hash-count cell->style_index_map) 2)
+          (check-equal? (hash-ref cell->style_index_map "A1") 1)
+          (check-equal? (hash-ref cell->style_index_map "B1") 1)
+          )))
+     ))
+   ))
     
-(run-tests test-add-style)
+(run-tests test-add-one-cell-style)
