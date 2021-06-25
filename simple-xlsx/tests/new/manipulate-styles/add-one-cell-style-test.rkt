@@ -26,27 +26,31 @@
         (add-cell-style "A1" '((fontSize . 20) (fontName . "Impact")))
         (add-cell-style "B1" '((fontSize . 20) (fontName . "Impact")))
         (add-cell-style "B1" '((fontSize . 21)))
+        (add-cell-style "C1" '((fontSize . 21)))
         ))
      
      (let ([style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
            [font_style_index->hash_map (XLSX-font_style_index->hash_map (*CURRENT_XLSX*))])
        (printf "~a\n" style_index->hash_map)
-       (check-equal? (hash-count style_index->hash_map) 2)
+       (check-equal? (hash-count style_index->hash_map) 3)
        (check-equal? (hash-ref style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
+       (check-equal? (hash-ref style_index->hash_map 3) (make-hash '((fontSize . 21))))
 
-       (check-equal? (hash-count font_style_index->hash_map) 2)
+       (check-equal? (hash-count font_style_index->hash_map) 3)
        (check-equal? (hash-ref font_style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref font_style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
+       (check-equal? (hash-ref font_style_index->hash_map 3) (make-hash '((fontSize . 21))))
        )
      
      (with-sheet
       "Sheet1"
       (lambda ()
         (let ([cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
-          (check-equal? (hash-count cell->style_index_map) 2)
+          (check-equal? (hash-count cell->style_index_map) 3)
           (check-equal? (hash-ref cell->style_index_map "A1") 1)
           (check-equal? (hash-ref cell->style_index_map "B1") 2)
+          (check-equal? (hash-ref cell->style_index_map "C1") 3)
           )))
      ))
    ))
