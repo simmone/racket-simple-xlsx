@@ -31,12 +31,12 @@
      
      (let ([style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
            [font_style_index->hash_map (XLSX-font_style_index->hash_map (*CURRENT_XLSX*))])
-       (printf "~a\n" style_index->hash_map)
+
        (check-equal? (hash-count style_index->hash_map) 3)
        (check-equal? (hash-ref style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
        (check-equal? (hash-ref style_index->hash_map 3) (make-hash '((fontSize . 21))))
-
+       
        (check-equal? (hash-count font_style_index->hash_map) 3)
        (check-equal? (hash-ref font_style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref font_style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
