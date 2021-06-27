@@ -24,7 +24,6 @@
       "Sheet1"
       (lambda ()           
         (add-cell-style "A1-C3" '((fontSize . 20) (fontName . "Impact")))
-        (add-cell-style "B2-D4" '((fontSize . 20) (fontName . "Impact")))
         (add-cell-style "B2-D4" '((fontSize . 21)))
         ))
      
@@ -34,27 +33,32 @@
            [num_style_index->hash_map (XLSX-num_style_index->hash_map (*CURRENT_XLSX*))]
            )
 
-       (check-equal? (hash-count style_index->hash_map) 2)
+       (check-equal? (hash-count style_index->hash_map) 3)
        (check-equal? (hash-ref style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
+       (check-equal? (hash-ref style_index->hash_map 3) (make-hash '((fontSize . 21))))
        
-       (check-equal? (hash-count font_style_index->hash_map) 2)
+       (check-equal? (hash-count font_style_index->hash_map) 3)
        (check-equal? (hash-ref font_style_index->hash_map 1) (make-hash '((fontSize . 20) (fontName . "Impact"))))
        (check-equal? (hash-ref font_style_index->hash_map 2) (make-hash '((fontSize . 21) (fontName . "Impact"))))
+       (check-equal? (hash-ref font_style_index->hash_map 3) (make-hash '((fontSize . 21))))
        )
      
      (with-sheet
       "Sheet1"
       (lambda ()
         (let ([cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
-          (check-equal? (hash-count cell->style_index_map) 16)
+          (check-equal? (hash-count cell->style_index_map) 14)
           (check-equal? (hash-ref cell->style_index_map "A1") 1)
-          (check-equal? (hash-ref cell->style_index_map "D1") 1)
-          (check-equal? (hash-ref cell->style_index_map "A4") 1)
+          (check-equal? (hash-ref cell->style_index_map "A3") 1)
+          (check-equal? (hash-ref cell->style_index_map "C1") 1)
           (check-equal? (hash-ref cell->style_index_map "B2") 2)
-          (check-equal? (hash-ref cell->style_index_map "D2") 2)
-          (check-equal? (hash-ref cell->style_index_map "B4") 2)
-          (check-equal? (hash-ref cell->style_index_map "D4") 2)
+          (check-equal? (hash-ref cell->style_index_map "C2") 2)
+          (check-equal? (hash-ref cell->style_index_map "B3") 2)
+          (check-equal? (hash-ref cell->style_index_map "C3") 2)
+          (check-equal? (hash-ref cell->style_index_map "B4") 3)
+          (check-equal? (hash-ref cell->style_index_map "D2") 3)
+          (check-equal? (hash-ref cell->style_index_map "D4") 3)
           )))
      ))
    ))

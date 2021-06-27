@@ -208,7 +208,7 @@
              [start_row_index (string->number (list-ref range_items 2))]
              [end_col_index (col_abc->number (list-ref range_items 3))]
              [end_row_index (string->number (list-ref range_items 4))])
-
+        
         ;; cover every cell's style, combine new style and exist cell style, check it is or not a new style.
         (let range-loop ([loop_col_index start_col_index]
                          [loop_row_index start_row_index])
@@ -220,7 +220,7 @@
                    [cell_fill_style_hash (hash-copy fill_style_hash)]
                    [cell_border_style_hash (hash-copy border_style_hash)]
                    [cell_alignment_style_hash (hash-copy alignment_style_hash)])
-
+              
               (hash-for-each
                style_hash
                (lambda (k v)
