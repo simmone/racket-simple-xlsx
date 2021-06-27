@@ -8,12 +8,12 @@
 
 (require rackunit "../../../xlsx/xlsx.rkt")
 
-(define test-one-cell-one-group-style
+(define test-one-cell-style
   (test-suite
-   "test-one-cell-one-group-style"
+   "test-one-cell-style"
 
    (test-case
-    "test-one-cell-one-group-style"
+    "test-one-cell-style"
 
     (parameterize 
      ([*CURRENT_XLSX* (new-xlsx)])
@@ -74,4 +74,4 @@
      ))
    ))
     
-(run-tests test-one-cell-one-group-style)
+(run-tests test-one-cell-style)
