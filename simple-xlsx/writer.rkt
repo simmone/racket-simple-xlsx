@@ -5,6 +5,7 @@
           [add-data-sheet (-> string? (listof list?) void?)]
           [add-chart-sheet (-> string? (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D) string? void?)]
           [add-cell-style (-> string? list? void?)]
+          [add-row-style (-> string? list? void?)]
           ))
 
 (require racket/date)
@@ -144,6 +145,8 @@
           (hash-set! (XLSX-sheet_rid_rel_map (*CURRENT_XLSX*)) rId rel)
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel))
       (error (format "duplicate sheet name[~a]" sheet_name))))
+
+(define (add-row-style row_range style_list)
 
 (define (add-cell-style cell_range style_list)
   (let ([formated_cell_range (check-cell-range cell_range)]
