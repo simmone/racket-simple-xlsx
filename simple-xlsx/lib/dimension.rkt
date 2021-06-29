@@ -160,7 +160,7 @@
           (error (format "row index should from small to big[~a]" row_range_str))
           (format "~a-~a" start_row_index end_row_index)))]
    [else
-    (error (format "invalid row range! should be like this: A-Z or 1-10 or A or 1 but is [~a]" row_range_str))]
+    (error (format "invalid row range! should be like this: 1-10 or 1 but is [~a]" row_range_str))]
    ))
 
 (define (only-one-row/col-data? range_str)

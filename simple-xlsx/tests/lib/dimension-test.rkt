@@ -122,8 +122,10 @@
     (check-equal? (check-row-range "7-12") "7-12")
 
     (check-equal? (check-row-range "10") "10-10")
-    
+
     (check-exn exn:fail? (lambda () (check-row-range "2-1")))
+
+    (check-exn exn:fail? (lambda () (check-row-range "A-B")))
 
     (check-exn exn:fail? (lambda () (check-row-range "12-7")))
     )
@@ -206,32 +208,6 @@
       (check-equal? (hash-ref range_hash 10) 1))
 
     )
-
-   (test-case
-    "test-combine-hash-in-hash"
-
-    (let* ([range1_hash (range-to-cell-hash "A1-C3" (make-hash '((a . 1))))]
-           [range2_hash (range-to-cell-hash "A3-B4" (make-hash '((a . 2) (b . 1))))]
-           [range3_hash (range-to-cell-hash "B3-D5" (make-hash '((c . 3))))]
-           [result_map (combine-hash-in-hash (list range1_hash range2_hash range3_hash))])
-      
-      (check-equal? (hash-count range1_hash) 9)
-      (check-equal? (hash-count range2_hash) 4)
-      (check-equal? (hash-count range3_hash) 9)
-      (check-equal? (hash-count result_map) 17)
-      
-      (check-equal? (hash-ref result_map "A1") (make-hash '((a . 1))))
-      (check-equal? (hash-ref result_map "C2") (make-hash '((a . 1))))
-
-      (check-equal? (hash-ref result_map "A3") (make-hash '((a . 2) (b . 1))))
-      (check-equal? (hash-ref result_map "A4") (make-hash '((a . 2) (b . 1))))
-
-      (check-equal? (hash-ref result_map "B3") (make-hash '((a . 2) (b . 1) (c . 3))))
-      (check-equal? (hash-ref result_map "B4") (make-hash '((a . 2) (b . 1) (c . 3))))
-      (check-equal? (hash-ref result_map "C3") (make-hash '((a . 1) (c . 3))))
-      (check-equal? (hash-ref result_map "D5") (make-hash '((c . 3))))
-
-    ))
 
    (test-case
     "test-combine-cols-hash"

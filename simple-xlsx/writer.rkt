@@ -146,8 +146,6 @@
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
-(define (add-row-style row_range style_list)
-
 (define (add-cell-style cell_range style_list)
   (let ([formated_cell_range (check-cell-range cell_range)]
         [style_hash (make-hash)]
