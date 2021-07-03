@@ -9,7 +9,7 @@
           [abc->range (-> string? pair?)]
           [check-cell-range (-> string? (or/c #f string?))]
           [check-col-range (-> string? string?)]
-          [check-row-range (-> string? string?)]
+          [check-row-range (-> string? (cons/c natural? natural?))]
           [only-one-row/col-data? (-> string? boolean?)]
           [convert-range (-> string? string?)]
           [range-length (-> string? natural?)]
@@ -151,14 +151,14 @@
     (let* ([items (regexp-match #rx"^([0-9]+)$" row_range_str)]
            [start_row_index (second items)]
            [end_row_index start_row_index])
-      (string-append start_row_index "-" end_row_index))]
+      (cons (string->number start_row_index) (string->number end_row_index)))]
    [(regexp-match #rx"^[0-9]+-[0-9]+$" row_range_str)
     (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" row_range_str)]
            [start_row_index (string->number (second items))]
            [end_row_index (string->number (third items))])
       (if (> start_row_index end_row_index)
           (error (format "row index should from small to big[~a]" row_range_str))
-          (format "~a-~a" start_row_index end_row_index)))]
+          (cons start_row_index end_row_index)))]
    [else
     (error (format "invalid row range! should be like this: 1-10 or 1 but is [~a]" row_range_str))]
    ))

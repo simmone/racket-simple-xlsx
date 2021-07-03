@@ -117,11 +117,11 @@
    (test-case
     "test-check-row-range"
     
-    (check-equal? (check-row-range "1-4") "1-4")
+    (check-equal? (check-row-range "1-4") '(1 . 4))
 
-    (check-equal? (check-row-range "7-12") "7-12")
+    (check-equal? (check-row-range "7-12") '(7 . 12))
 
-    (check-equal? (check-row-range "10") "10-10")
+    (check-equal? (check-row-range "10") '(10 . 10))
 
     (check-exn exn:fail? (lambda () (check-row-range "2-1")))
 

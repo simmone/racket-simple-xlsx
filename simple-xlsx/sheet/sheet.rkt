@@ -10,7 +10,9 @@
                    (freeze_range (cons/c natural? natural?))
                    (cell->style_index_map hash?)
                    (row->style_index_map hash?)
+                   (row->cells_map (hash/c natural? (set/c string?)))
                    (col->style_index_map hash?)
+                   (col->cells_map (hash/c natural? (set/c string?)))
                    )]
           [new-data-sheet (->
                            (cons/c natural? natural?)
@@ -44,7 +46,9 @@
                     [freeze_range #:mutable]
                     [cell->style_index_map #:mutable]
                     [row->style_index_map #:mutable]
+                    [row->cells_map #:mutable]
                     [col->style_index_map #:mutable]
+                    [col->celss_map #:mutable]
                     ))
 
 (define (new-data-sheet dimension rvtsf_map)
@@ -52,7 +56,7 @@
    dimension
    rvtsf_map
    (make-hash) (make-hash) '(0 . 0)
-   (make-hash) (make-hash) (make-hash)))
+   (make-hash) (make-hash) (make-hash) (make-hash) (make-hash)))
 
 (struct COL-ATTR ([width #:mutable] [back_color #:mutable]))
 
