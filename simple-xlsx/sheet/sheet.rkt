@@ -48,7 +48,7 @@
                     [row->style_index_map #:mutable]
                     [row->cells_map #:mutable]
                     [col->style_index_map #:mutable]
-                    [col->celss_map #:mutable]
+                    [col->cells_map #:mutable]
                     ))
 
 (define (new-data-sheet dimension rvtsf_map)

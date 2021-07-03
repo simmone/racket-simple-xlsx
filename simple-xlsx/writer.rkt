@@ -146,20 +146,18 @@
           (hash-set! (XLSX-sheet_index_rel_map (*CURRENT_XLSX*)) sheet_index rel))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
-(define (add-row-style row_range style_list)
+(define (add-row-style type row_range style_list)
   (let ([affected_row_range (check-row-range row_range)]
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))])
     (let loop-row ([loop_row_index (car affected_row_range)])
       (when (<= loop_row_index (cdr affected_row_range))
-            (add-style (hash-ref sheet_row->cells_map loop_row_index '()) style_list)
+            (add-cell-style (hash-ref sheet_row->cells_map loop_row_index '()) style_list)
             (loop-row (add1 loop_row_index))))))
 
 (define (add-cell-style cell_range style_list)
-  (add-style (check-cell-range cell_range) style_list))
-
-(define (add-style affected_cell_range style_list)
-  (when (not (null? affected_cell_range))
-        (let ([style_hash (make-hash)]
+  (when (not (null? cell_range))
+        (let ([affected_cell_range (check-cell-range cell_range)]
+              [style_hash (make-hash)]
               [font_style_hash (make-hash)]
               [num_style_hash (make-hash)]
               [fill_style_hash (make-hash)]
@@ -225,7 +223,7 @@
                    [end_col_index (col_abc->number (list-ref range_items 3))]
                    [end_row_index (string->number (list-ref range_items 4))])
               
-              ;; cover every cell's style, combine new style and exist cell style, check it is or not a new style.
+              ;; cover every cell/row style, combine new style and exist cell style, check it is or not a new style.
               (let range-loop ([loop_col_index start_col_index]
                                [loop_row_index start_row_index])
                 (when (and (<= loop_col_index end_col_index) (<= loop_row_index end_row_index))
