@@ -9,12 +9,12 @@
 (require "../../sheet/sheet.rkt")
 (require "../../xlsx/xlsx.rkt")
 
-(define test-cell-area-style
+(define test-cross-row-style
   (test-suite
-   "test-cell-area-style"
+   "test-cross-row-style"
 
    (test-case
-    "test-cell-area-style"
+    "test-cross-row-style"
 
     (parameterize 
      ([*CURRENT_XLSX* (new-xlsx)])
@@ -23,9 +23,9 @@
 
      (with-sheet
       "Sheet1"
-      (lambda ()           
-        (add-cell-style "A1-C3" '((fontSize . 20) (fontName . "Impact")))
-        (add-cell-style "B2-D4" '((fontSize . 21)))
+      (lambda ()
+        (add-cell-range-style "A1-C3" '((fontSize . 20) (fontName . "Impact")))
+        (add-row-style "2-4" '((fontSize . 21)))
         ))
      
      (let (
@@ -48,20 +48,32 @@
      (with-sheet
       "Sheet1"
       (lambda ()
-        (let ([cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))])
-          (check-equal? (hash-count cell->style_index_map) 14)
+        (let (
+              [row->style_index_map (DATA-SHEET-row->style_index_map (*CURRENT_SHEET*))]
+              [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))]
+              [cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
+              )
+          (check-equal? (hash-count row->style_index_map) 3)
+          (check-equal? (hash-ref row->style_index_map 2) 3)
+          (check-equal? (hash-ref row->style_index_map 3) 3)
+          (check-equal? (hash-ref row->style_index_map 4) 3)
+          (check-equal? (set-count (hash-ref sheet_row->cells_map 2)) 3)
+          (check-equal? (set-count (hash-ref sheet_row->cells_map 3)) 3)
+          (check-equal? (set-count (hash-ref sheet_row->cells_map 4 '())) 0)
+
+
+          (check-equal? (hash-count cell->style_index_map) 9)
           (check-equal? (hash-ref cell->style_index_map "A1") 1)
-          (check-equal? (hash-ref cell->style_index_map "A3") 1)
+          (check-equal? (hash-ref cell->style_index_map "B1") 1)
           (check-equal? (hash-ref cell->style_index_map "C1") 1)
+          (check-equal? (hash-ref cell->style_index_map "A2") 2)
           (check-equal? (hash-ref cell->style_index_map "B2") 2)
           (check-equal? (hash-ref cell->style_index_map "C2") 2)
+          (check-equal? (hash-ref cell->style_index_map "A3") 2)
           (check-equal? (hash-ref cell->style_index_map "B3") 2)
           (check-equal? (hash-ref cell->style_index_map "C3") 2)
-          (check-equal? (hash-ref cell->style_index_map "B4") 3)
-          (check-equal? (hash-ref cell->style_index_map "D2") 3)
-          (check-equal? (hash-ref cell->style_index_map "D4") 3)
           )))
      ))
    ))
     
-(run-tests test-cell-area-style)
+(run-tests test-cross-row-style)

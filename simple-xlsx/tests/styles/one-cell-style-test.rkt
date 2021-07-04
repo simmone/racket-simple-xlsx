@@ -2,11 +2,12 @@
 
 (require rackunit/text-ui)
 
-(require "../../../writer.rkt")
-(require "../../../lib/lib.rkt")
-(require "../../../sheet/sheet.rkt")
+(require rackunit "../../styles.rkt")
 
-(require rackunit "../../../xlsx/xlsx.rkt")
+(require "../../writer.rkt")
+(require "../../lib/lib.rkt")
+(require "../../sheet/sheet.rkt")
+(require "../../xlsx/xlsx.rkt")
 
 (define test-one-cell-style
   (test-suite

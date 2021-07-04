@@ -3,7 +3,8 @@
 (provide (contract-out
           [dimension->pair (-> string? (cons/c natural? natural?))]
           [get-dimension (-> (listof list?) (cons/c natural? natural?))]
-          [row_col->dimension (-> natural? natural? string?)]
+          [row_col->cell (-> natural? natural? string?)]
+          [cell->row_col (-> string? (cons/c natural? natural?))]
           [col_abc->number (-> string? natural?)]
           [col_number->abc (-> natural? string?)]
           [abc->range (-> string? pair?)]
@@ -17,13 +18,12 @@
           [range-to-row-hash (-> string? any/c hash?)]
           [range-to-col-hash (-> string? any/c hash?)]
           [combine-cols-hash (-> hash? hash? list?)]
-          [cell->rowcol (-> string? (cons/c natural? natural?))]
           [cross-cell-style (-> hash? hash? symbol? hash?)]
           [expand-row-style-to-cell (-> hash? hash? void?)]
           [expand-col-style-to-cell (-> hash? hash? void?)]
           ))
 
-(define (row_col->dimension row col)
+(define (row_col->cell row col)
   (format "~a~a" (col_number->abc col) row))
 
 (define (get-dimension data_list)
@@ -316,7 +316,7 @@
                (cons (cons (cons last_range_start last_range_end) last_val) squeeze_list))])
             (reverse (cons (cons (cons last_range_start last_range_end) last_val) squeeze_list)))))))
 
-(define (cell->rowcol cell_str)
+(define (cell->row_col cell_str)
   (let ([split_items (regexp-match #rx"^([a-zA-Z]+)([0-9]+)$" cell_str)])
     (if split_items
         (cons (string->number (third split_items)) (col_abc->number (second split_items)))
@@ -350,7 +350,7 @@
   (hash-for-each
    cell_style_map
    (lambda (cell cell_style_map)
-     (let ([rowcol (cell->rowcol cell)])
+     (let ([rowcol (cell->row_col cell)])
        (when (hash-has-key? row_style_map (car rowcol))
          (hash-for-each
           (hash-ref row_style_map (car rowcol))
@@ -361,7 +361,7 @@
   (hash-for-each
    cell_style_map
    (lambda (cell cell_style_map)
-     (let ([rowcol (cell->rowcol cell)])
+     (let ([rowcol (cell->row_col cell)])
        (when (hash-has-key? col_style_map (cdr rowcol))
          (hash-for-each
           (hash-ref col_style_map (cdr rowcol))

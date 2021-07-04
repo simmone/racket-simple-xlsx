@@ -1,7 +1,8 @@
 #lang racket
 
 (provide (contract-out
-          [add-cell-style (-> string? list? void?)]
+          [add-cell-range-style (-> string? list? void?)]
+          [add-cells-style (-> (listof string?) list? void?)]
           [add-row-style (-> string? list? void?)]
           ))
 
@@ -15,17 +16,36 @@
 (define (add-row-style row_range style_list)
   (let ([affected_row_range (check-row-range row_range)]
         [new_style_hashes (style_list->style_hash style_list)]
+        [sheet_row->style_index_map (DATA-SHEET-row->style_index_map (*CURRENT_SHEET*))]
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))])
     (let loop-row ([loop_row_index (car affected_row_range)])
       (when (<= loop_row_index (cdr affected_row_range))
-            (add-cell-style (hash-ref sheet_row->cells_map loop_row_index '()) new_style_hashes)
-            (let* ([exist_style_index (hash-ref sheet_row->cells_map loop_row_index -1)]
+            (add-cells-style (hash-ref sheet_row->cells_map loop_row_index '()) new_style_hashes)
+            (let* ([exist_style_index (hash-ref sheet_row->style_index_map loop_row_index 0)]
                    [new_style_index (add-style new_style_hashes exist_style_index)])
-
-              (hash-set! sheet_row->style_index_map loop_row_index new_index))
+              (hash-set! sheet_row->style_index_map loop_row_index new_style_index))
             (loop-row (add1 loop_row_index))))))
 
-(define (add-cell-style cell_range style_list)
+(define (add-cells-style cells new_style_hashes)
+  (printf "~a\n" cells)
+  (let ([sheet_cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
+        [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))]
+        [sheet_col->cells_map (DATA-SHEET-col->cells_map (*CURRENT_SHEET*))])
+
+    (let loop-cell ([loop_cells cells])
+      (when (not (null? loop_cells))
+            (let* ([exist_style_index (hash-ref sheet_cell->style_index_map (car loop_cells) 0)]
+                   [row_col (cell->row_col (car loop_cells))]
+                   [row_index (car row_col)]
+                   [col_index (cdr row_col)])
+              (hash-set! sheet_row->cells_map row_index (set-add (hash-ref sheet_row->cells_map row_index (set)) (car loop_cells)))
+              (hash-set! sheet_col->cells_map col_index (set-add (hash-ref sheet_col->cells_map col_index (set)) (car loop_cells)))
+      
+              (let ([new_style_index (add-style new_style_hashes exist_style_index)])
+                (hash-set! sheet_cell->style_index_map (car loop_cells) new_style_index)))
+            (loop-cell (cdr loop_cells))))))
+
+(define (add-cell-range-style cell_range style_list)
   (when (not (null? cell_range))
         (let ([affected_cell_range (check-cell-range cell_range)]
               [new_style_hashes (style_list->style_hash style_list)]
@@ -39,24 +59,16 @@
                    [end_col_index (col_abc->number (list-ref range_items 3))]
                    [end_row_index (string->number (list-ref range_items 4))])
               
-              ;; cover every cell/row style, combine new style and exist cell style, check it is or not a new style.
-              (let range-loop ([loop_col_index start_col_index]
-                               [loop_row_index start_row_index])
-                (when (and (<= loop_col_index end_col_index) (<= loop_row_index end_row_index))
-                      (let* ([cell (row_col->dimension loop_row_index loop_col_index)]
-                             [exist_style_index (hash-ref sheet_cell->style_index_map cell -1)])
-                        
-                        (hash-set! sheet_row->cells_map loop_row_index (set-add (hash-ref sheet_row->cells_map loop_row_index (set)) cell))
-                        (hash-set! sheet_col->cells_map loop_col_index (set-add (hash-ref sheet_col->cells_map loop_col_index (set)) cell))
-                        
-                        (let ([new_style_index (add-style new_style_hashes exist_style_index)])
-                          (hash-set! sheet_cell->style_index_map cell new_index)))
-                      (cond
-                       [(< loop_col_index end_col_index)
-                        (range-loop (add1 loop_col_index) loop_row_index)]
-                       [(< loop_row_index end_row_index)
-                        (range-loop start_col_index (add1 loop_row_index))])
-                      ))))))
+              (add-cells-style
+               (let range-loop ([loop_row_index start_row_index]
+                                [loop_col_index start_col_index]
+                                [cells '()])
+                 (if (<= loop_row_index end_row_index)
+                     (if (<= loop_col_index end_col_index)
+                         (range-loop loop_row_index (add1 loop_col_index) (cons (row_col->cell loop_row_index loop_col_index) cells))
+                         (range-loop (add1 loop_row_index) start_col_index (cons (row_col->cell loop_row_index loop_col_index) cells)))
+                     (reverse cells)))
+               new_style_hashes)))))
 
 (define (style_list->style_hash style_list)
   (let ([style_hash (make-hash)]
@@ -98,11 +110,15 @@
                     (hash-set! style_hash (car style_pair) (cdr style_pair))
                     (loop (cdr styles))))))
     
-    (values style_hash font_style_hash num_style_hash fill_style_hash border_style_hash alignment_style_hash)))
+    (list style_hash font_style_hash num_style_hash fill_style_hash border_style_hash alignment_style_hash)))
 
 (define (add-style new_style_hashes exist_style_index)
-  (let-values ([(style_hash font_style_hash num_style_hash fill_style_hash border_style_hash alignment_style_hash)
-                new_style_hashes])
+  (let ([style_hash (list-ref new_style_hashes 0)]
+        [font_style_hash (list-ref new_style_hashes 1)]
+        [num_style_hash (list-ref new_style_hashes 2)]
+        [fill_style_hash (list-ref new_style_hashes 3)]
+        [border_style_hash (list-ref new_style_hashes 4)]
+        [alignment_style_hash (list-ref new_style_hashes 5)])
 
     (let ([xlsx_style_hash->index_map (XLSX-style_hash->index_map (*CURRENT_XLSX*))]
           [xlsx_style_index->hash_map (XLSX-style_index->hash_map (*CURRENT_XLSX*))]
@@ -161,7 +177,7 @@
               (let ([new_index (add1 (hash-count xlsx_style_hash->index_map))])
                 (hash-set! xlsx_style_hash->index_map combined_style_hash new_index)
                 (hash-set! xlsx_style_index->hash_map new_index combined_style_hash)
-
+                
                 (when (and (> (hash-count new_font_style_hash) 0) (not (hash-has-key? font_style_hash->index_map new_font_style_hash)))
                       (let ([index (add1 (hash-count font_style_hash->index_map))])
                         (hash-set! font_style_hash->index_map new_font_style_hash index)

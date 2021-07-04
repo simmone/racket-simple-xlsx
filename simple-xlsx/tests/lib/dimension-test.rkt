@@ -21,11 +21,44 @@
     )
    
    (test-case
-    "test-row_col->dimension"
+    "test-row_col->cell"
     
-    (check-equal? (row_col->dimension 1 1) "A1")
-    (check-equal? (row_col->dimension 2 1) "A2")
-    (check-equal? (row_col->dimension 2 5) "E2"))
+    (check-equal? (row_col->cell 1 1) "A1")
+    (check-equal? (row_col->cell 2 1) "A2")
+    (check-equal? (row_col->cell 2 5) "E2"))
+
+   (test-case
+    "test-cell->row_col"
+    
+    (let ([rowcol (cell->row_col "A1")])
+      (check-equal? (car rowcol) 1)
+      (check-equal? (cdr rowcol) 1))
+
+    (let ([rowcol (cell->row_col "A2")])
+      (check-equal? (car rowcol) 2)
+      (check-equal? (cdr rowcol) 1))
+
+    (let ([rowcol (cell->row_col "E2")])
+      (check-equal? (car rowcol) 2)
+      (check-equal? (cdr rowcol) 5))
+
+    (let ([rowcol (cell->row_col "C10")])
+      (check-equal? (car rowcol) 10)
+      (check-equal? (cdr rowcol) 3))
+
+    (let ([rowcol (cell->row_col "AB23")])
+      (check-equal? (car rowcol) 23)
+      (check-equal? (cdr rowcol) 28))
+
+    (let ([rowcol (cell->row_col "23")])
+      (check-equal? (car rowcol) 0)
+      (check-equal? (cdr rowcol) 0))
+
+    (let ([rowcol (cell->row_col "A")])
+      (check-equal? (car rowcol) 0)
+      (check-equal? (cdr rowcol) 0))
+    )
+
 
    (test-case 
     "test-AZ-NUMBER"
@@ -283,30 +316,6 @@
 
     ))
 
-   (test-case
-    "test-cell->rowcol"
-    
-    (let ([rowcol (cell->rowcol "A1")])
-      (check-equal? (car rowcol) 1)
-      (check-equal? (cdr rowcol) 1))
-
-    (let ([rowcol (cell->rowcol "C10")])
-      (check-equal? (car rowcol) 10)
-      (check-equal? (cdr rowcol) 3))
-
-    (let ([rowcol (cell->rowcol "AB23")])
-      (check-equal? (car rowcol) 23)
-      (check-equal? (cdr rowcol) 28))
-
-    (let ([rowcol (cell->rowcol "23")])
-      (check-equal? (car rowcol) 0)
-      (check-equal? (cdr rowcol) 0))
-
-    (let ([rowcol (cell->rowcol "A")])
-      (check-equal? (car rowcol) 0)
-      (check-equal? (cdr rowcol) 0))
-
-    )
 
    (test-case
     "test-cross-cell-style"
