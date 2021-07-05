@@ -24,8 +24,8 @@
      (with-sheet
       "Sheet1"
       (lambda ()           
-        (add-cell-style "A1-C3" '((fontSize . 20) (fontName . "Impact")))
-        (add-cell-style "B2-D4" '((fontSize . 21)))
+        (add-cell-range-style "A1-C3" '((fontSize . 20) (fontName . "Impact")))
+        (add-cell-range-style "B2-D4" '((fontSize . 21)))
         ))
      
      (let (

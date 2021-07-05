@@ -59,7 +59,7 @@
           (check-equal? (hash-ref row->style_index_map 4) 3)
           (check-equal? (set-count (hash-ref sheet_row->cells_map 2)) 3)
           (check-equal? (set-count (hash-ref sheet_row->cells_map 3)) 3)
-          (check-equal? (set-count (hash-ref sheet_row->cells_map 4 '())) 0)
+          (check-equal? (set-count (hash-ref sheet_row->cells_map 4 (set))) 0)
 
 
           (check-equal? (hash-count cell->style_index_map) 9)

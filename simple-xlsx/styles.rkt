@@ -1,6 +1,7 @@
 #lang racket
 
 (provide (contract-out
+          [add-cell-style (-> string? (or/c list? (listof hash?)) void?)]
           [add-cell-range-style (-> string? list? void?)]
           [add-cells-style (-> (listof string?) list? void?)]
           [add-row-style (-> string? list? void?)]
@@ -20,30 +21,33 @@
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))])
     (let loop-row ([loop_row_index (car affected_row_range)])
       (when (<= loop_row_index (cdr affected_row_range))
-            (add-cells-style (hash-ref sheet_row->cells_map loop_row_index '()) new_style_hashes)
+            (add-cells-style (set->list (hash-ref sheet_row->cells_map loop_row_index (set))) new_style_hashes)
             (let* ([exist_style_index (hash-ref sheet_row->style_index_map loop_row_index 0)]
                    [new_style_index (add-style new_style_hashes exist_style_index)])
               (hash-set! sheet_row->style_index_map loop_row_index new_style_index))
             (loop-row (add1 loop_row_index))))))
 
-(define (add-cells-style cells new_style_hashes)
-  (printf "~a\n" cells)
-  (let ([sheet_cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
+(define (add-cell-style cell new_style_hashes_or_list)
+  (let ([new_style_hashes (if ((listof hash?) new_style_hashes_or_list) new_style_hashes_or_list (style_list->style_hash new_style_hashes_or_list))]
+        [sheet_cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))]
         [sheet_col->cells_map (DATA-SHEET-col->cells_map (*CURRENT_SHEET*))])
 
-    (let loop-cell ([loop_cells cells])
-      (when (not (null? loop_cells))
-            (let* ([exist_style_index (hash-ref sheet_cell->style_index_map (car loop_cells) 0)]
-                   [row_col (cell->row_col (car loop_cells))]
-                   [row_index (car row_col)]
-                   [col_index (cdr row_col)])
-              (hash-set! sheet_row->cells_map row_index (set-add (hash-ref sheet_row->cells_map row_index (set)) (car loop_cells)))
-              (hash-set! sheet_col->cells_map col_index (set-add (hash-ref sheet_col->cells_map col_index (set)) (car loop_cells)))
+    (let* ([exist_style_index (hash-ref sheet_cell->style_index_map cell 0)]
+           [row_col (cell->row_col cell)]
+           [row_index (car row_col)]
+           [col_index (cdr row_col)])
+      (hash-set! sheet_row->cells_map row_index (set-add (hash-ref sheet_row->cells_map row_index (set)) cell))
+      (hash-set! sheet_col->cells_map col_index (set-add (hash-ref sheet_col->cells_map col_index (set)) cell))
       
-              (let ([new_style_index (add-style new_style_hashes exist_style_index)])
-                (hash-set! sheet_cell->style_index_map (car loop_cells) new_style_index)))
-            (loop-cell (cdr loop_cells))))))
+      (let ([new_style_index (add-style new_style_hashes exist_style_index)])
+        (hash-set! sheet_cell->style_index_map cell new_style_index)))))
+
+(define (add-cells-style cells new_style_hashes)
+  (let loop-cell ([loop_cells cells])
+    (when (not (null? loop_cells))
+      (add-cell-style (car loop_cells) new_style_hashes)
+      (loop-cell (cdr loop_cells)))))
 
 (define (add-cell-range-style cell_range style_list)
   (when (not (null? cell_range))
@@ -58,7 +62,7 @@
                    [start_row_index (string->number (list-ref range_items 2))]
                    [end_col_index (col_abc->number (list-ref range_items 3))]
                    [end_row_index (string->number (list-ref range_items 4))])
-              
+
               (add-cells-style
                (let range-loop ([loop_row_index start_row_index]
                                 [loop_col_index start_col_index]
@@ -66,7 +70,7 @@
                  (if (<= loop_row_index end_row_index)
                      (if (<= loop_col_index end_col_index)
                          (range-loop loop_row_index (add1 loop_col_index) (cons (row_col->cell loop_row_index loop_col_index) cells))
-                         (range-loop (add1 loop_row_index) start_col_index (cons (row_col->cell loop_row_index loop_col_index) cells)))
+                         (range-loop (add1 loop_row_index) start_col_index cells))
                      (reverse cells)))
                new_style_hashes)))))
 
