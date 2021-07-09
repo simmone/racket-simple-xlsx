@@ -5,6 +5,7 @@
           [add-cell-range-style (-> string? list? void?)]
           [add-cells-style (-> (listof string?) list? void?)]
           [add-row-style (-> string? list? void?)]
+          [add-col-style (-> string? list? void?)]
           ))
 
 (require racket/date)
@@ -26,6 +27,19 @@
                    [new_style_index (add-style new_style_hashes exist_style_index)])
               (hash-set! sheet_row->style_index_map loop_row_index new_style_index))
             (loop-row (add1 loop_row_index))))))
+
+(define (add-col-style col_range style_list)
+  (let ([affected_col_range (check-col-range col_range)]
+        [new_style_hashes (style_list->style_hash style_list)]
+        [sheet_col->style_index_map (DATA-SHEET-col->style_index_map (*CURRENT_SHEET*))]
+        [sheet_col->cells_map (DATA-SHEET-col->cells_map (*CURRENT_SHEET*))])
+    (let loop-col ([loop_col_index (car affected_col_range)])
+      (when (<= loop_col_index (cdr affected_col_range))
+            (add-cells-style (set->list (hash-ref sheet_col->cells_map loop_col_index (set))) new_style_hashes)
+            (let* ([exist_style_index (hash-ref sheet_col->style_index_map loop_col_index 0)]
+                   [new_style_index (add-style new_style_hashes exist_style_index)])
+              (hash-set! sheet_col->style_index_map loop_col_index new_style_index))
+            (loop-col (add1 loop_col_index))))))
 
 (define (add-cell-style cell new_style_hashes_or_list)
   (let ([new_style_hashes (if ((listof hash?) new_style_hashes_or_list) new_style_hashes_or_list (style_list->style_hash new_style_hashes_or_list))]

@@ -7,9 +7,9 @@
           [cell->row_col (-> string? (cons/c natural? natural?))]
           [col_abc->number (-> string? natural?)]
           [col_number->abc (-> natural? string?)]
-          [abc->range (-> string? pair?)]
+          [col_abc->range (-> string? pair?)]
           [check-cell-range (-> string? (or/c #f string?))]
-          [check-col-range (-> string? string?)]
+          [check-col-range (-> natural? natural?)]
           [check-row-range (-> string? (cons/c natural? natural?))]
           [only-one-row/col-data? (-> string? boolean?)]
           [convert-range (-> string? string?)]
@@ -61,10 +61,10 @@
           (set! abc (string-append (string (integer->char (+ 64 loop_num))) abc))))
     abc))
 
-(define (abc->range abc_range)
+(define (col_abc->range col_abc_range)
   (cond
-   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" abc_range)
-    (let ([abc_items (regexp-split #rx"-" abc_range)])
+   [(regexp-match #rx"^([0-9]+|[A-Z]+)-([0-9]+|[A-Z]+)$" col_abc_range)
+    (let ([abc_items (regexp-split #rx"-" col_abc_range)])
       (if (= (length abc_items) 2)
           (let* ([first_item (first abc_items)]
                  [second_item (second abc_items)]
@@ -88,10 +88,10 @@
                 (cons start_index end_index)
                 (cons 1 1)))
           (cons 1 1)))]
-   [(regexp-match #rx"^[0-9]+$" abc_range)
-    (cons (string->number abc_range) (string->number abc_range))]
-   [(regexp-match #rx"^[A-Z]+$" abc_range)
-    (cons (col_abc->number abc_range) (col_abc->number abc_range))]
+   [(regexp-match #rx"^[0-9]+$" col_abc_range)
+    (cons (string->number col_abc_range) (string->number col_abc_range))]
+   [(regexp-match #rx"^[A-Z]+$" col_abc_range)
+    (cons (col_abc->number col_abc_range) (col_abc->number col_abc_range))]
    [else
     (cons 1 1)]))
 
@@ -116,34 +116,10 @@
     (error (format "invalid cell range! should be like this: A1-B2[~a]" cell_range_str))]))
 
 (define (check-col-range col_range_str)
-  (cond
-   [(regexp-match #rx"^[A-Z]+$" col_range_str)
-    (let* ([items (regexp-match #rx"^([A-Z]+)$" col_range_str)]
-           [start_col_name (second items)]
-           [end_col_name start_col_name])
-      (string-append start_col_name "-" end_col_name))]
-   [(regexp-match #rx"^[0-9]+$" col_range_str)
-    (let* ([items (regexp-match #rx"^([0-9]+)$" col_range_str)]
-           [start_col_index (second items)]
-           [end_col_index start_col_index])
-      (string-append start_col_index "-" end_col_index))]
-   [(regexp-match #rx"^[A-Z]+-[A-Z]+$" col_range_str)
-    (let* ([items (regexp-match #rx"^([A-Z]+)-([A-Z]+)$" col_range_str)]
-           [start_col_name (second items)]
-           [end_col_name (third items)])
-      (if (string>? start_col_name end_col_name)
-          (error (format "col name should from small to big[~a]" col_range_str))
-          (string-append start_col_name "-" end_col_name)))]
-   [(regexp-match #rx"^[0-9]+-[0-9]+$" col_range_str)
-    (let* ([items (regexp-match #rx"^([0-9]+)-([0-9]+)$" col_range_str)]
-           [start_col_index (string->number (second items))]
-           [end_col_index (string->number (third items))])
-      (if (> start_col_index end_col_index)
-          (error (format "col index should from small to big[~a]" col_range_str))
-          (format "~a-~a" start_col_index end_col_index)))]
-   [else
-    (error (format "invalid col range! should be like this: A-Z or 1-10 or A or 1 but is [~a]" col_range_str))]
-   ))
+  (let ([col_range (col_abc->range col_range_str)])
+    (if (<= (car col_range) (cdr col_range))
+        col_range
+        (error (format "col index should from small to big[~a]" col_range_str)))))
 
 (define (check-row-range row_range_str)
   (cond
@@ -242,7 +218,7 @@
 
 (define (range-to-col-hash range_str val)
   (let ([flat_map (make-hash)])
-    (let* ([items (abc->range range_str)]
+    (let* ([items (col_abc->range range_str)]
            [start_col (car items)]
            [end_col (cdr items)])
       (when (and
