@@ -16,7 +16,7 @@
 (require "lib/dimension.rkt")
 
 (define (add-row-style row_range style_list)
-  (let ([affected_row_range (check-row-range row_range)]
+  (let ([affected_row_range (to-row-range row_range)]
         [new_style_hashes (style_list->style_hash style_list)]
         [sheet_row->style_index_map (DATA-SHEET-row->style_index_map (*CURRENT_SHEET*))]
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))])
@@ -29,7 +29,7 @@
             (loop-row (add1 loop_row_index))))))
 
 (define (add-col-style col_range style_list)
-  (let ([affected_col_range (check-col-range col_range)]
+  (let ([affected_col_range (to-col-range col_range)]
         [new_style_hashes (style_list->style_hash style_list)]
         [sheet_col->style_index_map (DATA-SHEET-col->style_index_map (*CURRENT_SHEET*))]
         [sheet_col->cells_map (DATA-SHEET-col->cells_map (*CURRENT_SHEET*))])
@@ -63,9 +63,9 @@
       (add-cell-style (car loop_cells) new_style_hashes)
       (loop-cell (cdr loop_cells)))))
 
-(define (add-cell-range-style cell_range style_list)
-  (when (not (null? cell_range))
-        (let ([affected_cell_range (check-cell-range cell_range)]
+(define (add-cell-range-style cell_range_str style_list)
+  (when (not (null? cell_range_str))
+        (let ([affected_cell_range (to-cell-range cell_range_str)]
               [new_style_hashes (style_list->style_hash style_list)]
               [sheet_cell->style_index_map (DATA-SHEET-cell->style_index_map (*CURRENT_SHEET*))]
               [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))]

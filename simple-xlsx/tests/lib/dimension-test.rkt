@@ -92,19 +92,25 @@
     )
 
    (test-case
-    "test-AZ-RANGE"
-    (check-equal? (col_abc->range "A") '(1 . 1))
-    (check-equal? (col_abc->range "B") '(2 . 2))
-    (check-equal? (col_abc->range "2") '(2 . 2))
-    (check-equal? (col_abc->range "C-D") '(3 . 4))
-    (check-equal? (col_abc->range "3-4") '(3 . 4))
-    (check-equal? (col_abc->range "1-26") '(1 . 26))
-    (check-equal? (col_abc->range "26-1") '(1 . 1))
-    (check-equal? (col_abc->range "A-Z") '(1 . 26))
-    (check-equal? (col_abc->range "Z-A") '(1 . 1))
-    (check-equal? (col_abc->range "A-B-C") '(1 . 1))
-    (check-equal? (col_abc->range "A-ksdk344") '(1 . 1))
-    (check-equal? (col_abc->range "sdksjdkf-%^%$#") '(1 . 1))
+    "test-to-col-range"
+    (check-equal? (to-col-range "A") '(1 . 1))
+    (check-equal? (to-col-range "B") '(2 . 2))
+    (check-equal? (to-col-range "2") '(2 . 2))
+    (check-equal? (to-col-range "C-D") '(3 . 4))
+    (check-equal? (to-col-range "3-4") '(3 . 4))
+    (check-equal? (to-col-range "1-26") '(1 . 26))
+    (check-equal? (to-col-range "26-1") '(1 . 1))
+    (check-equal? (to-col-range "A-Z") '(1 . 26))
+    (check-equal? (to-col-range "Z-A") '(1 . 1))
+    (check-equal? (to-col-range "A-B-C") '(1 . 1))
+    (check-equal? (to-col-range "A-ksdk344") '(1 . 1))
+    (check-equal? (to-col-range "sdksjdkf-%^%$#") '(1 . 1))
+    (check-equal? (to-col-range "A-Z") '(1 . 26))
+    (check-equal? (to-col-range "A-z") '(1 . 26))
+    (check-equal? (to-col-range "A-B") '(1 . 2))
+    (check-equal? (to-col-range "A") '(1 . 1))
+    (check-equal? (to-col-range "7-12") '(7 . 12))
+    (check-equal? (to-col-range "10") '(10 . 10))
     )
 
    (test-case
@@ -114,8 +120,7 @@
 
     (check-equal? (convert-range "C2-Z2") "$C$2:$Z$2")
 
-    (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100")
-    )
+    (check-equal? (convert-range "AB20-AB100") "$AB$20:$AB$100"))
    
    (test-case
     "test-check-range"
@@ -132,47 +137,28 @@
     )
    
    (test-case
-    "test-check-row-range"
+    "test-to-row-range"
     
-    (check-equal? (check-row-range "1-4") '(1 . 4))
+    (check-equal? (to-row-range "1-4") '(1 . 4))
 
-    (check-equal? (check-row-range "7-12") '(7 . 12))
+    (check-equal? (to-row-range "7-12") '(7 . 12))
 
-    (check-equal? (check-row-range "10") '(10 . 10))
+    (check-equal? (to-row-range "10") '(10 . 10))
 
-    (check-exn exn:fail? (lambda () (check-row-range "2-1")))
+    (check-equal? (to-row-range "2-1") '(1 . 1))
 
-    (check-exn exn:fail? (lambda () (check-row-range "A-B")))
+    (check-equal? (to-row-range "A-B") '(1 . 1))
 
-    (check-exn exn:fail? (lambda () (check-row-range "12-7")))
-    )
+    (check-equal? (to-row-range "12-7") '(1 . 1)))
 
    (test-case
-    "test-check-col-range"
+    "test-to-cell-range"
     
-    (check-equal? (check-col-range "A-Z") '(1 . 26))
+    (check-equal? (to-cell-range "A1-B2") "A1-B2")
 
-    (check-equal? (check-col-range "A") '(1 . 1))
+    (check-equal? (to-cell-range "A1-b2") "A1-B2")
 
-    (check-equal? (check-col-range "7-12") '(7 . 12))
-
-    (check-equal? (check-col-range "10") '(10 . 10))
-    
-    (check-exn exn:fail? (lambda () (check-col-range "B-A")))
-
-    (check-exn exn:fail? (lambda () (check-col-range "A1-A")))
-    )
-
-   (test-case
-    "test-check-cell-range"
-    
-    (check-cell-range "A1-B2")
-
-    (check-cell-range "G7")
-
-    (check-exn exn:fail? (lambda () (check-cell-range "A10-B9")))
-
-    (check-exn exn:fail? (lambda () (check-cell-range "B1-A1")))
+    (check-equal? (to-cell-range "G7") "G7-G7")
     )
 
    (test-case
