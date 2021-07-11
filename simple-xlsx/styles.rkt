@@ -22,10 +22,10 @@
         [sheet_row->cells_map (DATA-SHEET-row->cells_map (*CURRENT_SHEET*))])
     (let loop-row ([loop_row_index (car affected_row_range)])
       (when (<= loop_row_index (cdr affected_row_range))
-            (add-cells-style (set->list (hash-ref sheet_row->cells_map loop_row_index (set))) new_style_hashes)
             (let* ([exist_style_index (hash-ref sheet_row->style_index_map loop_row_index 0)]
                    [new_style_index (add-style new_style_hashes exist_style_index)])
               (hash-set! sheet_row->style_index_map loop_row_index new_style_index))
+            (add-cells-style (set->list (hash-ref sheet_row->cells_map loop_row_index (set))) new_style_hashes)
             (loop-row (add1 loop_row_index))))))
 
 (define (add-col-style col_range style_list)
@@ -35,10 +35,10 @@
         [sheet_col->cells_map (DATA-SHEET-col->cells_map (*CURRENT_SHEET*))])
     (let loop-col ([loop_col_index (car affected_col_range)])
       (when (<= loop_col_index (cdr affected_col_range))
-            (add-cells-style (set->list (hash-ref sheet_col->cells_map loop_col_index (set))) new_style_hashes)
             (let* ([exist_style_index (hash-ref sheet_col->style_index_map loop_col_index 0)]
                    [new_style_index (add-style new_style_hashes exist_style_index)])
               (hash-set! sheet_col->style_index_map loop_col_index new_style_index))
+            (add-cells-style (set->list (hash-ref sheet_col->cells_map loop_col_index (set))) new_style_hashes)
             (loop-col (add1 loop_col_index))))))
 
 (define (add-cell-style cell new_style_hashes_or_list)
