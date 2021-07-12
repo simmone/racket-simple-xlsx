@@ -3,6 +3,7 @@
 (require simple-xml)
 
 (require "../../../xlsx/xlsx.rkt")
+(require "../../../sheet/sheet.rkt")
 (require "../../../lib/lib.rkt")
 
 (provide (contract-out
@@ -16,7 +17,7 @@
           [cellStyles (-> list?)]
           [dxfs (-> list?)]
           [styles (-> list? list? list? list? list? list?)]
-          [write-styles (-> list? list? list? list? list? void?)]
+          [write-styles (-> void?)]
           [read-styles (-> void?)]
           ))
 
@@ -262,8 +263,14 @@
    (dxfs)
    (tableStyles)))
 
-(define (write-styles style_list fill_list font_list numFmt_list border_list)
-  (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl")])
+(define (write-styles)
+  (let ([dir (build-path (XLSX-xlsx_dir (*CURRENT_XLSX*)) "xl")]
+        [style_list (map (lambda (s) (cdr s)) (sort (hash->list (XLSX-style_index->hash_map (*CURRENT_XLSX*))) < #:key car))]
+        [fill_list (map (lambda (s) (cdr s)) (sort (hash->list (XLSX-fill_index->hash_map (*CURRENT_XLSX*))) < #:key car))]
+        [font_list (map (lambda (s) (cdr s)) (sort (hash->list (XLSX-font_index->hash_map (*CURRENT_XLSX*))) < #:key car))]
+        [num_list (map (lambda (s) (cdr s)) (sort (hash->list (XLSX-num_index->hash_map (*CURRENT_XLSX*))) < #:key car))]
+        [border_list (map (lambda (s) (cdr s)) (sort (hash->list (XLSX-border_index->hash_map (*CURRENT_XLSX*))) < #:key car))])
+
     (make-directory* dir)
 
     (with-output-to-file (build-path dir "styles.xml")
