@@ -116,15 +116,15 @@
      (load-sheet "DataSheet" xlsx)
      (printf "~a\n" (get-sheet-dimension xlsx)) ;(4 . 6)
 
-     (printf "~a\n" (get-cell-value "A2" xlsx)) ;201601
+     (printf "~a\n" (get-cell "A2" xlsx)) ;201601
 
-     (let ([date_val (oa_date_number->date (get-cell-value "F2" xlsx))])
+     (let ([date_val (oa_date_number->date (get-cell "F2" xlsx))])
        (printf "~a,~a,~a\n" (date-year date_val) (date-month date_val) (date-day date_val)))
      ; 2018,9,17
 
      (printf "~a\n" (get-sheet-rows xlsx))
      ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
-     
+
      ))
   )
 

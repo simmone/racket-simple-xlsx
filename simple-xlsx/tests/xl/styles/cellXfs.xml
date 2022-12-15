@@ -1,0 +1,23 @@
+<cellXfs count="7">
+  <xf borderId="0" fontId="0" numFmtId="0" fillId="0" xfId="0">
+    <alignment vertical="center"/>
+  </xf>
+  <xf borderId="3" fontId="3" numFmtId="169" fillId="4" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="center" vertical="bottom"/>
+  </xf>
+  <xf borderId="1" fontId="1" numFmtId="166" fillId="3" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="left" vertical="center"/>
+  </xf>
+  <xf borderId="1" fontId="2" numFmtId="165" fillId="2" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="right" vertical="top"/>
+  </xf>
+  <xf borderId="2" fontId="4" numFmtId="168" fillId="5" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="left" vertical="center"/>
+  </xf>
+  <xf borderId="4" fontId="0" numFmtId="0" fillId="0" xfId="0" applyBorder="1">
+    <alignment horizontal="left" vertical="center"/>
+  </xf>
+  <xf borderId="4" fontId="2" numFmtId="167" fillId="4" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="center" vertical="top"/>
+  </xf>
+</cellXfs>

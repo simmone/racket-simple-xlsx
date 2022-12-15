@@ -1,0 +1,19 @@
+<c:title>
+  <c:tx>
+    <c:rich>
+      <a:bodyPr/>
+      <a:lstStyle/>
+      <a:p>
+        <a:pPr>
+          <a:defRPr/>
+        </a:pPr>
+        <a:r>
+          <a:rPr lang="zh-CN" altLang="en-US"/>
+          <a:t>Chart1</a:t>
+        </a:r>
+        <a:endParaRPr lang="en-US" altLang="zh-CN"/>
+      </a:p>
+    </c:rich>
+  </c:tx>
+  <c:layout/>
+</c:title>

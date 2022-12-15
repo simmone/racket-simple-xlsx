@@ -1,0 +1,139 @@
+<c:bar3DChart>
+  <c:barDir val="col"/>
+  <c:grouping val="clustered"/>
+  <c:ser>
+    <c:idx val="0"/>
+    <c:order val="0"/>
+    <c:tx>
+      <c:v>CAT</c:v>
+    </c:tx>
+    <c:marker>
+      <c:symbol val="none"/>
+    </c:marker>
+    <c:cat>
+      <c:strRef>
+        <c:f>DataSheet!$B$1:$D$1</c:f>
+        <c:strCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>201601</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>201602</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>201603</c:v>
+          </c:pt>
+        </c:strCache>
+      </c:strRef>
+    </c:cat>
+    <c:val>
+      <c:numRef>
+        <c:f>DataSheet!$B$2:$D$2</c:f>
+        <c:numCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>100</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>300</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>200</c:v>
+          </c:pt>
+        </c:numCache>
+      </c:numRef>
+    </c:val>
+  </c:ser>
+  <c:ser>
+    <c:idx val="1"/>
+    <c:order val="1"/>
+    <c:tx>
+      <c:v>Puma</c:v>
+    </c:tx>
+    <c:marker>
+      <c:symbol val="none"/>
+    </c:marker>
+    <c:cat>
+      <c:strRef>
+        <c:f>DataSheet!$B$1:$D$1</c:f>
+        <c:strCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>201601</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>201602</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>201603</c:v>
+          </c:pt>
+        </c:strCache>
+      </c:strRef>
+    </c:cat>
+    <c:val>
+      <c:numRef>
+        <c:f>DataSheet!$B$3:$D$3</c:f>
+        <c:numCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>200</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>400</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>300</c:v>
+          </c:pt>
+        </c:numCache>
+      </c:numRef>
+    </c:val>
+  </c:ser>
+  <c:ser>
+    <c:idx val="2"/>
+    <c:order val="2"/>
+    <c:tx>
+      <c:v>Brooks</c:v>
+    </c:tx>
+    <c:marker>
+      <c:symbol val="none"/>
+    </c:marker>
+    <c:cat>
+      <c:strRef>
+        <c:f>DataSheet!$B$1:$D$1</c:f>
+        <c:strCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>201601</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>201602</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>201603</c:v>
+          </c:pt>
+        </c:strCache>
+      </c:strRef>
+    </c:cat>
+    <c:val>
+      <c:numRef>
+        <c:f>DataSheet!$B$4:$D$4</c:f>
+        <c:numCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>300</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>500</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>400</c:v>
+          </c:pt>
+        </c:numCache>
+      </c:numRef>
+    </c:val>
+  </c:ser>
+  <c:marker val="1"/>
+  <c:axId val="76367360"/>
+  <c:axId val="76368896"/>
+</c:bar3DChart>

@@ -1,0 +1,69 @@
+<borders count="9">
+  <border>
+    <left/>
+    <right/>
+    <top/>
+    <bottom/>
+    <diagonal/>
+  </border>
+  <border>
+    <left style="thick">
+      <color rgb="000000"/>
+    </left>
+    <top style="thick">
+      <color rgb="000000"/>
+    </top>
+    <diagonal/>
+  </border>
+  <border>
+    <right style="thick">
+      <color rgb="000000"/>
+    </right>
+    <top style="thick">
+      <color rgb="000000"/>
+    </top>
+    <diagonal/>
+  </border>
+  <border>
+    <top style="thick">
+      <color rgb="000000"/>
+    </top>
+    <diagonal/>
+  </border>
+  <border>
+    <left style="thick">
+      <color rgb="000000"/>
+    </left>
+    <bottom style="thick">
+      <color rgb="000000"/>
+    </bottom>
+    <diagonal/>
+  </border>
+  <border>
+    <right style="thick">
+      <color rgb="000000"/>
+    </right>
+    <bottom style="thick">
+      <color rgb="000000"/>
+    </bottom>
+    <diagonal/>
+  </border>
+  <border>
+    <bottom style="thick">
+      <color rgb="000000"/>
+    </bottom>
+    <diagonal/>
+  </border>
+  <border>
+    <left style="thick">
+      <color rgb="000000"/>
+    </left>
+    <diagonal/>
+  </border>
+  <border>
+    <right style="thick">
+      <color rgb="000000"/>
+    </right>
+    <diagonal/>
+  </border>
+</borders>

@@ -1,0 +1,48 @@
+<c:pie3DChart>
+  <c:varyColors val="1"/>
+  <c:ser>
+    <c:idx val="0"/>
+    <c:order val="0"/>
+    <c:tx>
+      <c:v>CAT</c:v>
+    </c:tx>
+    <c:marker>
+      <c:symbol val="none"/>
+    </c:marker>
+    <c:cat>
+      <c:strRef>
+        <c:f>DataSheet!$B$1:$D$1</c:f>
+        <c:strCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>201601</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>201602</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>201603</c:v>
+          </c:pt>
+        </c:strCache>
+      </c:strRef>
+    </c:cat>
+    <c:val>
+      <c:numRef>
+        <c:f>DataSheet!$B$2:$D$2</c:f>
+        <c:numCache>
+          <c:ptCount val="3"/>
+          <c:pt idx="0">
+            <c:v>100</c:v>
+          </c:pt>
+          <c:pt idx="1">
+            <c:v>300</c:v>
+          </c:pt>
+          <c:pt idx="2">
+            <c:v>200</c:v>
+          </c:pt>
+        </c:numCache>
+      </c:numRef>
+    </c:val>
+  </c:ser>
+  <c:firstSliceAng val="0"/>
+</c:pie3DChart>

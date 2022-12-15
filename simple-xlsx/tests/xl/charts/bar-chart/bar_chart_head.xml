@@ -1,0 +1,4 @@
+<c:barChart>
+  <c:barDir val="col"/>
+  <c:grouping val="clustered"/>
+</c:barChart>

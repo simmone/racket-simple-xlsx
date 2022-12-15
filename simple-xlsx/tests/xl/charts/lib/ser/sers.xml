@@ -1,0 +1,132 @@
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>CAT</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet1!$A$1:$C$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201601</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201602</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201603</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet12!$D$1:$F$1</c:f>
+      <c:numCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>100</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>300</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>200</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:idx val="1"/>
+  <c:order val="1"/>
+  <c:tx>
+    <c:v>DOG</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet2!$B$1:$D$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201601</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201602</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201603</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet22!$E$1:$G$1</c:f>
+      <c:numCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>100</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>300</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>200</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:idx val="2"/>
+  <c:order val="2"/>
+  <c:tx>
+    <c:v>MOUSE</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet3!$C$1:$E$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201601</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201602</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201603</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet32!$F$1:$H$1</c:f>
+      <c:numCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>100</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>300</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>200</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>

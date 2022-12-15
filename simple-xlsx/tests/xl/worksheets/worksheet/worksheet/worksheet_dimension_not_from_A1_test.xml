@@ -1,0 +1,27 @@
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="B2:E2"/>
+  <sheetViews><sheetView tabSelected="1" workbookViewId="0"/>
+  </sheetViews><sheetFormatPr defaultRowHeight="13.5"/>
+  <cols>
+    <col min="1" max="4" width="8"/>
+    <col min="5" max="5" width="6"/>
+  </cols>
+  <sheetData>
+    <row r="2" spans="1:5">
+      <c r="B2">
+        <v>100</v>
+      </c>
+      <c r="C2">
+        <v>110</v>
+      </c>
+      <c r="D2">
+        <v>1110</v>
+      </c>
+      <c r="E2">
+        <v>6.9</v>
+      </c>
+    </row>
+  </sheetData>
+  <phoneticPr fontId="1" type="noConversion"/>
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+  <pageSetup paperSize="9" orientation="portrait" horizontalDpi="200" verticalDpi="200" r:id="rId1"/>
+</worksheet>

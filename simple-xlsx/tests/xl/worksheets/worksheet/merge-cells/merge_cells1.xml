@@ -1,0 +1,5 @@
+<mergeCells count="3">
+  <mergeCell ref="A1:C2"/>
+  <mergeCell ref="D3:F4"/>
+  <mergeCell ref="H5:J6"/>
+</mergeCells>

@@ -1,0 +1,152 @@
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet1!$A$1:$C$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201601</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201602</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201603</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet2!$D$1:$F$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201604</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201605</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201606</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet3!$G$1:$I$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201607</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201608</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201609</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet4!$J$1:$L$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201610</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201611</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201612</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet5!$M$1:$O$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201710</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201711</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201712</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet6!$P$1:$R$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201810</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201811</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201812</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet7!$S$1:$U$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>201910</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201911</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>201912</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>
+<c:ser>
+  <c:cat>
+    <c:strRef>
+      <c:f>DataSheet8!$V$1:$X$1</c:f>
+      <c:strCache>
+        <c:ptCount val="3"/>
+        <c:pt idx="0">
+          <c:v>202010</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>202011</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>202012</c:v>
+        </c:pt>
+      </c:strCache>
+    </c:strRef>
+  </c:cat>
+</c:ser>

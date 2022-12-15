@@ -1,91 +1,112 @@
 #lang racket
 
-(provide (contract-out
-          [write-xlsx-file (-> (is-a?/c xlsx%) path-string? void?)]
-          ))
-
 (require racket/date)
 
+(provide (contract-out
+          [write-xlsx (-> path-string? procedure? any)]
+          [write-batch (-> void?)]
+          ))
+
 (require "xlsx/xlsx.rkt")
-(require "xlsx/sheet.rkt")
+(require "style/style.rkt")
+(require "style/border-style.rkt")
+(require "style/font-style.rkt")
+(require "style/alignment-style.rkt")
+(require "style/number-style.rkt")
+(require "style/fill-style.rkt")
+(require "style/lib.rkt")
+(require "style/sort-styles.rkt")
+(require "style/set-styles.rkt")
+(require "sheet/sheet.rkt")
 (require "lib/lib.rkt")
-(require "writer/content-type/content-type.rkt")
-(require "writer/_rels/rels.rkt")
-(require "writer/docProps/docprops-app.rkt")
-(require "writer/docProps/docprops-core.rkt")
-(require "writer/xl/_rels/workbook-xml-rels.rkt")
-(require "writer/xl/printerSettings/printerSettings.rkt")
-(require "writer/xl/sharedStrings.rkt")
-(require "writer/xl/styles/styles.rkt")
-(require "writer/xl/theme/theme.rkt")
-(require "writer/xl/workbook.rkt")
-(require "writer/xl/worksheets/_rels/rels.rkt")
-(require "writer/xl/worksheets/worksheet/worksheet.rkt")
-(require "writer/xl/charts/chart.rkt")
-(require "writer/xl/chartsheets/chartsheet.rkt")
-(require "writer/xl/chartsheets/_rels/chartsheet-rels.rkt")
-(require "writer/xl/drawings/drawing.rkt")
-(require "writer/xl/drawings/_rels/drawing-rels.rkt")
+(require "lib/sheet-lib.rkt")
+(require "lib/dimension.rkt")
+(require "content-type.rkt")
+(require "_rels/rels.rkt")
+(require "docProps/docprops-app.rkt")
+(require "docProps/docprops-core.rkt")
+(require "xl/_rels/workbook-xml-rels.rkt")
+(require "xl/printerSettings/printerSettings.rkt")
+(require "xl/theme/theme.rkt")
+(require "xl/sharedStrings.rkt")
+(require "xl/styles/styles.rkt")
+(require "xl/workbook.rkt")
+(require "xl/worksheets/_rels/worksheets-rels.rkt")
+(require "xl/worksheets/worksheet.rkt")
+(require "xl/chartsheets/_rels/chartsheets-rels.rkt")
+(require "xl/chartsheets/chartsheet.rkt")
+(require "xl/charts/charts.rkt")
+(require "xl/drawings/_rels/drawing-rels.rkt")
+(require "xl/drawings/drawing.rkt")
 
-(define (write-xlsx-file xlsx xlsx_file_name)
+(define (write-batch)
+  ;; write shared_strings_map
+  (squash-shared-strings-map)
+
+  ;; [Content_Types].xml
+  (write-content-type)
+
+  ;; _rels/.rels
+  (write-rels)
+
+  ;; docProps/app.xml
+  (write-docprops-app)
+
+  ;; docProps/core.xml
+  (write-docprops-core (current-date))
+
+  ;; xl/_rels/rels
+  (write-workbook-rels)
+
+  ;; xl/theme/theme1.xml
+  (write-theme)
+
+  ;; xl/sharedStrings.xml
+  (write-shared-strings)
+
+  ;; xl/styles.xml
+  (sort-styles)
+  (write-styles)
+
+  ;; xl/workbook
+  (write-workbook)
+
+  ;; xl/worksheets/_rels/sheet?.rels.xml
+  (write-worksheets-rels)
+
+  ;; xl/worksheets/worksheet/sheet?.xml
+  (write-worksheets)
+
+  ;; xl/chartsheets/_rels/sheet?.rels.xml
+  (write-chartsheets-rels)
+
+  ;; xl/chartsheets/chartsheet/sheet?.xml
+  (write-chartsheets)
+
+  ;; xl/charts/chart?.xml
+  (write-charts)
+
+  ;; xl/drawings/_rels/drawing?.rels.xml
+  (write-drawings-rels)
+
+  ;; xl/drawings/drawing?.xml
+  (write-drawings))
+
+(define (write-xlsx xlsx_file_name user_proc)
   (when (file-exists? xlsx_file_name)
-        (delete-file xlsx_file_name))
+    (delete-file xlsx_file_name))
 
-  (let ([tmp_dir #f])
-    (dynamic-wind
-        (lambda () (set! tmp_dir (make-temporary-file "xlsx_tmp_~a" 'directory ".")))
-        (lambda ()
-          ;; [Content_Types].xml
-          (write-content-type-file tmp_dir xlsx)
+  (with-xlsx
+   (lambda ()
+     (dynamic-wind
+         (lambda () (set-XLSX-xlsx_dir! (*XLSX*) (make-temporary-file "xlsx_write_tmp_~a" 'directory ".")))
+         (lambda ()
+           (user_proc)
 
-          ;; _rels
-          (write-rels-file (build-path tmp_dir "_rels"))
+           (write-batch)
 
-          ;; docProps
-          (write-docprops-app-file (build-path tmp_dir "docProps") xlsx)
-          (write-docprops-core-file (build-path tmp_dir "docProps") (current-date))
-                
-          ;; xl
-          (write-workbook-xml-rels-file (build-path tmp_dir "xl" "_rels") xlsx)
-
-          ;; printerSettings
-          (create-printer-settings (build-path tmp_dir "xl" "printerSettings") xlsx)
-                  
-          ;; theme
-          (write-theme-file (build-path tmp_dir "xl" "theme"))
-
-          ;; sharedStrings
-          (write-shared-strings-file (build-path tmp_dir "xl") xlsx)
-
-          ;; styles
-          (send xlsx burn-styles!)
-          (write-styles-file 
-           (build-path tmp_dir "xl") 
-           (send xlsx get-style-list) 
-           (send xlsx get-fill-list) 
-           (send xlsx get-font-list)
-           (send xlsx get-numFmt-list)
-           (send xlsx get-border-list)
-           )
-
-          ;; workbook
-          (write-workbook-file (build-path tmp_dir "xl") xlsx)
-
-          ;; data-sheets
-          (write-worksheets-rels-file (build-path tmp_dir "xl" "worksheets" "_rels") xlsx)
-          (write-data-sheet-file (build-path tmp_dir "xl" "worksheets") xlsx)
-
-          ;; charts
-          (write-chart-file (build-path tmp_dir "xl" "charts") xlsx)
-
-          ;; chartsheets
-          (write-chart-sheet-rels-file (build-path tmp_dir "xl" "chartsheets" "_rels") xlsx)
-          (write-chart-sheet-file (build-path tmp_dir "xl" "chartsheets") xlsx)
-
-          ;; drawing
-          (write-drawing-rels-file (build-path tmp_dir "xl" "drawings" "_rels") xlsx)
-          (write-drawing-file (build-path tmp_dir "xl" "drawings") xlsx)
-
-          (zip-xlsx xlsx_file_name tmp_dir))
-        (lambda ()
-          (delete-directory/files tmp_dir)))))
+           (zip-xlsx xlsx_file_name (XLSX-xlsx_dir (*XLSX*))))
+         (lambda ()
+;;           (void)
+           (delete-directory/files (XLSX-xlsx_dir (*XLSX*)))
+           )))))

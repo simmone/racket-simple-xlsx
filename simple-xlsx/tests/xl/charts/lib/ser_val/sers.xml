@@ -1,0 +1,132 @@
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet1!$A$2:$D$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>101</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>201</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>301</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>401</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet2!$E$2:$H$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>102</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>202</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>302</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>402</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet3!$I$2:$L$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>103</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>203</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>303</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>403</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet4!$M$2:$P$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>104</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>204</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>304</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>404</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet5!$Q$2:$T$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>105</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>205</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>305</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>405</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>
+<c:ser>
+  <c:val>
+    <c:numRef>
+      <c:f>DataSheet6!$U$2:$X$2</c:f>
+      <c:numCache>
+        <c:ptCount val="4"/>
+        <c:pt idx="0">
+          <c:v>106</c:v>
+        </c:pt>
+        <c:pt idx="1">
+          <c:v>206</c:v>
+        </c:pt>
+        <c:pt idx="2">
+          <c:v>306</c:v>
+        </c:pt>
+        <c:pt idx="3">
+          <c:v>406</c:v>
+        </c:pt>
+      </c:numCache>
+    </c:numRef>
+  </c:val>
+</c:ser>

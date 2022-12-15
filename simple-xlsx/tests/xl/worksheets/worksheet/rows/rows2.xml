@@ -1,0 +1,53 @@
+<sheetData>
+  <row r="3" spans="3:7">
+    <c r="C3" t="s">
+      <v>0</v>
+    </c>
+    <c r="D3" t="s">
+      <v>1</v>
+    </c>
+    <c r="E3" t="s">
+      <v>2</v>
+    </c>
+    <c r="F3" t="s">
+      <v>0</v>
+    </c>
+    <c r="G3" t="s">
+      <v>3</v>
+    </c>
+  </row>
+  <row r="4" spans="3:7" ht="5" customHeight="1">
+    <c r="C4">
+      <v>201601</v>
+    </c>
+    <c r="D4">
+      <v>100</v>
+    </c>
+    <c r="E4">
+      <v>110</v>
+    </c>
+    <c r="F4">
+      <v>1110</v>
+    </c>
+    <c r="G4">
+      <v>6.9</v>
+    </c>
+  </row>
+  <row r="5" spans="3:7" ht="5" customHeight="1">
+    <c r="C5">
+      <v>43360</v>
+    </c>
+    <c r="D5">
+      <v>43360</v>
+    </c>
+    <c r="E5">
+      <v>43360</v>
+    </c>
+    <c r="F5">
+      <v>43360</v>
+    </c>
+    <c r="G5">
+      <v>43360</v>
+    </c>
+  </row>
+</sheetData>

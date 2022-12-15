@@ -1,0 +1,20 @@
+<c:cat>
+  <c:strRef>
+    <c:f>Sheet1!$A$1:$D$1</c:f>
+    <c:strCache>
+      <c:ptCount val="4"/>
+      <c:pt idx="0">
+        <c:v>month1</c:v>
+      </c:pt>
+      <c:pt idx="1">
+        <c:v>month2</c:v>
+      </c:pt>
+      <c:pt idx="2">
+        <c:v>month3</c:v>
+      </c:pt>
+      <c:pt idx="3">
+        <c:v>month4</c:v>
+      </c:pt>
+    </c:strCache>
+  </c:strRef>
+</c:cat>

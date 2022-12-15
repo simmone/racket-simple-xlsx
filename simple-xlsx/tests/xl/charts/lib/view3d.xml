@@ -1,0 +1,3 @@
+<c:view3D>
+  <c:perspective val="30"/>
+</c:view3D>

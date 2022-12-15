@@ -1,0 +1,20 @@
+<c:val>
+  <c:numRef>
+    <c:f>Sheet1!$A$2:$D$2</c:f>
+    <c:numCache>
+      <c:ptCount val="4"/>
+      <c:pt idx="0">
+        <c:v>100</c:v>
+      </c:pt>
+      <c:pt idx="1">
+        <c:v>200</c:v>
+      </c:pt>
+      <c:pt idx="2">
+        <c:v>300</c:v>
+      </c:pt>
+      <c:pt idx="3">
+        <c:v>400</c:v>
+      </c:pt>
+    </c:numCache>
+  </c:numRef>
+</c:val>

@@ -1,0 +1,60 @@
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser1</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser2</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser3</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser4</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser5</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
+<c:ser>
+  <c:idx val="0"/>
+  <c:order val="0"/>
+  <c:tx>
+    <c:v>Ser6</c:v>
+  </c:tx>
+  <c:marker>
+    <c:symbol val="none"/>
+  </c:marker>
+</c:ser>
