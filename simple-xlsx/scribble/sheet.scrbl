@@ -2,7 +2,7 @@
 
 @title{Second Level: with-sheet*}
 
-In the with-sheet-*'s scope, you can get and set sheet data, set styles etc.
+In the with-sheet-*'s scope, you can get and set sheet data, set sheet styles, etc.
 
 @section{with-sheet-*}
 
@@ -18,7 +18,7 @@ with-sheet-name use sheet name to specify.
 
 All the sheet data's operations: get or set data, set data's styles should be placed in the with-sheet-*.
 
-Because almost methods is on the sheet scope, so all the code style is like below:
+Because most methods is effect in the sheet scope, so normally, the code style is like below:
 
 @codeblock|{
 (write-xlsx

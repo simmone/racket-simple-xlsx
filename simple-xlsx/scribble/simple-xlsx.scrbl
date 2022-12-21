@@ -22,7 +22,7 @@ raco pkg install simple-xlsx
 
 Caution: simple-xlsx depends on package: simple-xml, if you have installed simple-xml, should update the package to newest version.
 
-@section{Example}
+@section{Basic Example}
 
 @subsection{Generate a xlsx file}
 

@@ -14,23 +14,24 @@
         <vt:lpstr>工作表</vt:lpstr>
       </vt:variant>
       <vt:variant>
-        <vt:i4>2</vt:i4>
+        <vt:i4>3</vt:i4>
       </vt:variant>
       <vt:variant>
         <vt:lpstr>图表</vt:lpstr>
       </vt:variant>
       <vt:variant>
-        <vt:i4>2</vt:i4>
+        <vt:i4>3</vt:i4>
       </vt:variant>
     </vt:vector>
   </HeadingPairs>
   <TitlesOfParts>
-    <vt:vector size="5" baseType="lpstr">
+    <vt:vector size="6" baseType="lpstr">
       <vt:lpstr>数据页面</vt:lpstr>
       <vt:lpstr>Sheet2</vt:lpstr>
       <vt:lpstr>Sheet3</vt:lpstr>
       <vt:lpstr>Chart1</vt:lpstr>
       <vt:lpstr>Chart4</vt:lpstr>
+      <vt:lpstr>Chart5</vt:lpstr>
     </vt:vector>
   </TitlesOfParts>
 </Properties>

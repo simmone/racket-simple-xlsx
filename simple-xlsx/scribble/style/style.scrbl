@@ -2,7 +2,7 @@
 
 @title{Set Styles}
 
-Add styles to sheets.
+add styles to sheets.
 
 @section{about styles}
 
@@ -12,11 +12,19 @@ Add styles to sheets.
 
 3. if you have overlap styles, the overlap area's style will be piled up.
 
+@section{cell/row/col range}
+
+cell range: "A1-B3".
+
+row range: "1-3", start from 1.
+
+col range: "A-C" or "1-3", start from 1.
+
 @section{set-row-range-height}
 
 @codeblock|{set-row-range-height (-> string? natural? void?)}|
 
-arg1: row range, as "1-2".
+arg1: row range.
 
 arg2: row height.
 
@@ -24,7 +32,7 @@ arg2: row height.
 
 @codeblock|{set-col-range-width (-> string? natural? void?)}|
 
-arg1: col range, as "A-B".
+arg1: col range.
 
 arg2: col width.
 
@@ -67,9 +75,13 @@ set merge cell ranges.(multiple times)
 
 @section{set-cell-range-border-style}
 
-@codeblock|{set-cell-range-border-style (-> string? border-direction? rgb? border-mode? void?)}|
+@codeblock|{
+  set-cell-range-border-style (-> string? border-direction? rgb? border-mode? void?)
+  set-row-range-border-style (-> string? border-direction? rgb? border-mode? void?)
+  set-col-range-border-style (-> string? border-direction? rgb? border-mode? void?)
+}|
 
-arg1: cell range, as "A1-B2".
+arg1: cell/row/col range.
 
 arg2: border-direction?, one of '("all" "side" "top" "bottom" "left" "right").
 the side direction means only set the cell range's out border.
@@ -89,11 +101,15 @@ arg4: border-mode?, one of '("" "thin" "dashed" "double" "thick")
 
 @image{scribble/style/border_style.png}
 
-@section{set-cell-range-font-style}
+@section{set-font-style}
 
-@codeblock|{set-cell-range-font-style (-> string? natural? string? rgb? void?)}|
+@codeblock|{
+  set-cell-range-font-style (-> string? natural? string? rgb? void?)
+  set-row-range-font-style (-> string? natural? string? rgb? void?)
+  set-col-range-font-style (-> string? natural? string? rgb? void?)
+}|
 
-arg1: cell range.
+arg1: cell/row/col range.
 
 arg2: font size.
 
@@ -109,23 +125,15 @@ arg4: font color, rgb color, as "0000ff".
 
 @image{scribble/style/font_style.png}
 
-@section{set-row-range-font-style}
+@section{set-alignment-style}
 
-@codeblock|{set-row-range-font-style (-> string? natural? string? rgb? void?)}|
+@codeblock|{
+  set-cell-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)
+  set-row-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)
+  set-col-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)
+}|
 
-arg1: row range.
-
-@section{set-col-range-font-style}
-
-@codeblock|{set-col-range-font-style (-> string? natural? string? rgb? void?)}|
-
-arg1: col range.
-
-@section{set-cell-range-alignment-style}
-
-@codeblock|{set-cell-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)}|
-
-arg1: cell range.
+arg1: cell/row/col range.
 
 arg2: horizontal_mode?, one of '("left" "right" "center")
 
@@ -146,23 +154,15 @@ arg3: vertical_mode?, one of '("top" "bottom" "center")
 
 @image{scribble/style/alignment_style.png}
 
-@section{set-row-range-alignment-style}
+@section{set-number-style}
 
-arg1: row range.
+@codeblock|{
+  set-cell-range-number-style (-> string? string? void?)
+  set-row-range-number-style (-> string? string? void?)
+  set-col-range-number-style (-> string? string? void?)
+}|
 
-@codeblock|{set-row-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)}|
-
-@section{set-col-range-alignment-style}
-
-arg1: col range.
-
-@codeblock|{set-col-range-alignment-style (-> string? horizontal_mode? vertical_mode? void?)}|
-
-@section{set-cell-range-number-style}
-
-@codeblock|{set-cell-range-number-style (-> string? string? void?)}|
-
-arg1: cell range.
+arg1: cell/row/col range.
 
 arg2: number style as "0.00" "0,000.00" "0.00%" etc.
 
@@ -176,23 +176,15 @@ arg2: number style as "0.00" "0,000.00" "0.00%" etc.
 
 @image{scribble/style/number_style.png}
 
-@section{set-row-range-number-style}
+@section{set-date-style}
 
-@codeblock|{set-row-range-number-style (-> string? string? void?)}|
+@codeblock|{
+  set-cell-range-date-style (-> string? string? void?)
+  set-row-range-date-style (-> string? string? void?)
+  set-col-range-date-style (-> string? string? void?)
+}|
 
-arg1: row range.
-
-@section{set-col-range-number-style}
-
-@codeblock|{set-col-range-number-style (-> string? string? void?)}|
-
-arg1: col range.
-
-@section{set-cell-range-date-style}
-
-@codeblock|{set-cell-range-date-style (-> string? string? void?)}|
-
-arg1: cell range.
+arg1: cell/row/col range.
 
 arg2: date style, as "yyyy/mm/dd", "yyyy-mm-dd", "yyyymmdd" etc.
 
@@ -218,22 +210,15 @@ arg2: date style, as "yyyy/mm/dd", "yyyy-mm-dd", "yyyymmdd" etc.
 
 @image{scribble/style/date_style.png}
 
-@section{set-row-range-date-style}
+@section{set-fill-style}
 
-arg1: row range.
+@codeblock|{
+  set-cell-range-fill-style (-> string? rgb? fill-pattern? void?)
+  set-row-range-fill-style (-> string? rgb? fill-pattern? void?)
+  set-col-range-fill-style (-> string? rgb? fill-pattern? void?)
+}|
 
-@section{set-col-range-date-style}
-
-arg1: col range.
-
-          [set-row-range-date-style (-> string? string? void?)]
-          [set-col-range-date-style (-> string? string? void?)]
-
-@section{set-cell-range-fill-style}
-
-@codeblock|{set-cell-range-fill-style (-> string? rgb? fill-pattern? void?)}|
-
-arg1: cell range.
+arg1: cell/row/col range.
 
 arg2: rgb color as "0000ff".
 
@@ -253,14 +238,3 @@ arg3: fill pattern, one of
 
 @image{scribble/style/fill.png}
 
-@section{set-row-range-fill-style}
-
-@codeblock|{set-row-range-fill-style (-> string? rgb? fill-pattern? void?)}|
-
-arg1: row range.
-
-@section{set-col-range-fill-style}
-
-@codeblock|{set-col-range-fill-style (-> string? rgb? fill-pattern? void?)}|
-
-arg1: col range.

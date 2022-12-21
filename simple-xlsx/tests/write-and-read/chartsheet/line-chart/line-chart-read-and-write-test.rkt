@@ -24,19 +24,20 @@
              (add-data-sheet
               "DataSheet"
               '(
-                ("201601" "201602" "201603" "201604")
-                (100 300 200 400)
-                (200 400 300 100)
-                (300 500 400 200)
+                ("" "201601" "201602" "201603" "201604")
+                ("CAT" 100 300 200 400)
+                ("DOG" 200 400 300 100)
+                ("RABBIT" 300 500 400 200)
                 ))
 
              (add-chart-sheet
               "LineChart" 'LINE "LineChartExample"
               '(
-                ("CAT" "DataSheet" "A1-D1" "DataSheet" "A2-D2")
-                ("Puma" "DataSheet" "A1-D1" "DataSheet" "A3-D3")
-                ("Brooks" "DataSheet" "A1-D1" "DataSheet" "A4-D4")
-               ))))
+                ("CAT" "DataSheet" "B1-E1" "DataSheet" "B2-E2")
+                ("Puma" "DataSheet" "B1-E1" "DataSheet" "B3-E3")
+                ("Brooks" "DataSheet" "B1-E1" "DataSheet" "B4-E4")
+               ))
+             ))
 
           (read-and-write-xlsx
            line_chart_file

@@ -18,7 +18,7 @@ write-xlsx (-> path-string? procedure? any)
 
 arg1: The output file name.
 
-arg2: User procedure.
+arg2: user procedure.
 
 @section{read-xlsx}
 
@@ -28,7 +28,7 @@ read-xlsx (-> path-string? procedure? any)
 
 arg1: The input file name.
 
-arg2: User procedure.
+arg2: user procedure.
 
 @section{read-and-write-xlsx}
 
@@ -40,7 +40,7 @@ arg1: The input file name.
 
 arg2: The output file name.
 
-arg3: User procedure.
+arg3: user procedure.
 
 @section{get-sheet-name-list}
 

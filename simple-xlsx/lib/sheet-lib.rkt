@@ -5,6 +5,8 @@
 (require "dimension.rkt")
 
 (provide (contract-out
+          [get-sheet-dimension (-> string?)]
+
           [get-rows-count (-> natural?)]
           [get-sheet-ref-rows-count (-> natural? natural?)]
           [get-sheet-name-rows-count (-> string? natural?)]
@@ -82,6 +84,9 @@
 
           [squash-shared-strings-map (-> void?)]
           ))
+
+(define (get-sheet-dimension)
+  (DATA-SHEET-dimension (*CURRENT_SHEET*)))
 
 (define (get-rows-count)
   (car (range->capacity (DATA-SHEET-dimension (*CURRENT_SHEET*)))))

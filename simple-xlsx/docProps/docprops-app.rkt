@@ -35,21 +35,19 @@
               (list
                "vt:vector"
                (cons "size" (number->string
-                             (+
-                              (if (= data_sheet_count 0) 0 2)
-                              (if (= chart_sheet_count 0) 0 2))))
+                             (+ (if (> data_sheet_count 0) 2 0) (if (> chart_sheet_count 0) 2 0))))
                (cons "baseType" "variant"))
 
                 (if (> data_sheet_count 0)
                     (list
                      (list "vt:variant" (list "vt:lpstr" "工作表"))
-                     (list "vt:variant" (list "vt:i4" "2")))
+                     (list "vt:variant" (list "vt:i4" (number->string data_sheet_count))))
                     '())
 
                 (if (> chart_sheet_count 0)
                     (list
                      (list "vt:variant" (list "vt:lpstr" "图表"))
-                     (list "vt:variant" (list "vt:i4" "2")))
+                     (list "vt:variant" (list "vt:i4" (number->string chart_sheet_count))))
                     '()))))
 
     (set! titles_of_parts_list

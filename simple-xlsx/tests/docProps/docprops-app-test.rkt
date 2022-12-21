@@ -27,6 +27,7 @@
        (add-data-sheet "Sheet3" '((1)))
        (add-chart-sheet "Chart1" 'LINE "Chart1" '())
        (add-chart-sheet "Chart4" 'LINE "Chart4" '())
+       (add-chart-sheet "Chart5" 'LINE "Chart5" '())
 
        (call-with-input-file app1_file
          (lambda (expected)
@@ -61,11 +62,12 @@
        (add-data-sheet "3" '((1)))
        (add-chart-sheet "4" 'LINE "Chart1" '())
        (add-chart-sheet "5" 'LINE "Chart4" '())
+       (add-chart-sheet "6" 'LINE "Chart5" '())
 
        (from-docprops-app app1_file)
 
        (let ([sheet_list (XLSX-sheet_list (*XLSX*))])
-         (check-equal? (length sheet_list) 5)
+         (check-equal? (length sheet_list) 6)
          (check-true (DATA-SHEET? (list-ref sheet_list 0)))
          (check-equal? (DATA-SHEET-sheet_name (list-ref sheet_list 0)) "数据页面")
          (check-true (DATA-SHEET? (list-ref sheet_list 1)))
@@ -76,6 +78,8 @@
          (check-equal? (CHART-SHEET-sheet_name (list-ref sheet_list 3)) "Chart1")
          (check-true (CHART-SHEET? (list-ref sheet_list 4)))
          (check-equal? (CHART-SHEET-sheet_name (list-ref sheet_list 4)) "Chart4")
+         (check-true (CHART-SHEET? (list-ref sheet_list 5)))
+         (check-equal? (CHART-SHEET-sheet_name (list-ref sheet_list 5)) "Chart5")
          )))
     )
    ))

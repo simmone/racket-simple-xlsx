@@ -1,6 +1,7 @@
 #lang racket
 
 (require "lib/dimension.rkt")
+(require "lib/lib.rkt")
 (require "style/set-styles.rkt")
 (require "style/lib.rkt")
 (require "style/border-style.rkt")
@@ -18,10 +19,12 @@
           [read-xlsx (-> path-string? procedure? any)]
           [read-and-write-xlsx (-> path-string? path-string? procedure? any)]
           [add-data-sheet (->* (string? (listof list?)) (cell?) void?)]
+          [get-sheet-name-list (-> (listof string?))]
           [with-sheet-ref (-> natural? procedure? any)]
           [with-sheet (-> procedure? any)]
           [with-sheet-name (-> string? procedure? any)]
           [with-sheet-*name* (-> string? procedure? any)]
+          [get-sheet-dimension (-> string?)]
           [set-row-range-height (-> string? natural? void?)]
           [set-col-range-width (-> string? natural? void?)]
           [set-freeze-row-col-range (-> natural? natural? void?)]
@@ -47,7 +50,7 @@
                                (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D)
                                string?
                                (listof (list/c string? string? string? string? string?)) void?)]
-          [get-sheet-name-list (-> (listof string?))]
+
           [cell-value? (-> (or/c string? number? date?) boolean?)]
 
           [get-rows-count (-> natural?)]
@@ -124,4 +127,6 @@
           [get-sheet-ref-range-values (-> natural? string? (listof cell-value?))]
           [get-sheet-name-range-values (-> string? string? (listof cell-value?))]
           [get-sheet-*name*-range-values (-> string? string? (listof cell-value?))]
+
+          [oa_date_number->date (->* (number?) (boolean?) date?)]
           ))

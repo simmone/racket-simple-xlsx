@@ -16,7 +16,7 @@
    (cons "xmlns" "http://schemas.openxmlformats.org/package/2006/relationships")
    (list
     "Relationship"
-    (cons "Id" "rId1")
+    (cons "Id" (format "rId~a" typeSeq))
     (cons "Type" "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing")
     (cons "Target" (format "../drawings/drawing~a.xml" typeSeq)))))
 
