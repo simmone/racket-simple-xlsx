@@ -10,6 +10,7 @@
 (define deps '("base"
                "rackunit-lib"
                "simple-xml"
+               "scribble-lib"
                ))
 
 (define test-omit-paths '("info.rkt"))

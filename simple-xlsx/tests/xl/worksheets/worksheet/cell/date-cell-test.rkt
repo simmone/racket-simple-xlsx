@@ -54,10 +54,10 @@
            1 1)
           (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") 43360)
 
-          (let ([xlsx_date (oa_date_number->date 43360)])
+          (let ([xlsx_date (oa_date_number->date 43360 #f)])
             (check-equal? (date-year xlsx_date) 2018)
             (check-equal? (date-month xlsx_date) 9)
-            (check-equal? (date-day xlsx_date) 17))
+            (check-equal? (date-day xlsx_date) 18))
           )))))
 
    ))
