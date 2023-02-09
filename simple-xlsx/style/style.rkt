@@ -22,7 +22,7 @@
                    (font_index->style_map (hash/c natural? string?))
 
                    (number_style->index_map (hash/c string? natural?))
-                   (number_index->style_map (hash/c natural? string?))
+                   (number_index->style_map (hash/c exact-integer? string?))
 
                    (fill_style->index_map (hash/c string? natural?))
                    (fill_index->style_map (hash/c natural? string?))

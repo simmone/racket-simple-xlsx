@@ -129,7 +129,8 @@
                                     (-
                                      (string->number (hash-ref xml_hash (format "~a.numFmtId" prefix)))
                                      SKIP_NUMBER_COUNT
-                                     164)))))
+                                     164)
+                                    "0.00"))))
 
                   (set! alignment_style (ALIGNMENT-STYLE
                                          ""

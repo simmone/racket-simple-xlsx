@@ -47,7 +47,7 @@
 
   ;; xl/sharedStrings.xml
   (read-shared-strings)
-
+  
   ;; xl/styles.xml
   (read-styles)
 

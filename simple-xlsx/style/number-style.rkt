@@ -12,7 +12,7 @@
           [number-style<? (-> (or/c #f NUMBER-STYLE?) (or/c #f NUMBER-STYLE?) boolean?)]
           [number-style=? (-> (or/c #f NUMBER-STYLE?) (or/c #f NUMBER-STYLE?) boolean?)]
           [*NUMBER_STYLE->INDEX_MAP* (parameter/c (or/c (hash/c string? natural?) #f))]
-          [*NUMBER_INDEX->STYLE_MAP* (parameter/c (or/c (hash/c natural? string?) #f))]
+          [*NUMBER_INDEX->STYLE_MAP* (parameter/c (or/c (hash/c exact-integer? string?) #f))]
           ))
 
 (define *NUMBER_STYLE->INDEX_MAP* (make-parameter #f))
