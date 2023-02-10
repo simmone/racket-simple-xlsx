@@ -7,7 +7,7 @@
           [struct DATA-SHEET
                   (
                    (sheet_name string?)
-                   (dimension cell-range?)
+                   (dimension (or/c #f cell-range?))
                    (cell->value_hash (hash/c cell? cell-value?))
                    )]
           [struct CHART-SHEET

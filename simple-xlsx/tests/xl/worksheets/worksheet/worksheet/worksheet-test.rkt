@@ -15,6 +15,7 @@
 
 (require racket/runtime-path)
 (define-runtime-path worksheet_test_file "worksheet_test.xml")
+(define-runtime-path worksheet_no_dimension_test_file "worksheet_no_dimension_test.xml")
 (define-runtime-path worksheet_not_formated_test_file "worksheet_not_formated_test.xml")
 (define-runtime-path worksheet_dimension_not_from_A1_file "worksheet_dimension_not_from_A1_test.xml")
 
@@ -74,6 +75,52 @@
                  (xml->hash (open-input-string (file->string worksheet_test_file)))])
 
             (from-work-sheet xml_hash)
+
+            (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "A1:E2")
+
+            (check-equal? (hash-count (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))) 10)
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "month1")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "month2")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C1") "month3")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "D1") "month1")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E1") "real")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A2") 201601)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B2") 100)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C2") 110)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "D2") 1110)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E2") 6.9)
+
+            ))))))
+
+   (test-case
+    "test-from-no-dimension-worksheet"
+
+    (with-xlsx
+     (lambda ()
+       (add-data-sheet "Sheet1" '(("none")))
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month1" 0)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 0 "month1")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month2" 1)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 1 "month2")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month3" 2)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 2 "month3")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "real" 3)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 3 "real")
+
+       (with-sheet
+        (lambda ()
+          (let ([xml_hash
+                 (xml->hash (open-input-string (file->string worksheet_no_dimension_test_file)))])
+
+            (from-work-sheet xml_hash)
+
+            (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "A1:E2")
 
             (check-equal? (hash-count (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))) 10)
 

@@ -36,13 +36,17 @@
         (let ([xml_hash (xml->hash shared_strings_file)])
           (let loop ([loop_count 0])
             (when (< loop_count (hash-ref xml_hash "sst1.si's count" 0))
-                  (hash-set! (XLSX-shared_string->index_map (*XLSX*))
-                             (hash-ref xml_hash (format "sst1.si~a.t1" (add1 loop_count)))
-                             loop_count)
-                  (hash-set! (XLSX-shared_index->string_map (*XLSX*))
-                             loop_count
-                             (hash-ref xml_hash (format "sst1.si~a.t1" (add1 loop_count))))
-                  (loop (add1 loop_count)))))))
+              (let ([str
+                     (let ([key1 (format "sst1.si~a.t1" (add1 loop_count))]
+                           [key2 (format "sst1.si~a.r1.t1" (add1 loop_count))])
+                       (cond
+                        [(hash-has-key? xml_hash key1) (hash-ref xml_hash key1)]
+                        [(hash-has-key? xml_hash key2) (hash-ref xml_hash key2)]
+                        [else
+                         ""]))])
+                  (hash-set! (XLSX-shared_string->index_map (*XLSX*)) str loop_count)
+                  (hash-set! (XLSX-shared_index->string_map (*XLSX*)) loop_count str))
+              (loop (add1 loop_count)))))))
 
 (define (filter-string str)
   (regexp-replace*

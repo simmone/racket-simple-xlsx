@@ -67,7 +67,7 @@
 (define (from-work-sheet-head xml_hash)
   (if (hash-has-key? xml_hash "worksheet1.dimension1.ref")
       (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) (hash-ref xml_hash "worksheet1.dimension1.ref"))
-      (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) "A1")))
+      (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) #f)))
 
 (define (to-sheet-views)
   (list
@@ -216,7 +216,11 @@
         '())))
 
 (define (from-rows xml_hash)
-  (let* ([rows_count (hash-ref xml_hash "worksheet1.sheetData1.row's count" 0)])
+  (let* ([rows_count (hash-ref xml_hash "worksheet1.sheetData1.row's count" 0)]
+         [cols_count (hash-ref xml_hash "worksheet1.sheetData1.row1.c's count" 0)])
+    
+    (when (not (DATA-SHEET-dimension (*CURRENT_SHEET*)))
+      (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) (capacity->range (cons rows_count cols_count))))
 
     (let loop-row ([loop_row_index 1])
       (when (<= loop_row_index rows_count)

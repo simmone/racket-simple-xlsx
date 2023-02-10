@@ -13,6 +13,7 @@
 (require racket/runtime-path)
 (define-runtime-path work_sheet_head_file "work_sheet_head.xml")
 (define-runtime-path work_sheet_not_start_from_A1_head_file "work_sheet_not_start_from_A1_head.xml")
+(define-runtime-path work_sheet_head_no_dimension_file "work_sheet_head_no_dimension.xml")
 
 (define test-worksheet
   (test-suite
@@ -62,6 +63,16 @@
           (from-work-sheet-head (xml->hash work_sheet_not_start_from_A1_head_file))
 
           (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "B1:E2")))))
+
+    (with-xlsx
+     (lambda ()
+       (add-data-sheet "S1" '((1)))
+
+       (with-sheet
+        (lambda ()
+          (from-work-sheet-head (xml->hash work_sheet_head_no_dimension_file))
+
+          (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) #f)))))
     )
    ))
 
