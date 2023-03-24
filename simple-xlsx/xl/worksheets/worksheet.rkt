@@ -262,7 +262,7 @@
          [cell_value (hash-ref xml_hash (format "~a.c~a.v1" prefix loop_cell_index) #f)])
 
     (when (and cell cell_value)
-      (when cell_style
+      (when (and cell_style (hash-has-key? (*INDEX->STYLE_MAP*) (string->number cell_style)))
         (hash-set! (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*))
                    cell
                    (style-from-hash-code (hash-ref (*INDEX->STYLE_MAP*) (string->number cell_style)))))

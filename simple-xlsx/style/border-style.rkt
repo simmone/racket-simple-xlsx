@@ -51,7 +51,7 @@
         #f)))
 
 (define (border-mode? mode)
-  (ormap (lambda (_mode) (string=? _mode mode)) '("" "thin" "dashed" "double" "thick" "medium")))
+  (ormap (lambda (_mode) (string=? _mode mode)) '("" "thin" "dashed" "double" "thick" "medium" "none")))
 
 (define (border-style=? border1 border2)
   (cond
