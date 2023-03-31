@@ -303,6 +303,7 @@
                   (loop-merge-cell-ranges (add1 loop_count)))))))
 
 (define (to-col-width-style)
+(when (not (null? (squeeze-range-hash (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)))))
   (append
    (list "cols")
    (let loop ([col_range_width_list (squeeze-range-hash (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)))]
@@ -317,7 +318,7 @@
             (cons "max" (number->string (second (car col_range_width_list))))
             (cons "width" (number->string (third (car col_range_width_list)))))
            result_list))
-         (reverse result_list)))))
+         (reverse result_list))))))
 
 (define (from-col-width-style xml_hash)
   (let ([col_range_width_list '()]
