@@ -25,7 +25,7 @@ cell-value can be these type: string, number, date.
 
 @section{Skip the with-sheet*}
 
-If not a lot actions on a sheet, you can get/set data a sheet directly, not need in a with-sheet* scope.
+If not have a mass access on a sheet, you can get/set data a sheet directly, not need in a with-sheet* scope.
 
 Example:
 

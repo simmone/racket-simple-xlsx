@@ -35,7 +35,7 @@
              (call-with-input-file workbook_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (workbook))
+                  (lists->xml (to-workbook))
                   (lambda (actual)
                     (check-lines? expected actual))))))
            (lambda ()

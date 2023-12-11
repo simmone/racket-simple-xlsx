@@ -54,7 +54,7 @@
         ))
 
       (add-chart-sheet "Chart3" 'BAR "Chart3" '())
-      
+
       (with-sheet-name
        "BarChart"
        (lambda ()
@@ -84,7 +84,7 @@
               (lists->xml_content (to-chart))
               (lambda (actual)
                 (check-lines? expected actual)))))))
-      
+
       (with-sheet-name
        "Bar3DChart"
        (lambda ()
@@ -111,12 +111,12 @@
                  (from-chart
                   (xml->hash
                    (open-input-string (file->string bar_chart_file))))])
-          
+
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "BarChartExample")
             (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
               (check-equal? (length sers) 3)
-              
+
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
               (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
               (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
@@ -129,12 +129,12 @@
                  (from-chart
                   (xml->hash
                    (open-input-string (file->string bar_3d_chart_file))))])
-          
+
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR3D)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Bar3DChartExample")
             (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
               (check-equal? (length sers) 3)
-              
+
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
               (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
               (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))

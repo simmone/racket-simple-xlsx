@@ -18,6 +18,7 @@
 (require racket/runtime-path)
 (define-runtime-path rows1_file "rows1.xml")
 (define-runtime-path rows2_file "rows2.xml")
+(define-runtime-path rows_have_not_same_cols_file "rows_have_not_same_cols.xml")
 
 (define test-rows
   (test-suite
@@ -248,6 +249,43 @@
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "F5") 43360)
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "G5") 43360)
 
+            ))))))
+
+   (test-case
+    "test-from-rows-have-not-same-cols"
+
+    (with-xlsx
+     (lambda ()
+       (add-data-sheet "Sheet1" '(("none")))
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month1" 0)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 0 "month1")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month2" 1)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 1 "month2")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month3" 2)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 2 "month3")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "real" 3)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 3 "real")
+
+       (with-sheet
+        (lambda ()
+          (let ([xml_hash
+                 (xml->hash (open-input-string (format "<worksheet>~a</worksheet>"
+                                                       (file->string rows_have_not_same_cols_file)
+                                                       )))])
+
+            (hash-clear! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)))
+
+            (from-work-sheet-head xml_hash)
+
+            (from-rows xml_hash)
+
+            (check-equal? (hash-count (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))) 12)
+
+            (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "A1:F4")
             ))))))
    ))
 

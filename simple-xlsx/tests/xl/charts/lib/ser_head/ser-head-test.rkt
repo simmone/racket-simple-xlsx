@@ -51,11 +51,11 @@
       (add-chart-sheet "Chart4" 'PIE3D "Chart4" '())
       (add-chart-sheet "Chart5" 'BAR "Chart5" '())
       (add-chart-sheet "Chart6" 'BAR3D "Chart6" '())
-    
+
       (with-sheet-name
        "Chart1"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string
@@ -67,7 +67,7 @@
       (with-sheet-name
        "Chart2"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string
@@ -79,7 +79,7 @@
       (with-sheet-name
        "Chart3"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string
@@ -91,7 +91,7 @@
       (with-sheet-name
        "Chart4"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string
@@ -103,7 +103,7 @@
       (with-sheet-name
        "Chart5"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string
@@ -115,7 +115,7 @@
       (with-sheet-name
        "Chart6"
        (lambda ()
-         (check-equal? 
+         (check-equal?
           (from-ser-head
            (xml->hash
             (open-input-string

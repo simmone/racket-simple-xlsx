@@ -73,6 +73,15 @@ set merge cell ranges.(multiple times)
 (set-merge-cell-range "G8-I10")
 }|
 
+@section{about color}
+
+you can set rgb color, like: FF0000.
+
+1. RGB use upcase, not support lower case string.
+
+2. Not support theme color yet, only support standard color.
+   If sheet software set theme color, write back will lost color information.
+
 @section{set-cell-range-border-style}
 
 @codeblock|{
@@ -86,17 +95,17 @@ arg1: cell/row/col range.
 arg2: border-direction?, one of '("all" "side" "top" "bottom" "left" "right").
 the side direction means only set the cell range's out border.
 
-arg3: rgb?, rgb color as "0000ff".
+arg3: rgb?, rgb color as "0000FF".
 
 arg4: border-mode?, one of '("" "thin" "dashed" "double" "thick")
 
 @codeblock|{
-(set-cell-range-border-style "B2-F6" "all" "ff0000" "thick")
-(set-cell-range-border-style "B8-F12" "left" "ff0000" "thick")
-(set-cell-range-border-style "H2-L6" "right" "ff0000" "dashed")
-(set-cell-range-border-style "H8-L12" "top" "ff0000" "double")
-(set-cell-range-border-style "N2-R6" "bottom" "ff0000" "thick")
-(set-cell-range-border-style "N8-R12" "side" "ff0000" "thick")
+(set-cell-range-border-style "B2-F6" "all" "FF0000" "thick")
+(set-cell-range-border-style "B8-F12" "left" "FF0000" "thick")
+(set-cell-range-border-style "H2-L6" "right" "FF0000" "dashed")
+(set-cell-range-border-style "H8-L12" "top" "FF0000" "double")
+(set-cell-range-border-style "N2-R6" "bottom" "FF0000" "thick")
+(set-cell-range-border-style "N8-R12" "side" "FF0000" "thick")
 }|
 
 @image{scribble/style/border_style.png}
@@ -115,7 +124,7 @@ arg2: font size.
 
 arg3: font name, as "Arial".
 
-arg4: font color, rgb color, as "0000ff".
+arg4: font color, rgb color, as "0000FF".
 
 @codeblock|{
 (set-cell-range-font-style "A1-C1" 12 "Arial" "000000")
@@ -141,13 +150,13 @@ arg3: vertical_mode?, one of '("top" "bottom" "center")
 
 @codeblock|{
 (set-cell-range-alignment-style "A1-E5" "center" "center")
-(set-cell-range-border-style "A1-E5" "side" "ff0000" "thick")
+(set-cell-range-border-style "A1-E5" "side" "FF0000" "thick")
 
 (set-cell-range-alignment-style "G1-K5" "left" "top")
-(set-cell-range-border-style "G1-K5" "side" "ff0000" "thick")
+(set-cell-range-border-style "G1-K5" "side" "FF0000" "thick")
 
 (set-cell-range-alignment-style "M1-Q5" "right" "bottom")
-(set-cell-range-border-style "M1-Q5" "side" "ff0000" "thick")
+(set-cell-range-border-style "M1-Q5" "side" "FF0000" "thick")
 
 (set-row-range-height "1-5" 30)
 }|
@@ -220,7 +229,7 @@ arg2: date style, as "yyyy/mm/dd", "yyyy-mm-dd", "yyyymmdd" etc.
 
 arg1: cell/row/col range.
 
-arg2: rgb color as "0000ff".
+arg2: rgb color as "0000FF".
 
 arg3: fill pattern, one of 
 @codeblock|{
@@ -231,9 +240,9 @@ arg3: fill pattern, one of
 }|
 
 @codeblock|{
-(set-cell-range-fill-style "B2-F6" "ff0000" "solid")
-(set-cell-range-fill-style "H2-L6" "0000ff" "gray125")
-(set-cell-range-fill-style "N2-R6" "00ff00" "darkDown")
+(set-cell-range-fill-style "B2-F6" "FF0000" "solid")
+(set-cell-range-fill-style "H2-L6" "0000FF" "gray125")
+(set-cell-range-fill-style "N2-R6" "00FF00" "darkDown")
 }|
 
 @image{scribble/style/fill.png}

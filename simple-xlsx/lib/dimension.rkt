@@ -189,22 +189,22 @@
          [end_col (cddr row_col_pair)])
 
     (let loop ([cells (cell_range->cell_list cell_range_str)]
-               [top_cells '()]
-               [bottom_cells '()]
                [left_cells '()]
-               [right_cells '()])
+               [right_cells '()]
+               [top_cells '()]
+               [bottom_cells '()])
       (if (not (null? cells))
           (let ([row_col (cell->row_col (car cells))]
-                [loop_top_cells top_cells]
-                [loop_bottom_cells bottom_cells]
                 [loop_left_cells left_cells]
-                [loop_right_cells right_cells])
+                [loop_right_cells right_cells]
+                [loop_top_cells top_cells]
+                [loop_bottom_cells bottom_cells])
 
-            (when (= (car row_col) start_row) (set! loop_top_cells (cons (car cells) loop_top_cells)))
-            (when (= (car row_col) end_row)  (set! loop_bottom_cells (cons (car cells) loop_bottom_cells)))
             (when (= (cdr row_col) start_col) (set! loop_left_cells (cons (car cells) loop_left_cells)))
             (when (= (cdr row_col) end_col) (set! loop_right_cells (cons (car cells) loop_right_cells)))
+            (when (= (car row_col) start_row) (set! loop_top_cells (cons (car cells) loop_top_cells)))
+            (when (= (car row_col) end_row)  (set! loop_bottom_cells (cons (car cells) loop_bottom_cells)))
 
-            (loop (cdr cells) loop_top_cells loop_bottom_cells loop_left_cells loop_right_cells))
+            (loop (cdr cells) loop_left_cells loop_right_cells loop_top_cells loop_bottom_cells))
           (values
-           (reverse top_cells) (reverse bottom_cells) (reverse left_cells) (reverse right_cells))))))
+            (reverse left_cells) (reverse right_cells) (reverse top_cells) (reverse bottom_cells))))))

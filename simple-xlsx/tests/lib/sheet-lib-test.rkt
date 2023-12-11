@@ -103,7 +103,7 @@
 
           (check-equal? (get-cell "A1") 1)
           (check-equal? (get-cell "C2") 6)
-          
+
           (check-equal? (get-row-cells 1) '("A1" "B1" "C1"))
           (check-equal? (get-row-cells 2) '("A2" "B2" "C2"))
 

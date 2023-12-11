@@ -1,0 +1,38 @@
+<fills count="6">
+  <fill>
+    <patternFill patternType="none">
+      <fgColor rgb="FFFFFF"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="gray125">
+      <fgColor rgb="FFFFFF"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="gray125">
+      <fgColor rgb="FF0000"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="solid">
+      <fgColor rgb="000000"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="solid">
+      <fgColor rgb="FFFF00"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="solid">
+      <fgColor rgb="FFFFFF"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+</fills>

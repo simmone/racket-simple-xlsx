@@ -48,4 +48,8 @@ arg3: user procedure.
 get-sheet-name-list (-> (listof string?))
 }|
 
-Get all the sheet name list on the actual sheet order.
+@section{get-sheet-count}
+
+@codeblock|{
+get-sheet-count (-> natural?)
+}|

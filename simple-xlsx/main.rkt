@@ -2,8 +2,8 @@
 
 (require "lib/dimension.rkt")
 (require "lib/lib.rkt")
+(require "style/style-lib.rkt")
 (require "style/set-styles.rkt")
-(require "style/lib.rkt")
 (require "style/border-style.rkt")
 (require "style/fill-style.rkt")
 (require "style/alignment-style.rkt")

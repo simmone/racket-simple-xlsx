@@ -9,13 +9,13 @@
 
 (require "xlsx/xlsx.rkt")
 (require "style/style.rkt")
+(require "style/styles.rkt")
 (require "style/border-style.rkt")
 (require "style/font-style.rkt")
 (require "style/alignment-style.rkt")
 (require "style/number-style.rkt")
 (require "style/fill-style.rkt")
-(require "style/lib.rkt")
-(require "style/sort-styles.rkt")
+(require "style/assemble-styles.rkt")
 (require "style/set-styles.rkt")
 (require "sheet/sheet.rkt")
 (require "lib/lib.rkt")
@@ -65,7 +65,8 @@
   (write-shared-strings)
 
   ;; xl/styles.xml
-  (sort-styles)
+  (strip-styles)
+  (assemble-styles)
   (write-styles)
 
   ;; xl/workbook

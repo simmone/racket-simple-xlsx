@@ -7,6 +7,7 @@
 (require "../../../../../xlsx/xlsx.rkt")
 (require "../../../../../sheet/sheet.rkt")
 (require "../../../../../style/style.rkt")
+(require "../../../../../style/styles.rkt")
 (require "../../../../../style/set-styles.rkt")
 (require "../../../../../lib/lib.rkt")
 

@@ -1,0 +1,151 @@
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="4">
+    <numFmt numFmtId="1" formatCode="0.00"/>
+    <numFmt numFmtId="2" formatCode="#,###.00"/>
+    <numFmt numFmtId="3" formatCode="yyyymmdd"/>
+    <numFmt numFmtId="4" formatCode="yyyy-mm-dd"/>
+  </numFmts>
+  <fonts count="5">
+    <font>
+      <sz val="10"/>
+      <color rgb="000000"/>
+      <name val="Arial"/>
+    </font>
+    <font>
+      <sz val="10"/>
+      <color rgb="0000FF"/>
+      <name val="Arial"/>
+    </font>
+    <font>
+      <sz val="15"/>
+      <color rgb="0000FF"/>
+      <name val="Arial"/>
+    </font>
+    <font>
+      <sz val="15"/>
+      <color rgb="0000FF"/>
+      <name val="宋体"/>
+    </font>
+    <font>
+      <sz val="15"/>
+      <color rgb="FF0000"/>
+      <name val="宋体"/>
+    </font>
+  </fonts>
+  <fills count="6">
+    <fill>
+      <patternFill patternType="none">
+        <fgColor rgb="FFFFFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="gray125">
+        <fgColor rgb="FFFFFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="gray125">
+        <fgColor rgb="FF0000"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="000000"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="FFFF00"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="solid">
+        <fgColor rgb="FFFFFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+  </fills>
+  <borders count="5">
+    <border>
+      <left/>
+      <right/>
+      <top/>
+      <bottom/>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="dashed">
+        <color rgb="FF0000"/>
+      </left>
+      <right style="dashed">
+        <color rgb="FF0000"/>
+      </right>
+      <top style="dashed">
+        <color rgb="FF0000"/>
+      </top>
+      <bottom style="dashed">
+        <color rgb="FF0000"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left style="dashed">
+        <color rgb="000000"/>
+      </left>
+      <right style="dashed">
+        <color rgb="000000"/>
+      </right>
+      <top style="dashed">
+        <color rgb="000000"/>
+      </top>
+      <bottom style="dashed">
+        <color rgb="000000"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left/>
+      <right/>
+      <top/>
+      <bottom style="thick">
+        <color rgb="0000FF"/>
+      </bottom>
+      <diagonal/>
+    </border>
+    <border>
+      <left/>
+      <right/>
+      <top style="thin">
+        <color rgb="000000"/>
+      </top>
+      <bottom/>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellXfs count="6">
+    <xf fillId="0" xfId="0" applyFill="1">
+      <alignment horizontal="center" vertical="bottom"/>
+    </xf>
+    <xf fillId="1" xfId="0" applyFill="1">
+      <alignment horizontal="center" vertical="bottom"/>
+    </xf>
+    <xf borderId="1" fontId="1" numFmtId="1" fillId="2" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+      <alignment horizontal="left" vertical="center"/>
+    </xf>
+    <xf borderId="2" fontId="2" numFmtId="2" fillId="3" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+      <alignment horizontal="center" vertical="top"/>
+    </xf>
+    <xf borderId="3" fontId="3" numFmtId="3" fillId="4" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+      <alignment horizontal="right" vertical="bottom"/>
+    </xf>
+    <xf borderId="4" fontId="4" numFmtId="4" fillId="5" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+      <alignment horizontal="center" vertical="bottom"/>
+    </xf>
+  </cellXfs>
+  <tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
+</styleSheet>

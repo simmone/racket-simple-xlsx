@@ -55,7 +55,7 @@
        (lambda ()
          (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "")
 
-         (from-chart-title 
+         (from-chart-title
            (xml->hash (open-input-string (format "<c:chartSpace><c:chart>~a</c:chart></c:chartSpace>" (file->string chart_title_file)))))
 
          (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Chart1")))))

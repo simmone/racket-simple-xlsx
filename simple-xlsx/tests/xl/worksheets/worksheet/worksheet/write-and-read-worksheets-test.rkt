@@ -29,6 +29,7 @@
      (lambda ()
        (add-data-sheet "Sheet1"
                        '(("month1" "month2" "month3" "month1" "real") (201601 100 110 1110 6.9)))
+
        (with-sheet-ref
         0
         (lambda ()
@@ -50,7 +51,7 @@
 
           (set-col-range-width "1-4" 8)
           (set-col-range-width "5-5" 6)))
-       
+
        (add-chart-sheet "Chart" 'LINE "Chart1" '())
 
        (add-data-sheet "Sheet3"

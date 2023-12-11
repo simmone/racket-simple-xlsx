@@ -67,20 +67,21 @@
     `(,@properties_list ,heading_pairs_list ,titles_of_parts_list)))
 
 (define (from-docprops-app doc_props_app_file)
-  (let* ([xml_hash (xml->hash doc_props_app_file)]
-         [lpstr_count (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count" 0)]
-         [sheet_list (XLSX-sheet_list (*XLSX*))])
+  (when (file-exists? doc_props_app_file)
+    (let* ([xml_hash (xml->hash doc_props_app_file)]
+           [lpstr_count (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count" 0)]
+           [sheet_list (XLSX-sheet_list (*XLSX*))])
 
-    (when (> lpstr_count 0)
-          (let loop ([loop_count 1])
-            (when (<= loop_count lpstr_count)
-                  (let ([sheet_name (hash-ref xml_hash (format "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr~a" loop_count) "")])
-                    (cond
-                     [(DATA-SHEET? (list-ref sheet_list (sub1 loop_count)))
-                      (set-DATA-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)]
-                     [(CHART-SHEET? (list-ref sheet_list (sub1 loop_count)))
-                      (set-CHART-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)])
-                    (loop (add1 loop_count))))))))
+      (when (> lpstr_count 0)
+        (let loop ([loop_count 1])
+          (when (<= loop_count lpstr_count)
+            (let ([sheet_name (hash-ref xml_hash (format "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr~a" loop_count) "")])
+              (cond
+               [(DATA-SHEET? (list-ref sheet_list (sub1 loop_count)))
+                (set-DATA-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)]
+               [(CHART-SHEET? (list-ref sheet_list (sub1 loop_count)))
+                (set-CHART-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)])
+              (loop (add1 loop_count)))))))))
 
 (define (write-docprops-app [output_dir #f])
   (let ([dir (if output_dir output_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "docProps"))])

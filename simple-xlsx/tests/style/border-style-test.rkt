@@ -9,96 +9,46 @@
    "test-border-style"
 
    (test-case
-    "test-border-style"
+    "test-update-border-style"
 
-    (let ([border_style (border-style-from-hash-code "f00000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-equal? (BORDER-STYLE-top_color border_style) "F00000")
-      (check-equal? (BORDER-STYLE-top_mode border_style) "thin")
-      (check-equal? (BORDER-STYLE-bottom_color border_style) "0F0000")
-      (check-equal? (BORDER-STYLE-bottom_mode border_style) "thick")
-      (check-equal? (BORDER-STYLE-left_color border_style) "00F000")
-      (check-equal? (BORDER-STYLE-left_mode border_style) "double")
-      (check-equal? (BORDER-STYLE-right_color border_style) "000F00")
-      (check-equal? (BORDER-STYLE-right_mode border_style) "dashed")
-      (check-equal? (BORDER-STYLE-hash_code border_style) "F00000<p>thin<p>0F0000<p>thick<p>00F000<p>double<p>000F00<p>dashed"))
+    (let ([border_style (BORDER-STYLE "000000" "thin" "0F0000" "thick" "00F000" "double" "000F00" "dashed")]
+          [new_style1 (BORDER-STYLE "0000FF" #f #f #f #f #f #f #f)]
+          [new_style2 (BORDER-STYLE #f "thick" #f #f #f #f #f #f)]
+          [new_style3 (BORDER-STYLE #f #f "FF0000" #f #f #f #f #f)]
+          [new_style4 (BORDER-STYLE #f #f #f "thin" #f #f #f #f)]
+          [new_style5 (BORDER-STYLE #f #f #f #f "00FF00" #f #f #f)]
+          [new_style6 (BORDER-STYLE #f #f #f #f #f "dashed" #f #f)]
+          [new_style7 (BORDER-STYLE #f #f #f #f #f #f "0000F0" #f)]
+          [new_style8 (BORDER-STYLE #f #f #f #f #f #f #f "thin")]
+          [new_style9 (BORDER-STYLE "FFFFFF" #f "000000" #f "FFFF00" #f "0000FF" #f)]
+          )
+      (update-border-style border_style new_style1)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thin" "0F0000" "thick" "00F000" "double" "000F00" "dashed"))
 
-    (let ([border_style (border-style-from-hash-code "<p><p><p><p><p><p><p>")])
-      (check-equal? (BORDER-STYLE-top_color border_style) "")
-      (check-equal? (BORDER-STYLE-top_mode border_style) "")
-      (check-equal? (BORDER-STYLE-bottom_color border_style) "")
-      (check-equal? (BORDER-STYLE-bottom_mode border_style) "")
-      (check-equal? (BORDER-STYLE-left_color border_style) "")
-      (check-equal? (BORDER-STYLE-left_mode border_style) "")
-      (check-equal? (BORDER-STYLE-right_color border_style) "")
-      (check-equal? (BORDER-STYLE-right_mode border_style) "")
-      (check-equal? (BORDER-STYLE-hash_code border_style) "<p><p><p><p><p><p><p>"))
+      (update-border-style border_style new_style2)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "0F0000" "thick" "00F000" "double" "000F00" "dashed"))
 
-    (let ([border_style (border-style-from-hash-code "")])
-      (check-false border_style)))
+      (update-border-style border_style new_style3)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thick" "00F000" "double" "000F00" "dashed"))
 
-   (test-case
-    "test-border-style<=?"
+      (update-border-style border_style new_style4)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thin" "00F000" "double" "000F00" "dashed"))
 
-    (let ([border1_style #f]
-          [border2_style (border-style-from-hash-code "000000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style))
-      (check-false (border-style=? border1_style border2_style)))
+      (update-border-style border_style new_style5)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thin" "00FF00" "double" "000F00" "dashed"))
 
-    (let ([border1_style (border-style-from-hash-code "000000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style #f])
-      (check-false (border-style<? border1_style border2_style))
-      (check-false (border-style=? border1_style border2_style)))
+      (update-border-style border_style new_style6)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thin" "00FF00" "dashed" "000F00" "dashed"))
 
-   (let ([border1_style #f]
-         [border2_style #f])
-      (check-false (border-style<? border1_style border2_style))
-      (check-true (border-style=? border1_style border2_style)))
+      (update-border-style border_style new_style7)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thin" "00FF00" "dashed" "0000F0" "dashed"))
 
-    (let ([border1_style (border-style-from-hash-code "000000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "000000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-false (border-style<? border1_style border2_style))
-      (check-true (border-style=? border1_style border2_style)))
+      (update-border-style border_style new_style8)
+      (check-equal? border_style (BORDER-STYLE "0000FF" "thick" "FF0000" "thin" "00FF00" "dashed" "0000F0" "thin"))
 
-    (let ([border1_style (border-style-from-hash-code "<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "000000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style))
-      (check-false (border-style=? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "0f0000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "ff0000<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p>thick<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p>thin<p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p>0f0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p>ff0000<p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p>double<p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p><p>thick<p>00f000<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p><p>00f000<p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p><p><p>00ff00<p>double<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p><p><p>double<p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p><p><p><p>thick<p>000f00<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p><p><p><p>000f00<p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p><p><p><p><p>000ff0<p>dashed")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p><p><p><p><p>dashed")]
-          [border2_style (border-style-from-hash-code "<p><p><p><p><p><p><p>double")])
-      (check-true (border-style<? border1_style border2_style)))
-
-    (let ([border1_style (border-style-from-hash-code "<p><p><p><p><p><p><p>")]
-          [border2_style (border-style-from-hash-code "<p><p><p><p><p><p><p>")])
-      (check-false (border-style<? border1_style border2_style)))
+      (update-border-style border_style new_style9)
+      (check-equal? border_style (BORDER-STYLE "FFFFFF" "thick" "000000" "thin" "FFFF00" "dashed" "0000FF" "thin"))
+      )
     )
 
    ))

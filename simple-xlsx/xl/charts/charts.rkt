@@ -198,7 +198,7 @@
                  #:exists 'replace
                  (lambda ()
                    (printf (lists->xml (to-chart)))))))
-            
+
             (loop (cdr sheets) (add1 sheet_index) (add1 chart_sheet_index)))
           (loop (cdr sheets) (add1 sheet_index) chart_sheet_index)))))
 

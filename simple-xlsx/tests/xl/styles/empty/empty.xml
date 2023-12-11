@@ -1,0 +1,42 @@
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="0"/>
+  <fonts count="1">
+    <font>
+      <sz val="10"/>
+      <color rgb="000000"/>
+      <name val="Arial"/>
+    </font>
+  </fonts>
+  <fills count="2">
+    <fill>
+      <patternFill patternType="none">
+        <fgColor rgb="FFFFFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+    <fill>
+      <patternFill patternType="gray125">
+        <fgColor rgb="FFFFFF"/>
+        <bgColor indexed="64"/>
+      </patternFill>
+    </fill>
+  </fills>
+  <borders count="1">
+    <border>
+      <left/>
+      <right/>
+      <top/>
+      <bottom/>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellXfs count="2">
+    <xf fillId="0" xfId="0" applyFill="1">
+      <alignment horizontal="center" vertical="bottom"/>
+    </xf>
+    <xf fillId="1" xfId="0" applyFill="1">
+      <alignment horizontal="center" vertical="bottom"/>
+    </xf>
+  </cellXfs>
+  <tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
+</styleSheet>

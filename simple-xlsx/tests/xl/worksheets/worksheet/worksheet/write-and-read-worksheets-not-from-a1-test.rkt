@@ -44,7 +44,7 @@
                      (lists->xml (to-work-sheet))
                      (lambda (actual)
                        (check-lines? expected actual)))))))
-             
+
              (read-worksheets (apply build-path (drop-right (explode-path sheet1_file) 1)))
 
              (with-sheet-ref

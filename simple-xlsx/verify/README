@@ -1,0 +1,7 @@
+1. Check write and read's unique, write data, read data without loss, and write data without loss.
+2. Be sure cross-platform's correctness.
+   . Excel on Chromebook
+   . Excel 2019 on Windows
+   . LibreOffice on Windows or Mac
+   . WPS Excel on Windows or Mac
+

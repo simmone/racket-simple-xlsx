@@ -7,6 +7,7 @@
 (require "../../../../../xlsx/xlsx.rkt")
 (require "../../../../../sheet/sheet.rkt")
 (require "../../../../../style/style.rkt")
+(require "../../../../../style/styles.rkt")
 (require "../../../../../style/set-styles.rkt")
 (require "../../../../../lib/lib.rkt")
 
@@ -15,6 +16,7 @@
 (require racket/runtime-path)
 (define-runtime-path sheet_cols1_file "sheet_cols1.xml")
 (define-runtime-path sheet_cols2_file "sheet_cols2.xml")
+(define-runtime-path sheet_no_cols_file "sheet_no_cols.xml")
 
 (define test-worksheet
   (test-suite
@@ -42,7 +44,7 @@
           (call-with-input-file sheet_cols1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-col-width-style))
+               (lists->xml_content (to-cols))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -50,11 +52,21 @@
         1
         (lambda ()
           (set-col-range-width "F-10" 7)
-
+          
           (call-with-input-file sheet_cols2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-col-width-style))
+               (lists->xml_content (to-cols))
+               (lambda (actual)
+                 (check-lines? expected actual)))))))
+
+       (with-sheet-ref
+        2
+        (lambda ()
+          (call-with-input-file sheet_no_cols_file
+            (lambda (expected)
+              (call-with-input-string
+               (lists->xml_content (to-cols))
                (lambda (actual)
                  (check-lines? expected actual)))))))
           )))

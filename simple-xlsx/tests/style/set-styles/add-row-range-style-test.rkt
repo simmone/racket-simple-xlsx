@@ -5,6 +5,12 @@
 (require"../../../xlsx/xlsx.rkt")
 (require"../../../sheet/sheet.rkt")
 (require"../../../style/style.rkt")
+(require "../../../style/border-style.rkt")
+(require "../../../style/font-style.rkt")
+(require "../../../style/alignment-style.rkt")
+(require "../../../style/number-style.rkt")
+(require "../../../style/fill-style.rkt")
+(require"../../../style/styles.rkt")
 (require"../../../style/set-styles.rkt")
 
 (define test-styles
@@ -26,36 +32,46 @@
 
        (with-sheet
         (lambda ()
-          (set-row-range-font-style "1" 10 "Arial" "0000ff")
+          (set-row-range-font-style "1" 10 "Arial" "0000FF")
           (set-row-range-alignment-style "1" "center" "center")
           (set-row-range-number-style "2" "0.000")
           (check-equal? (hash-count (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*))) 2)
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 1))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 2))
-                        "<s><s><s>0.000<s>")
-
+          (check-equal? (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 1)
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 2)
+                        (STYLE #f #f #f (NUMBER-STYLE "1" "0.000") #f))
           (check-equal? (hash-count (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*))) 10)
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "A1"))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "B1"))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "C1"))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "D1"))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1"))
-                        "<s>10<p>Arial<p>0000FF<s>center<p>center<s><s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "A2"))
-                        "<s><s><s>0.000<s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "B2"))
-                        "<s><s><s>0.000<s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "C2"))
-                        "<s><s><s>0.000<s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "D2"))
-                        "<s><s><s>0.000<s>")
-          (check-equal? (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E2"))
-                        "<s><s><s>0.000<s>")
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "A1")
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "B1")
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "C1")
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "D1")
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1")
+                        (STYLE
+                          #f (FONT-STYLE 10 "Arial" "0000FF") (ALIGNMENT-STYLE "center" "center") #f #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "A2")
+                        (STYLE
+                          #f #f #f (NUMBER-STYLE "1" "0.000") #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "B2")
+                        (STYLE
+                          #f #f #f (NUMBER-STYLE "1" "0.000") #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "C2")
+                        (STYLE
+                          #f #f #f (NUMBER-STYLE "1" "0.000") #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "D2")
+                        (STYLE
+                          #f #f #f (NUMBER-STYLE "1" "0.000") #f))
+          (check-equal? (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E2")
+                        (STYLE
+                          #f #f #f (NUMBER-STYLE "1" "0.000") #f))
           )))))
     ))
 

@@ -1,0 +1,27 @@
+<fonts count="5">
+  <font>
+    <sz val="10"/>
+    <color rgb="000000"/>
+    <name val="Arial"/>
+  </font>
+  <font>
+    <sz val="10"/>
+    <color rgb="0000FF"/>
+    <name val="Arial"/>
+  </font>
+  <font>
+    <sz val="15"/>
+    <color rgb="0000FF"/>
+    <name val="Arial"/>
+  </font>
+  <font>
+    <sz val="15"/>
+    <color rgb="0000FF"/>
+    <name val="宋体"/>
+  </font>
+  <font>
+    <sz val="15"/>
+    <color rgb="FF0000"/>
+    <name val="宋体"/>
+  </font>
+</fonts>

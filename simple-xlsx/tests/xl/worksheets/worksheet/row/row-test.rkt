@@ -9,7 +9,9 @@
 (require "../../../../../xlsx/xlsx.rkt")
 (require "../../../../../sheet/sheet.rkt")
 (require "../../../../../style/style.rkt")
-(require "../../../../../style/sort-styles.rkt")
+(require "../../../../../style/border-style.rkt")
+(require "../../../../../style/styles.rkt")
+(require "../../../../../style/assemble-styles.rkt")
 (require "../../../../../style/set-styles.rkt")
 (require "../../../../../lib/lib.rkt")
 (require "../../../../../lib/sheet-lib.rkt")
@@ -21,6 +23,7 @@
 (define-runtime-path row2_file "row2.xml")
 (define-runtime-path row3_file "row3.xml")
 (define-runtime-path row1_not_from_a1_file "row1_not_from_a1.xml")
+(define-runtime-path row_with_oversize_dimension_file "row_with_oversize_dimension.xml")
 
 (define test-row
   (test-suite
@@ -46,11 +49,11 @@
        (with-sheet
         (lambda ()
           (set-row-range-height "1-3" 5)
-          (set-row-range-font-style "1" 10 "Arial" "0000ff")))
+          (set-row-range-font-style "1" 10 "Arial" "0000FF")))
 
        (squash-shared-strings-map)
 
-       (sort-styles)
+       (strip-styles)
 
        (with-sheet
         (lambda ()
@@ -74,6 +77,13 @@
                (lists->xml_content (to-row 3 1 5))
                (lambda (actual)
                  (check-lines? expected actual)))))
+
+          (call-with-input-file row_with_oversize_dimension_file
+            (lambda (expected)
+              (call-with-input-string
+               (lists->xml_content (to-row 1 1 10))
+               (lambda (actual)
+                 (check-lines? expected actual)))))
           )))))
 
    (test-case
@@ -95,9 +105,12 @@
        (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "real" 3)
        (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 3 "real")
 
-       (hash-set! (*INDEX->STYLE_MAP*)
-                  1
-                  "ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<s><s><s><s>")
+       (set-STYLES-styles!
+        (*STYLES*)
+        (list
+         (STYLE
+          (BORDER-STYLE "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed")
+          #f #f #f #f)))
 
        (with-sheet
         (lambda ()
@@ -119,7 +132,7 @@
             (from-row xml_hash 1)
 
             (check-true (hash-has-key? (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 1))
-            
+
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "month1")
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "month2")
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C1") "month3")
@@ -175,9 +188,12 @@
        (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "real" 3)
        (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 3 "real")
 
-       (hash-set! (*INDEX->STYLE_MAP*)
-                  1
-                  "ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<s><s><s><s>")
+       (set-STYLES-styles!
+        (*STYLES*)
+        (list
+         (STYLE
+          (BORDER-STYLE "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed")
+          #f #f #f #f)))
 
        (with-sheet
         (lambda ()
@@ -191,7 +207,7 @@
             (hash-clear! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)))
 
             (from-row xml_hash 1)
-            
+
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C3") "month1")
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "D3") "month2")
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E3") "month3")

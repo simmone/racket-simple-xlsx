@@ -157,7 +157,7 @@
          [key_suffix "c:ser's count"]
          [key (format "~a.~a.~a" key_head chart_type key_suffix)]
          [sers_count (hash-ref xml_hash key 0)])
-    
+
     (let loop ([ser_index 1]
                [sers_list '()])
       (if (<= ser_index sers_count)

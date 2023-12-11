@@ -1,0 +1,9 @@
+Verify three aspects of the simple-xlsx's compatibility, include MS Office, WPS, Google Sheet, LibreOffice.
+
+1. App read simple-xlsx generate file with no error.
+
+2. simple-xlsx read app write file with no error.
+
+3. simple-xlsx read app write file and write back some content with no error.
+
+sheet 1: cell fill style

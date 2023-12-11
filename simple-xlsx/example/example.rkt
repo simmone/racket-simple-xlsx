@@ -47,7 +47,7 @@
         (set-cell-range-number-style "E2-E2" "0.00%")
         (set-cell-range-number-style "E3-E3" "0,000.00")
         (set-cell-range-number-style "E4-E4" "0")
-        (set-cell-range-border-style "B2-C4" "all" "0000ff" "dashed")
+        (set-cell-range-border-style "B2-C4" "all" "0000FF" "dashed")
         (set-cell-range-date-style "F2-F2" "yyyy-mm-dd")
         (set-cell-range-date-style "F3-F3" "yyyy/mm/dd")
         (set-cell-range-date-style "F4-F4" "yyyy年mm月dd日")))
@@ -76,13 +76,13 @@
         (set-cell-range-number-style "G1" "@__&quot;means&quot;__@")
         (set-col-range-number-style "E-F" "￥#,##0.00;[Red]￥-#,##0.00")))
 
-     (add-chart-sheet 
+     (add-chart-sheet
       "LineChart" 'LINE "LineChart"
       '(
         ("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")
         ("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3")
         ("Books" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
-     
+
      (add-chart-sheet
       "Line3DChart" 'LINE3D "Line3DChartExample"
       '(
@@ -132,7 +132,7 @@
         (printf "~a\n" (get-rows)
         ; ((month/brand 201601 201602 201603 201604 201605) (CAT 100 300 200 0.6934 43360) (Puma 200 400 300 139999.89223 43361) (Asics 300 500 400 23.34 43362))
                 )))))
-  
+
   (read-and-write-xlsx
    "test.xlsx"
    "write_back.xlsx"

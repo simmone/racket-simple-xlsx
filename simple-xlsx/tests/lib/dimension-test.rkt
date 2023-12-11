@@ -68,17 +68,17 @@
     (check-equal? (range->row_col_pair "A2-A1") '((1 . 1) . (1 . 1)))
     (check-equal? (range->row_col_pair "B1-A1") '((1 . 1) . (1 . 1)))
     )
-   
+
    (test-case
     "test-range->capacity"
 
     (check-equal? (range->capacity "A1:F4") '(4 . 6))
     (check-equal? (range->capacity "B2:F4") '(3 . 5))
     )
-   
+
    (test-case
     "test-capacity->range"
-    
+
     (check-equal? (capacity->range '(4 . 6)) "A1:F4")
 
     (check-equal? (capacity->range '(4 . 6) "B1") "B1:G4")
@@ -187,31 +187,31 @@
    (test-case
     "test-get-cell-range-side-cells"
 
-    (let-values ([(top_cells bottom_cells left_cells right_cells) (get-cell-range-four-sides-cells "A1")])
+    (let-values ([(left_cells right_cells top_cells bottom_cells) (get-cell-range-four-sides-cells "A1")])
       (check-equal? top_cells '("A1"))
       (check-equal? bottom_cells '("A1"))
       (check-equal? left_cells '("A1"))
       (check-equal? right_cells '("A1")))
 
-    (let-values ([(top_cells bottom_cells left_cells right_cells) (get-cell-range-four-sides-cells "A1-B1")])
+    (let-values ([(left_cells right_cells top_cells bottom_cells) (get-cell-range-four-sides-cells "A1-B1")])
       (check-equal? top_cells '("A1" "B1"))
       (check-equal? bottom_cells '("A1" "B1"))
       (check-equal? left_cells '("A1"))
       (check-equal? right_cells '("B1")))
 
-    (let-values ([(top_cells bottom_cells left_cells right_cells) (get-cell-range-four-sides-cells "A1-A2")])
+    (let-values ([(left_cells right_cells top_cells bottom_cells) (get-cell-range-four-sides-cells "A1-A2")])
       (check-equal? top_cells '("A1"))
       (check-equal? bottom_cells '("A2"))
       (check-equal? left_cells '("A1" "A2"))
       (check-equal? right_cells '("A1" "A2")))
 
-    (let-values ([(top_cells bottom_cells left_cells right_cells) (get-cell-range-four-sides-cells "A1-A2")])
+    (let-values ([(left_cells right_cells top_cells bottom_cells) (get-cell-range-four-sides-cells "A1-A2")])
       (check-equal? top_cells '("A1"))
       (check-equal? bottom_cells '("A2"))
       (check-equal? left_cells '("A1" "A2"))
       (check-equal? right_cells '("A1" "A2")))
 
-    (let-values ([(top_cells bottom_cells left_cells right_cells) (get-cell-range-four-sides-cells "A1-C3")])
+    (let-values ([(left_cells right_cells top_cells bottom_cells) (get-cell-range-four-sides-cells "A1-C3")])
       (check-equal? top_cells '("A1" "B1" "C1"))
       (check-equal? bottom_cells '("A3" "B3" "C3"))
       (check-equal? left_cells '("A1" "A2" "A3"))

@@ -9,49 +9,18 @@
    "test-alignment-style"
 
    (test-case
-    "test-set-alignment-style"
+    "test-update-alignment-style"
 
-    (let ([alignment_style (alignment-style-from-hash-code "left<p>top")])
-      (check-equal? (ALIGNMENT-STYLE-horizontal_placement alignment_style) "left")
-      (check-equal? (ALIGNMENT-STYLE-vertical_placement alignment_style) "top")
-      (check-equal? (ALIGNMENT-STYLE-hash_code alignment_style) "left<p>top"))
+    (let ([alignment_style (ALIGNMENT-STYLE "right" "top")]
+          [new1_style (ALIGNMENT-STYLE "left" "")]
+          [new2_style (ALIGNMENT-STYLE "" "bottom")]
+          )
+      (update-alignment-style alignment_style new1_style)
+      (check-equal? alignment_style (ALIGNMENT-STYLE "left" "top"))
 
-    (let ([alignment_style (alignment-style-from-hash-code "")])
-      (check-false alignment_style))
-    )
-
-   (test-case
-    "test-alignment-style<=?"
-
-    (let ([alignment1_style #f]
-          [alignment2_style (alignment-style-from-hash-code "right<p>top")])
-      (check-true (alignment-style<? alignment1_style alignment2_style))
-      (check-false (alignment-style=? alignment1_style alignment2_style)))
-
-    (let ([alignment1_style (alignment-style-from-hash-code "left<p>top")]
-          [alignment2_style #f])
-      (check-false (alignment-style<? alignment1_style alignment2_style))
-      (check-false (alignment-style=? alignment1_style alignment2_style)))
-
-    (let ([alignment1_style #f]
-          [alignment2_style #f])
-      (check-false (alignment-style<? alignment1_style alignment2_style))
-      (check-true (alignment-style=? alignment1_style alignment2_style)))
-
-    (let ([alignment1_style (alignment-style-from-hash-code "right<p>top")]
-          [alignment2_style (alignment-style-from-hash-code "right<p>top")])
-      (check-false (alignment-style<? alignment1_style alignment2_style))
-      (check-true (alignment-style=? alignment1_style alignment2_style)))
-
-    (let ([alignment1_style (alignment-style-from-hash-code "left<p>top")]
-          [alignment2_style (alignment-style-from-hash-code "right<p>top")])
-      (check-true (alignment-style<? alignment1_style alignment2_style))
-      (check-false (alignment-style=? alignment1_style alignment2_style)))
-
-    (let ([alignment1_style (alignment-style-from-hash-code "right<p>bottom")]
-          [alignment2_style (alignment-style-from-hash-code "right<p>top")])
-      (check-true (alignment-style<? alignment1_style alignment2_style)))
-    )
+      (update-alignment-style alignment_style new2_style)
+      (check-equal? alignment_style (ALIGNMENT-STYLE "left" "bottom"))
+      ))
    ))
 
 (run-tests test-alignment-style)

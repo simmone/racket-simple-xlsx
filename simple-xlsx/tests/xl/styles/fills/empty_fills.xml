@@ -1,0 +1,14 @@
+<fills count="2">
+  <fill>
+    <patternFill patternType="none">
+      <fgColor rgb="FFFFFF"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+  <fill>
+    <patternFill patternType="gray125">
+      <fgColor rgb="FFFFFF"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+</fills>

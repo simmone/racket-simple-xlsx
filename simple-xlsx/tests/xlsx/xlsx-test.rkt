@@ -45,6 +45,7 @@
                                   ))
 
        (check-equal? (get-sheet-name-list) '("sheet1" "sheet2" "sheet3" "sheet4"))
+       (check-equal? (get-sheet-count) 4)
        )))
 
    ))

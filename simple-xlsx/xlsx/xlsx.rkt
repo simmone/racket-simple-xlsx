@@ -3,7 +3,7 @@
 (require "../lib/lib.rkt")
 (require "../lib/dimension.rkt")
 (require "../sheet/sheet.rkt")
-(require "../style/style.rkt")
+(require "../style/styles.rkt")
 (require "../style/border-style.rkt")
 (require "../style/fill-style.rkt")
 (require "../style/font-style.rkt")
@@ -33,6 +33,7 @@
                                string?
                                (listof (list/c string? string? string? string? string?))
                                void?)]
+          [get-sheet-count (-> natural?)]
           [get-sheet-name-list (-> (listof string?))]
           ))
 
@@ -53,16 +54,6 @@
    (
     [*XLSX* (new-xlsx)]
     [*STYLES* (XLSX-styles (*XLSX*))]
-    [*STYLE->INDEX_MAP* (STYLES-style->index_map (*STYLES*))]
-    [*INDEX->STYLE_MAP* (STYLES-index->style_map (*STYLES*))]
-    [*BORDER_STYLE->INDEX_MAP* (STYLES-border_style->index_map (*STYLES*))]
-    [*BORDER_INDEX->STYLE_MAP* (STYLES-border_index->style_map (*STYLES*))]
-    [*FONT_STYLE->INDEX_MAP* (STYLES-font_style->index_map (*STYLES*))]
-    [*FONT_INDEX->STYLE_MAP* (STYLES-font_index->style_map (*STYLES*))]
-    [*NUMBER_STYLE->INDEX_MAP* (STYLES-number_style->index_map (*STYLES*))]
-    [*NUMBER_INDEX->STYLE_MAP* (STYLES-number_index->style_map (*STYLES*))]
-    [*FILL_STYLE->INDEX_MAP* (STYLES-fill_style->index_map (*STYLES*))]
-    [*FILL_INDEX->STYLE_MAP* (STYLES-fill_index->style_map (*STYLES*))]
     )
    (user_proc)))
 
@@ -75,7 +66,7 @@
              (
               [*CURRENT_SHEET* (list-ref (XLSX-sheet_list (*XLSX*)) sheet_index)]
               [*CURRENT_SHEET_INDEX* sheet_index]
-              [*CURRENT_SHEET_STYLE* (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) sheet_index)]
+              [*CURRENT_SHEET_STYLE* (list-ref (STYLES-sheet_style_list (*STYLES*)) sheet_index)]
               )
              (user_proc))]
            [(CHART-SHEET? sheet)
@@ -83,6 +74,7 @@
              (
               [*CURRENT_SHEET* (list-ref (XLSX-sheet_list (*XLSX*)) sheet_index)]
               [*CURRENT_SHEET_INDEX* sheet_index]
+              [*CURRENT_SHEET_STYLE* (list-ref (STYLES-sheet_style_list (*STYLES*)) sheet_index)]
               )
              (user_proc))]
            [else
@@ -116,6 +108,7 @@
 
         (let ([sheet_style (new-sheet-style)]
               [start_cell_row_col (cell->row_col start_cell?)])
+
           (let row-loop ([rows sheet_data]
                          [row_index (car start_cell_row_col)])
             (when (not (null? rows))
@@ -128,21 +121,31 @@
 
                 (row-loop (cdr rows) (add1 row_index))))
 
-          (hash-set! (STYLES-sheet_index->style_map (*STYLES*)) sheet_index sheet_style))
+        (if (< sheet_index (length (STYLES-sheet_style_list (*STYLES*))))
+            (set-STYLES-sheet_style_list!
+             (*STYLES*)
+             (list-set (STYLES-sheet_style_list (*STYLES*)) sheet_index sheet_style))
+            (set-STYLES-sheet_style_list!
+             (*STYLES*)
+             `(,@(STYLES-sheet_style_list (*STYLES*)) ,sheet_style)))
 
         (set-XLSX-sheet_list! (*XLSX*)
                               `(,@(XLSX-sheet_list (*XLSX*))
                                 ,(DATA-SHEET
                                   sheet_name
                                   (capacity->range (cons (length sheet_data) (length (car sheet_data))) start_cell?)
-                                  cell->value_map))))
+                                  cell->value_map)))))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
 (define (add-chart-sheet sheet_name chart_type topic serial)
   (if (not (member sheet_name (get-sheet-name-list)))
-      (set-XLSX-sheet_list! (*XLSX*)
-                            `(,@(XLSX-sheet_list (*XLSX*))
-                              ,(CHART-SHEET sheet_name chart_type topic serial)))
+      (begin
+        (set-XLSX-sheet_list! (*XLSX*)
+                              `(,@(XLSX-sheet_list (*XLSX*))
+                                ,(CHART-SHEET sheet_name chart_type topic serial)))
+        (set-STYLES-sheet_style_list!
+         (*STYLES*)
+         `(,@(STYLES-sheet_style_list (*STYLES*)) ,(new-sheet-style))))
       (error (format "duplicate sheet name[~a]" sheet_name))))
 
 (define (get-sheet-name-list)
@@ -161,3 +164,6 @@
             (CHART-SHEET-sheet_name (car sheet_list))])
           result_list))
         (reverse result_list))))
+
+(define (get-sheet-count)
+  (length (XLSX-sheet_list (*XLSX*))))

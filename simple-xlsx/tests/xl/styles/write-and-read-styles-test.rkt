@@ -8,7 +8,7 @@
 (require "../../../sheet/sheet.rkt")
 (require "../../../style/style.rkt")
 (require "../../../lib/lib.rkt")
-(require "../../../style/sort-styles.rkt")
+(require "../../../style/assemble-styles.rkt")
 (require "../../../style/set-styles.rkt")
 
 (require"../../../xl/styles/styles.rkt")
@@ -16,7 +16,7 @@
 (require racket/runtime-path)
 (define-runtime-path styles_file "styles.xml")
 
-(require "cellXfs-alignment-test.rkt")
+(require "cellXfs/cellXfs-alignment-test.rkt")
 (require "styles/styles-test.rkt")
 
 (define test-styles
@@ -35,7 +35,8 @@
 
        (with-sheet (lambda () (set-cellXfses)))
 
-       (sort-styles)
+       (strip-styles)
+       (assemble-styles)
 
        (dynamic-wind
            (lambda ()

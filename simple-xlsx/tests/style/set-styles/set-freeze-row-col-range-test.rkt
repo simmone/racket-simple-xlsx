@@ -5,6 +5,7 @@
 (require"../../../xlsx/xlsx.rkt")
 (require"../../../sheet/sheet.rkt")
 (require"../../../style/style.rkt")
+(require"../../../style/styles.rkt")
 (require"../../../style/set-styles.rkt")
 
 (define test-styles
@@ -29,7 +30,9 @@
           (set-freeze-row-col-range 1 3)
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(1 . 3))
-          (check-equal? (SHEET-STYLE-freeze_range (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 0)) '(1 . 3))
+          (check-equal? (SHEET-STYLE-freeze_range
+                         (list-ref (STYLES-sheet_style_list (*STYLES*)) 0))
+                        '(1 . 3))
           ))
 
        (with-sheet-ref
@@ -38,11 +41,17 @@
           (set-freeze-row-col-range 2 4)
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(2 . 4))
-          (check-equal? (SHEET-STYLE-freeze_range (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 1)) '(2 . 4))
+          (check-equal? (SHEET-STYLE-freeze_range
+                         (list-ref (STYLES-sheet_style_list (*STYLES*)) 1))
+                        '(2 . 4))
           ))
 
-       (check-equal? (SHEET-STYLE-freeze_range (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 0)) '(1 . 3))
-       (check-equal? (SHEET-STYLE-freeze_range (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 1)) '(2 . 4))
+       (check-equal? (SHEET-STYLE-freeze_range
+                      (list-ref (STYLES-sheet_style_list (*STYLES*)) 0))
+                     '(1 . 3))
+       (check-equal? (SHEET-STYLE-freeze_range
+                      (list-ref (STYLES-sheet_style_list (*STYLES*)) 1))
+                     '(2 . 4))
        )))
    ))
 

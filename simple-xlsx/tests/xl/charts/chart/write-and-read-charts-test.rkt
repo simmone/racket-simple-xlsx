@@ -44,7 +44,7 @@
         ("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3")
         ("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")
         ))
-      
+
       (add-data-sheet "Sheet2" '(("none")))
 
       (add-chart-sheet
@@ -126,7 +126,7 @@
                (call-with-input-file chart3_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart)) 
+                    (lists->xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -162,9 +162,9 @@
                     (lists->xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
-            
+
             (set-XLSX-sheet_list! (*XLSX*) '())
-            
+
             (check-equal? (length (XLSX-sheet_list (*XLSX*))) 0)
 
             (add-data-sheet "DataSheet" '(("none")))
@@ -184,7 +184,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "LineChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 3)
-              
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
                  (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
                  (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
@@ -197,7 +197,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Line3DChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 3)
-                 
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
                  (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
                  (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
@@ -210,7 +210,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "BarChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 3)
-                   
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
                  (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
                  (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
@@ -223,7 +223,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Bar3DChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 3)
-                 
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
                  (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
                  (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
@@ -236,7 +236,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "PieChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 1)
-                 
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
                ))
 
@@ -247,7 +247,7 @@
                (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Pie3DChartExample")
                (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
                  (check-equal? (length sers) 1)
-                 
+
                  (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
                ))
             )

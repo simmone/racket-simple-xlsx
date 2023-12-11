@@ -14,8 +14,6 @@
 (require "style/alignment-style.rkt")
 (require "style/number-style.rkt")
 (require "style/fill-style.rkt")
-(require "style/lib.rkt")
-(require "style/sort-styles.rkt")
 (require "style/set-styles.rkt")
 (require "sheet/sheet.rkt")
 (require "lib/lib.rkt")
@@ -45,9 +43,12 @@
   ;; docProps/app.xml
   (read-docprops-app)
 
+  ;; xl/workbook.xml
+  (read-workbook)
+
   ;; xl/sharedStrings.xml
   (read-shared-strings)
-  
+
   ;; xl/styles.xml
   (read-styles)
 

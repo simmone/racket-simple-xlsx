@@ -6,7 +6,9 @@
 
 (require "../../../../../xlsx/xlsx.rkt")
 (require "../../../../../style/style.rkt")
-(require "../../../../../style/sort-styles.rkt")
+(require "../../../../../style/border-style.rkt")
+(require "../../../../../style/styles.rkt")
+(require "../../../../../style/assemble-styles.rkt")
 (require "../../../../../style/set-styles.rkt")
 (require "../../../../../sheet/sheet.rkt")
 (require "../../../../../lib/lib.rkt")
@@ -38,9 +40,9 @@
 
        (with-sheet
         (lambda ()
-          (set-cell-range-border-style "A1-C1" "all" "0000ff" "thick")
+          (set-cell-range-border-style "A1-C1" "all" "0000FF" "thick")
 
-          (sort-styles)
+          (strip-styles)
 
           (call-with-input-file string1_cell_file
             (lambda (expected)
@@ -87,9 +89,12 @@
      (lambda ()
        (add-data-sheet "Sheet1" '(("" "" "" "" "")))
 
-       (hash-set! (*INDEX->STYLE_MAP*)
-                  1
-                  "ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<p>ff0000<p>dashed<s><s><s><s>")
+       (set-STYLES-styles!
+        (*STYLES*)
+        (list
+         (STYLE
+          (BORDER-STYLE "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed" "FF0000" "dashed")
+          #f #f #f #f)))
 
        (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "month1" 0)
        (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 0 "month1")
@@ -116,14 +121,16 @@
           (check-false (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1"))
 
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet><sheetData><row r=\"1\">~a~a~a~a~a~a</row></sheetData></worksheet>"
-                                                       (file->string string5_cell_file)
-                                                       (file->string string2_cell_file)
-                                                       (file->string string3_cell_file)
-                                                       (file->string string4_cell_file)
-                                                       (file->string string1_cell_file)
-                                                       (file->string string6_cell_file)
-                                                       )))])
+                 (xml->hash
+                  (open-input-string
+                   (format "<worksheet><sheetData><row r=\"1\">~a~a~a~a~a~a</row></sheetData></worksheet>"
+                           (file->string string5_cell_file)
+                           (file->string string2_cell_file)
+                           (file->string string3_cell_file)
+                           (file->string string4_cell_file)
+                           (file->string string1_cell_file)
+                           (file->string string6_cell_file)
+                           )))])
 
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "")
             (from-cell xml_hash 1 5)
@@ -155,7 +162,6 @@
           (check-true (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "C1"))
           (check-false (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "D1"))
           (check-false (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1"))
-
           )))))
 
    ))

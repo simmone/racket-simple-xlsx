@@ -5,6 +5,7 @@
 (require"../../../xlsx/xlsx.rkt")
 (require"../../../sheet/sheet.rkt")
 (require"../../../style/style.rkt")
+(require"../../../style/styles.rkt")
 (require"../../../style/set-styles.rkt")
 
 (define test-styles
@@ -31,7 +32,9 @@
           (set-row-range-height "3-5" 7)
 
           (check-equal? (hash-count (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*))) 5)
-          (check-equal? (hash-count (SHEET-STYLE-row->height_map (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 0))) 5)
+          (check-equal? (hash-count (SHEET-STYLE-row->height_map
+                                     (list-ref (STYLES-sheet_style_list (*STYLES*)) 0)))
+                        5)
           (check-equal? (hash-count (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*))) 5)
 
           (check-equal? (hash-ref (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*)) 1) 5)

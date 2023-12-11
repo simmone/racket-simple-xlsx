@@ -1,3 +1,7 @@
 <cols>
-  <col min="6" max="10" width="7"/>
+  <col min="6" max="6" width="7"/>
+  <col min="7" max="7" width="7"/>
+  <col min="8" max="8" width="7"/>
+  <col min="9" max="9" width="7"/>
+  <col min="10" max="10" width="7"/>
 </cols>

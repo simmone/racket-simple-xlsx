@@ -104,15 +104,15 @@
   (let* ([range_row_col (range->row_col_pair (DATA-SHEET-dimension (*CURRENT_SHEET*)))]
          [start_col (cdar range_row_col)]
          [end_col (cddr range_row_col)])
-  (let loop ([loop_col_index start_col]
-             [cells '()])
-    (if (<= loop_col_index end_col)
-        (loop
-         (add1 loop_col_index)
-         (cons
-          (row_col->cell row_index loop_col_index)
-          cells))
-        (reverse cells)))))
+    (let loop ([loop_col_index start_col]
+               [cells '()])
+      (if (<= loop_col_index end_col)
+          (loop
+           (add1 loop_col_index)
+           (cons
+            (row_col->cell row_index loop_col_index)
+            cells))
+          (reverse cells)))))
 (define (get-sheet-ref-row-cells sheet_index row_index) (with-sheet-ref sheet_index (lambda ()  (get-row-cells row_index))))
 (define (get-sheet-name-row-cells sheet_name row_index) (with-sheet-name sheet_name (lambda () (get-row-cells row_index))))
 (define (get-sheet-*name*-row-cells search_sheet_name row_index) (with-sheet-*name* search_sheet_name (lambda () (get-row-cells row_index))))
@@ -129,15 +129,15 @@
          [start_row (caar range_row_col)]
          [end_row (cadr range_row_col)])
 
-  (let loop ([loop_row_index start_row]
-             [cells '()])
-    (if (<= loop_row_index end_row)
-        (loop
-         (add1 loop_row_index)
-         (cons
-          (row_col->cell loop_row_index col_index)
-          cells))
-        (reverse cells)))))
+    (let loop ([loop_row_index start_row]
+               [cells '()])
+      (if (<= loop_row_index end_row)
+          (loop
+           (add1 loop_row_index)
+           (cons
+            (row_col->cell loop_row_index col_index)
+            cells))
+          (reverse cells)))))
 (define (get-sheet-ref-col-cells sheet_index col_index) (with-sheet-ref sheet_index (lambda ()  (get-col-cells col_index))))
 (define (get-sheet-name-col-cells sheet_name col_index) (with-sheet-name sheet_name (lambda () (get-col-cells col_index))))
 (define (get-sheet-*name*-col-cells search_sheet_name col_index) (with-sheet-*name* search_sheet_name (lambda () (get-col-cells col_index))))
@@ -167,8 +167,8 @@
   (let loop ([cell_strs (get-row-cells row_index)]
              [cell_values cell_list])
     (when (not (null? cell_strs))
-          (set-cell! (car cell_strs) (if (null? cell_values) "" (car cell_values)))
-          (loop (cdr cell_strs) (cdr cell_values)))))
+      (set-cell! (car cell_strs) (if (null? cell_values) "" (car cell_values)))
+      (loop (cdr cell_strs) (cdr cell_values)))))
 (define (set-sheet-ref-row! sheet_index row_index cell_list) (with-sheet-ref sheet_index (lambda ()  (set-row! row_index cell_list))))
 (define (set-sheet-name-row! sheet_name row_index cell_list) (with-sheet-name sheet_name (lambda () (set-row! row_index cell_list))))
 (define (set-sheet-*name*-row! search_sheet_name row_index cell_list) (with-sheet-*name* search_sheet_name (lambda () (set-row! row_index cell_list))))
@@ -179,13 +179,13 @@
          [end_row (cadr range_row_col)])
     (let loop ([loop_row_index start_row]
                [rows '()])
-    (if (<= loop_row_index end_row)
-        (loop
-         (add1 loop_row_index)
-         (cons
-          (get-row loop_row_index)
-          rows))
-        (reverse rows)))))
+      (if (<= loop_row_index end_row)
+          (loop
+           (add1 loop_row_index)
+           (cons
+            (get-row loop_row_index)
+            rows))
+          (reverse rows)))))
 (define (get-sheet-ref-rows sheet_index) (with-sheet-ref sheet_index (lambda ()  (get-rows))))
 (define (get-sheet-name-rows sheet_name) (with-sheet-name sheet_name (lambda () (get-rows))))
 (define (get-sheet-*name*-rows search_sheet_name) (with-sheet-*name* search_sheet_name (lambda () (get-rows))))
@@ -216,8 +216,8 @@
   (let loop ([cell_strs (get-col-cells col_index)]
              [cell_values cell_list])
     (when (not (null? cell_strs))
-          (set-cell! (car cell_strs) (if (null? cell_values) "" (car cell_values)))
-          (loop (cdr cell_strs) (cdr cell_values)))))
+      (set-cell! (car cell_strs) (if (null? cell_values) "" (car cell_values)))
+      (loop (cdr cell_strs) (cdr cell_values)))))
 (define (set-sheet-ref-col! sheet_index col_index cell_list) (with-sheet-ref sheet_index (lambda ()  (set-col! col_index cell_list))))
 (define (set-sheet-name-col! sheet_name col_index cell_list) (with-sheet-name sheet_name (lambda () (set-col! col_index cell_list))))
 (define (set-sheet-*name*-col! search_sheet_name col_index cell_list) (with-sheet-*name* search_sheet_name (lambda () (set-col! col_index cell_list))))
@@ -246,8 +246,8 @@
     (let loop ([loop_col_index 0]
                [actual_loop_col_index start_col])
       (when (<= actual_loop_col_index end_col)
-          (set-col! actual_loop_col_index (list-ref cols loop_col_index))
-          (loop (add1 loop_col_index) (add1 actual_loop_col_index))))))
+        (set-col! actual_loop_col_index (list-ref cols loop_col_index))
+        (loop (add1 loop_col_index) (add1 actual_loop_col_index))))))
 (define (set-sheet-ref-cols! sheet_index cols) (with-sheet-ref sheet_index (lambda ()  (set-cols! cols))))
 (define (set-sheet-name-cols! sheet_name cols) (with-sheet-name sheet_name (lambda () (set-cols! cols))))
 (define (set-sheet-*name*-cols! search_sheet_name cols) (with-sheet-*name* search_sheet_name (lambda () (set-cols! cols))))
@@ -273,28 +273,28 @@
                [sheet_string_index 0])
 
       (when (not (null? sheets))
-            (if (DATA-SHEET? (car sheets))
-                (loop (cdr sheets) (add1 sheet_index)
-                      (with-sheet-ref
-                       sheet_index
-                       (lambda ()
-                         (let loop-row ([rows (get-rows)]
-                                        [row_string_index sheet_string_index])
-                           (if (not (null? rows))
-                               (loop-row
-                                (cdr rows)
-                                (let loop-cell ([row_cells (car rows)]
-                                                [cell_string_index row_string_index])
-                                  (if (not (null? row_cells))
-                                      (let ([cell_value (car row_cells)])
-                                        (if (string? cell_value)
-                                            (if (not (hash-has-key? shared_string->index_map cell_value))
-                                                (begin
-                                                  (hash-set! shared_string->index_map cell_value cell_string_index)
-                                                  (hash-set! shared_index->string_map cell_string_index cell_value)
-                                                  (loop-cell (cdr row_cells) (add1 cell_string_index)))
-                                                (loop-cell (cdr row_cells) cell_string_index))
-                                            (loop-cell (cdr row_cells) cell_string_index)))
-                                      cell_string_index)))
-                               row_string_index)))))
-                (loop (cdr sheets) (add1 sheet_index) sheet_string_index))))))
+        (if (DATA-SHEET? (car sheets))
+            (loop (cdr sheets) (add1 sheet_index)
+                  (with-sheet-ref
+                   sheet_index
+                   (lambda ()
+                     (let loop-row ([rows (get-rows)]
+                                    [row_string_index sheet_string_index])
+                       (if (not (null? rows))
+                           (loop-row
+                            (cdr rows)
+                            (let loop-cell ([row_cells (car rows)]
+                                            [cell_string_index row_string_index])
+                              (if (not (null? row_cells))
+                                  (let ([cell_value (car row_cells)])
+                                    (if (string? cell_value)
+                                        (if (not (hash-has-key? shared_string->index_map cell_value))
+                                            (begin
+                                              (hash-set! shared_string->index_map cell_value cell_string_index)
+                                              (hash-set! shared_index->string_map cell_string_index cell_value)
+                                              (loop-cell (cdr row_cells) (add1 cell_string_index)))
+                                            (loop-cell (cdr row_cells) cell_string_index))
+                                        (loop-cell (cdr row_cells) cell_string_index)))
+                                  cell_string_index)))
+                           row_string_index)))))
+            (loop (cdr sheets) (add1 sheet_index) sheet_string_index))))))

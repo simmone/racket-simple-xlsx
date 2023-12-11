@@ -1,5 +1,6 @@
 #lang racket
 
+(require "../../style/styles.rkt")
 (require "../../style/fill-style.rkt")
 
 (provide (contract-out
@@ -9,9 +10,7 @@
 
 (define (to-fills fill_list)
   (append
-   (list "fills" (cons "count" (number->string (+ 2 (length fill_list)))))
-   '(("fill" ("patternFill" ("patternType" . "none"))))
-   '(("fill" ("patternFill" ("patternType" . "gray125"))))
+   (list "fills" (cons "count" (number->string (length fill_list))))
    (let loop ([fills fill_list]
               [result_list '()])
      (if (not (null? fills))
@@ -28,19 +27,13 @@
          (reverse result_list)))))
 
 (define (from-fills xml_hash)
-  (let ([skip_count 2])
-    (let loop ([loop_count 0])
-      (when (< loop_count (hash-ref xml_hash "styleSheet1.fills1.fill's count" 0))
-            (when (>= loop_count skip_count)
-                  (let ([prefix (format "styleSheet1.fills1.fill~a" (add1 loop_count))])
-                    (let ([hash_code
-                           (FILL-STYLE-hash_code
-                            (FILL-STYLE
-                             ""
-                             (hash-ref xml_hash (format "~a.patternFill1.fgColor1.rgb" prefix) "000000")
-                             (hash-ref xml_hash (format "~a.patternFill1.patternType" prefix) "none")))])
-
-                      (hash-set! (*FILL_STYLE->INDEX_MAP*) hash_code (- loop_count skip_count))
-                      (hash-set! (*FILL_INDEX->STYLE_MAP*) (- loop_count skip_count) hash_code))))
-            (loop (add1 loop_count))))))
-
+  (let loop ([loop_count 0]
+             [fill_list '()])
+    (if (< loop_count (hash-ref xml_hash "styleSheet1.fills1.fill's count" 0))
+        (let ([prefix (format "styleSheet1.fills1.fill~a" (add1 loop_count))])
+          (let ([fill_style
+                 (FILL-STYLE
+                  (hash-ref xml_hash (format "~a.patternFill1.fgColor1.rgb" prefix) "FFFFFF")
+                  (hash-ref xml_hash (format "~a.patternFill1.patternType" prefix) "none"))])
+            (loop (add1 loop_count) (cons fill_style fill_list))))
+        (set-STYLES-fill_list! (*STYLES*) (reverse fill_list)))))

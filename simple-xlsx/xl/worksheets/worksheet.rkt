@@ -5,9 +5,9 @@
 (require "../../xlsx/xlsx.rkt")
 (require "../../sheet/sheet.rkt")
 (require "../../style/style.rkt")
-(require "../../style/sort-styles.rkt")
+(require "../../style/style-lib.rkt")
+(require "../../style/styles.rkt")
 (require "../../style/set-styles.rkt")
-(require "../../style/lib.rkt")
 (require "../../lib/dimension.rkt")
 (require "../../lib/lib.rkt")
 
@@ -17,7 +17,7 @@
           [to-sheet-view (-> list?)]
           [from-sheet-view (-> hash? void?)]
           [to-sheet-views (-> list?)]
-          [to-col-width-style (-> list?)]
+          [to-cols (-> list?)]
           [from-col-width-style (-> hash? void?)]
           [to-rows (-> list?)]
           [from-rows (-> hash? void?)]
@@ -25,7 +25,7 @@
           [from-merge-cells (-> hash? void?)]
           [to-row (-> positive-integer? positive-integer? positive-integer? list?)]
           [from-row (-> hash? positive-integer? void?)]
-          [to-cells (-> positive-integer? list?)]
+          [to-cells (-> positive-integer? positive-integer? positive-integer? list?)]
           [to-cell (-> positive-integer? positive-integer? list?)]
           [from-cells (-> hash? positive-integer? void?)]
           [from-cell (-> hash? positive-integer? positive-integer? void?)]
@@ -41,7 +41,7 @@
    (to-work-sheet-head)
    (list (to-sheet-views))
    '(("sheetFormatPr" ("defaultRowHeight" . "13.5")))
-   (list (to-col-width-style))
+   (list (to-cols))
    (list (to-rows))
    (list (to-merge-cells))
    (work-sheet-tail)))
@@ -156,9 +156,9 @@
    (if (hash-has-key? (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) row_index)
        (list
         (cons "s" (number->string
-                   (add1
-                    (hash-ref (STYLES-style->index_map (*STYLES*))
-                              (STYLE-hash_code (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) row_index))))))
+                   (index-of (STYLES-styles (*STYLES*))
+                             (hash-ref (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) row_index)
+                             equal-hash-code=?)))
         (cons "customFormat" "1"))
        '())
    (if (hash-has-key? (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*)) row_index)
@@ -166,24 +166,18 @@
         (cons "ht" (number->string (hash-ref (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*)) row_index)))
         (cons "customHeight" "1"))
        '())
-   (to-cells row_index)))
+   (to-cells row_index col_start_index col_end_index)))
 
-(define (to-cells row_index)
-  (let* ([range_row_col (range->row_col_pair (DATA-SHEET-dimension (*CURRENT_SHEET*)))]
-         [start_row (caar range_row_col)]
-         [start_col (cdar range_row_col)]
-         [end_row (cadr range_row_col)]
-         [end_col (cddr range_row_col)])
-
-    (let loop ([col_index start_col]
-               [cell_list '()])
-      (if (<= col_index end_col)
-          (loop
-           (add1 col_index)
-           (cons
-            (to-cell row_index col_index)
-            cell_list))
-          (reverse cell_list)))))
+(define (to-cells row_index start_col end_col)
+  (let loop ([col_index start_col]
+             [cell_list '()])
+    (if (<= col_index end_col)
+        (loop
+         (add1 col_index)
+         (cons
+          (to-cell row_index col_index)
+          cell_list))
+        (reverse cell_list))))
 
 (define (to-cell row_index col_index)
   (let ([cell (row_col->cell row_index col_index)])
@@ -197,9 +191,9 @@
                (list
                 (cons "s"
                       (number->string
-                       (add1
-                        (hash-ref (STYLES-style->index_map (*STYLES*))
-                                  (STYLE-hash_code (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) cell)))))))
+                       (index-of (STYLES-styles (*STYLES*))
+                                 (hash-ref (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) cell)
+                                 equal-hash-code=?))))
                '())
            (list
             (if (string? cell_value)
@@ -216,42 +210,46 @@
         '())))
 
 (define (from-rows xml_hash)
-  (let* ([rows_count (hash-ref xml_hash "worksheet1.sheetData1.row's count" 0)]
-         [cols_count (hash-ref xml_hash "worksheet1.sheetData1.row1.c's count" 0)])
-    
-    (when (not (DATA-SHEET-dimension (*CURRENT_SHEET*)))
-      (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) (capacity->range (cons rows_count cols_count))))
+  (let* ([rows_count (hash-ref xml_hash "worksheet1.sheetData1.row's count" 0)])
 
-    (let loop-row ([loop_row_index 1])
-      (when (<= loop_row_index rows_count)
+    (let loop-row ([loop_row_index 1]
+                   [max_cols_count 0])
+      (if (<= loop_row_index rows_count)
+          (begin
             (from-row xml_hash loop_row_index)
-            (loop-row (add1 loop_row_index))))))
+
+            (if (> (hash-ref xml_hash (format "worksheet1.sheetData1.row~a.c's count" loop_row_index) 0) max_cols_count)
+                (loop-row (add1 loop_row_index) (hash-ref xml_hash (format "worksheet1.sheetData1.row~a.c's count" loop_row_index) 0))
+                (loop-row (add1 loop_row_index) max_cols_count)))
+          (when (not (DATA-SHEET-dimension (*CURRENT_SHEET*)))
+            (set-DATA-SHEET-dimension! (*CURRENT_SHEET*) (capacity->range (cons rows_count max_cols_count))))))))
 
 (define (from-row xml_hash loop_row_index)
-  (let* ([prefix (format "worksheet1.sheetData1.row~a" loop_row_index)])
+  (let ([prefix (format "worksheet1.sheetData1.row~a" loop_row_index)])
     (when (hash-has-key? xml_hash (format "~a.r" prefix))
       (let ([row_index (string->number (hash-ref xml_hash (format "~a.r" prefix)))]
             [row_style (hash-ref xml_hash (format "~a.s" prefix) #f)]
             [row_height (hash-ref xml_hash (format "~a.ht" prefix) #f)])
 
-        (when row_style
+        (when (and row_style
+                   (< (string->number row_style) (length (STYLES-styles (*STYLES*)))))
           (hash-set! (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*))
                      row_index
-                     (style-from-hash-code (hash-ref (*INDEX->STYLE_MAP*) (string->number row_style)))))
+                     (list-ref (STYLES-styles (*STYLES*)) (string->number row_style))))
 
         (when row_height
           (hash-set! (SHEET-STYLE-row->height_map (*CURRENT_SHEET_STYLE*))
                      row_index
                      (string->number row_height))))
-    
+
       (from-cells xml_hash loop_row_index))))
 
 (define (from-cells xml_hash loop_row_index)
   (let* ([cells_count (hash-ref xml_hash (format "worksheet1.sheetData1.row~a.c's count" loop_row_index) 0)])
     (let loop-cell ([loop_cell_index 1])
       (when (<= loop_cell_index cells_count)
-            (from-cell xml_hash loop_row_index loop_cell_index)
-            (loop-cell (add1 loop_cell_index))))))
+        (from-cell xml_hash loop_row_index loop_cell_index)
+        (loop-cell (add1 loop_cell_index))))))
 
 (define (from-cell xml_hash loop_row_index loop_cell_index)
   (let* ([prefix (format "worksheet1.sheetData1.row~a" loop_row_index)]
@@ -262,13 +260,14 @@
          [cell_value (hash-ref xml_hash (format "~a.c~a.v1" prefix loop_cell_index) #f)])
 
     (when (and cell cell_value)
-      (when (and cell_style (hash-has-key? (*INDEX->STYLE_MAP*) (string->number cell_style)))
+      (when (and cell_style
+                 (< (string->number cell_style) (length (STYLES-styles (*STYLES*)))))
         (hash-set! (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*))
                    cell
-                   (style-from-hash-code (hash-ref (*INDEX->STYLE_MAP*) (string->number cell_style)))))
-          
+                   (list-ref (STYLES-styles (*STYLES*)) (string->number cell_style))))
+
       (cond
-       [(string=? cell_type "number")
+       [(or (string=? cell_type "number") (string=? cell_type "n"))
         (hash-set! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) cell (string->number cell_value))]
        [(string=? cell_type "s")
         (hash-set! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))
@@ -296,66 +295,86 @@
 (define (from-merge-cells xml_hash)
   (let ([merge_cell_range_count (hash-ref xml_hash "worksheet1.mergeCells1.mergeCell's count" 0)])
     (when (> merge_cell_range_count 0)
-          (let loop-merge-cell-ranges ([loop_count 1])
-            (when (<= loop_count merge_cell_range_count)
-                  (hash-set! (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*))
-                             (hash-ref xml_hash (format "worksheet1.mergeCells1.mergeCell~a.ref" loop_count)) #t)
-                  (loop-merge-cell-ranges (add1 loop_count)))))))
+      (let loop-merge-cell-ranges ([loop_count 1])
+        (when (<= loop_count merge_cell_range_count)
+          (hash-set! (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*))
+                     (hash-ref xml_hash (format "worksheet1.mergeCells1.mergeCell~a.ref" loop_count)) #t)
+          (loop-merge-cell-ranges (add1 loop_count)))))))
 
-(define (to-col-width-style)
-(when (not (null? (squeeze-range-hash (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)))))
-  (append
-   (list "cols")
-   (let loop ([col_range_width_list (squeeze-range-hash (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)))]
-              [result_list '()])
-     (if (not (null? col_range_width_list))
-         (loop
-          (cdr col_range_width_list)
-          (cons
-           (list
-            "col"
-            (cons "min" (number->string (first (car col_range_width_list))))
-            (cons "max" (number->string (second (car col_range_width_list))))
-            (cons "width" (number->string (third (car col_range_width_list)))))
-           result_list))
-         (reverse result_list))))))
+(define (to-cols)
+  (if (or
+       (> (hash-count (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))) 0)
+       (> (hash-count (SHEET-STYLE-col->style_map (*CURRENT_SHEET_STYLE*))) 0))
+    (append
+     (list "cols")
+     (let loop ([cols 
+                 (sort
+                  (remove-duplicates
+                   (append
+                    (hash-keys (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)))
+                    (hash-keys (SHEET-STYLE-col->style_map (*CURRENT_SHEET_STYLE*)))))
+                  <)]
+                [result_list '()])
+       (if (not (null? cols))
+           (loop
+            (cdr cols)
+            (cons
+             (append
+              (list
+               "col"
+               (cons "min" (number->string (car cols)))
+               (cons "max" (number->string (car cols))))
+              (if (hash-has-key? (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)) (car cols))
+                  (list
+                   (cons "width" (number->string (hash-ref (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)) (car cols)))))
+                  '())
+              (if (hash-has-key? (SHEET-STYLE-col->style_map (*CURRENT_SHEET_STYLE*)) (car cols))
+                  (list
+                   (cons "s" (number->string
+                              (index-of (STYLES-styles (*STYLES*))
+                                        (hash-ref (SHEET-STYLE-col->style_map (*CURRENT_SHEET_STYLE*)) (car cols))
+                                        equal-hash-code=?))))
+                  '()))
+             result_list))
+           (reverse result_list))))
+    '()))
 
 (define (from-col-width-style xml_hash)
   (let ([col_range_width_list '()]
         [col_range_width_count (hash-ref xml_hash "worksheet1.cols1.col's count" 0)])
     (when (> col_range_width_count 0)
-          (set! col_range_width_list
-                (let loop-cols ([loop_count 1]
-                                [result_list '()])
-                  (if (<= loop_count col_range_width_count)
-                      (loop-cols
-                       (add1 loop_count)
-                       (cons
-                        (list
-                         (hash-ref xml_hash (format "worksheet1.cols1.col~a.min" loop_count) "0")
-                         (hash-ref xml_hash (format "worksheet1.cols1.col~a.max" loop_count) "0")
-                         (hash-ref xml_hash (format "worksheet1.cols1.col~a.width" loop_count) "0"))
-                        result_list))
-                      (reverse result_list))))
+      (set! col_range_width_list
+            (let loop-cols ([loop_count 1]
+                            [result_list '()])
+              (if (<= loop_count col_range_width_count)
+                  (loop-cols
+                   (add1 loop_count)
+                   (cons
+                    (list
+                     (hash-ref xml_hash (format "worksheet1.cols1.col~a.min" loop_count) "0")
+                     (hash-ref xml_hash (format "worksheet1.cols1.col~a.max" loop_count) "0")
+                     (hash-ref xml_hash (format "worksheet1.cols1.col~a.width" loop_count) "0"))
+                    result_list))
+                  (reverse result_list))))
 
-          (let loop-col-range ([loop_list col_range_width_list])
-            (when (not (null? loop_list))
-                  (let ([min (string->number (first (car loop_list)))]
-                        [max (string->number (second (car loop_list)))]
-                        [width (string->number (third (car loop_list)))])
-                    (if (or
-                         (= min 0)
-                         (= max 0)
-                         (= width 0))
-                        (loop-col-range (cdr loop_list))
-                        (let loop-col ([loop_index min])
-                          (when (<= loop_index max)
-                                (hash-set!
-                                 (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))
-                                 loop_index
-                                 width)
-                                (loop-col (add1 loop_index))))))
-                  (loop-col-range (cdr loop_list)))))))
+      (let loop-col-range ([loop_list col_range_width_list])
+        (when (not (null? loop_list))
+          (let ([min (string->number (first (car loop_list)))]
+                [max (string->number (second (car loop_list)))]
+                [width (string->number (third (car loop_list)))])
+            (if (or
+                 (= min 0)
+                 (= max 0)
+                 (= width 0))
+                (loop-col-range (cdr loop_list))
+                (let loop-col ([loop_index min])
+                  (when (<= loop_index max)
+                    (hash-set!
+                     (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))
+                     loop_index
+                     width)
+                    (loop-col (add1 loop_index))))))
+          (loop-col-range (cdr loop_list)))))))
 
 (define (work-sheet-tail)
   '(
@@ -369,20 +388,20 @@
              [work_sheet_index 1])
 
     (when (not (null? sheets))
-          (if (DATA-SHEET? (car sheets))
-              (let ([dir (if output_dir output_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl" "worksheets"))])
-                (make-directory* dir)
-                
-                (with-sheet-ref
-                 sheet_index
-                 (lambda ()
-                   (with-output-to-file (build-path dir (format "sheet~a.xml" work_sheet_index))
-                     #:exists 'replace
-                     (lambda ()
-                       (printf (lists->xml (to-work-sheet)))))))
+      (if (DATA-SHEET? (car sheets))
+          (let ([dir (if output_dir output_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl" "worksheets"))])
+            (make-directory* dir)
 
-                (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
-              (loop (cdr sheets) (add1 sheet_index) work_sheet_index)))))
+            (with-sheet-ref
+             sheet_index
+             (lambda ()
+               (with-output-to-file (build-path dir (format "sheet~a.xml" work_sheet_index))
+                 #:exists 'replace
+                 (lambda ()
+                   (printf (lists->xml (to-work-sheet)))))))
+
+            (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
+          (loop (cdr sheets) (add1 sheet_index) work_sheet_index)))))
 
 (define (read-worksheets [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl" "worksheets"))])
@@ -390,12 +409,12 @@
                [sheet_index 0]
                [work_sheet_index 1])
       (when (not (null? sheets))
-            (if (DATA-SHEET? (car sheets))
-                (begin
-                  (with-sheet-ref
-                   sheet_index
-                   (lambda ()
-                     (from-work-sheet (xml->hash (build-path dir (format "sheet~a.xml" work_sheet_index))))))
-                  (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
-                (loop (cdr sheets) (add1 sheet_index) work_sheet_index))))))
+        (if (DATA-SHEET? (car sheets))
+            (begin
+              (with-sheet-ref
+               sheet_index
+               (lambda ()
+                 (from-work-sheet (xml->hash (build-path dir (format "sheet~a.xml" work_sheet_index))))))
+              (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
+            (loop (cdr sheets) (add1 sheet_index) work_sheet_index))))))
 

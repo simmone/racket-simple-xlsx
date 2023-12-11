@@ -1,0 +1,8 @@
+<fills count="1">
+  <fill>
+    <patternFill patternType="none">
+      <fgColor theme="9"/>
+      <bgColor indexed="64"/>
+    </patternFill>
+  </fill>
+</fills>

@@ -107,12 +107,12 @@
                  (from-chart
                   (xml->hash
                    (open-input-string (file->string pie_chart_file))))])
-          
+
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "PieChartExample")
             (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
               (check-equal? (length sers) 1)
-              
+
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
             )))
 
@@ -123,12 +123,12 @@
                  (from-chart
                   (xml->hash
                    (open-input-string (file->string pie_3d_chart_file))))])
-          
+
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE3D)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Pie3DChartExample")
             (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
               (check-equal? (length sers) 1)
-              
+
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
             ))))))
 

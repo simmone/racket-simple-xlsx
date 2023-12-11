@@ -1,0 +1,20 @@
+<cellXfs count="6">
+  <xf fillId="0" xfId="0" applyFill="1">
+    <alignment horizontal="center" vertical="bottom"/>
+  </xf>
+  <xf fillId="1" xfId="0" applyFill="1">
+    <alignment horizontal="center" vertical="bottom"/>
+  </xf>
+  <xf borderId="1" fontId="1" numFmtId="1" fillId="2" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="left" vertical="center"/>
+  </xf>
+  <xf borderId="2" fontId="2" numFmtId="2" fillId="3" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="center" vertical="top"/>
+  </xf>
+  <xf borderId="3" fontId="3" numFmtId="3" fillId="4" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="right" vertical="bottom"/>
+  </xf>
+  <xf borderId="4" fontId="4" numFmtId="4" fillId="5" xfId="0" applyBorder="1" applyFont="1" applyFill="1">
+    <alignment horizontal="center" vertical="bottom"/>
+  </xf>
+</cellXfs>

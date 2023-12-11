@@ -5,6 +5,7 @@
 (require"../../../xlsx/xlsx.rkt")
 (require"../../../sheet/sheet.rkt")
 (require"../../../style/style.rkt")
+(require"../../../style/styles.rkt")
 (require"../../../style/set-styles.rkt")
 
 (define test-styles
@@ -32,7 +33,9 @@
           (set-col-range-width "G-10" 8)
 
           (check-equal? (hash-count (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))) 10)
-          (check-equal? (hash-count (SHEET-STYLE-col->width_map (hash-ref (STYLES-sheet_index->style_map (*STYLES*)) 0))) 10)
+          (check-equal? (hash-count (SHEET-STYLE-col->width_map
+                                     (list-ref (STYLES-sheet_style_list (*STYLES*)) 0)))
+                        10)
           (check-equal? (hash-count (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))) 10)
 
           (check-equal? (hash-ref (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)) 1) 5)
