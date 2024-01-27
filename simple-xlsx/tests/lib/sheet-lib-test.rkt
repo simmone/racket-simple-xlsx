@@ -30,7 +30,7 @@
                                   (3 4)
                                   (5 6)
                                   )
-                       "B2"
+                       #:start_cell? "B2"
                        )
 
        (with-sheet-name

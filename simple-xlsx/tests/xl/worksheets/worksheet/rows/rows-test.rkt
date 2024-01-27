@@ -180,7 +180,7 @@
                          (seconds->date (find-seconds 0 0 0 17 9 2018 #f))
                          (seconds->date (find-seconds 0 0 0 17 9 2018 #f)))
                         )
-                       "C3")
+                       #:start_cell? "C3")
 
        (squash-shared-strings-map)
 

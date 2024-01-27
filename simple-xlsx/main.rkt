@@ -18,7 +18,7 @@
           [write-xlsx (-> path-string? procedure? any)]
           [read-xlsx (-> path-string? procedure? any)]
           [read-and-write-xlsx (-> path-string? path-string? procedure? any)]
-          [add-data-sheet (->* (string? (listof list?)) (cell?) void?)]
+          [add-data-sheet (->* (string? (listof list?)) (#:start_cell? cell? #:fill? (or/c string? number? date?)) void?)]
           [get-sheet-name-list (-> (listof string?))]
           [with-sheet-ref (-> natural? procedure? any)]
           [with-sheet (-> procedure? any)]

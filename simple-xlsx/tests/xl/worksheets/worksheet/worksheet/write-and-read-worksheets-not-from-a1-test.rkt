@@ -27,7 +27,7 @@
      (lambda ()
        (add-data-sheet "Sheet1"
                        '(("month1" "month2" "month3" "month1" "real") (201601 100 110 1110 6.9))
-                       "B2")
+                       #:start_cell? "B2")
 
        (squash-shared-strings-map)
 

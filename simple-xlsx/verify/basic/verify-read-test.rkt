@@ -2,8 +2,8 @@
 
 (require rackunit/text-ui rackunit)
 
-(require "../../../main.rkt")
-(require "../../../style/styles.rkt")
+(require "../../main.rkt")
+(require "../../style/styles.rkt")
 
 (require racket/runtime-path)
 (define-runtime-path basic_write_google_file "basic_write_google.xlsx")

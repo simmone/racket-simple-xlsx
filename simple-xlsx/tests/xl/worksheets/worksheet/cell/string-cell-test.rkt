@@ -164,6 +164,95 @@
           (check-false (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1"))
           )))))
 
+   (test-case
+    "test-from-special-char-cell"
+
+    (with-xlsx
+     (lambda ()
+       (add-data-sheet "Sheet1" '(("" "" "" "" "" "" "" "" "")))
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "<test>" 0)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 0 "<test>")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "<foo> " 1)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 1 "<foo> ")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) " <baz>" 2)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 2 " <baz>")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "< bar>" 3)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 3 "< bar>")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "< fro >" 4)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 4 "< fro >")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "<bas >" 5)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 5 "<bas >")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "<maybe" 6)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 6 "<maybe")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "<< not >>" 7)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 7 "<< not >>")
+
+       (hash-set! (XLSX-shared_string->index_map (*XLSX*)) "show>" 8)
+       (hash-set! (XLSX-shared_index->string_map (*XLSX*)) 8 "show>")
+
+       (with-sheet
+        (lambda ()
+          (let ([xml_hash
+                 (xml->hash
+                  (open-input-string
+                   (format "<worksheet><sheetData><row r=\"1\">~a~a~a~a~a~a~a~a~a</row></sheetData></worksheet>"
+                           "<c r=\"A1\" t=\"s\"><v>0</v></c>"
+                           "<c r=\"B1\" t=\"s\"><v>1</v></c>"
+                           "<c r=\"C1\" t=\"s\"><v>2</v></c>"
+                           "<c r=\"D1\" t=\"s\"><v>3</v></c>"
+                           "<c r=\"E1\" t=\"s\"><v>4</v></c>"
+                           "<c r=\"F1\" t=\"s\"><v>5</v></c>"
+                           "<c r=\"G1\" t=\"s\"><v>6</v></c>"
+                           "<c r=\"H1\" t=\"s\"><v>7</v></c>"
+                           "<c r=\"I1\" t=\"s\"><v>8</v></c>"
+                           )))])
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "")
+            (from-cell xml_hash 1 1)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "<test>")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "")
+            (from-cell xml_hash 1 2)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "<foo> ")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C1") "")
+            (from-cell xml_hash 1 3)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "C1") " <baz>")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "D1") "")
+            (from-cell xml_hash 1 4)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "D1") "< bar>")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E1") "")
+            (from-cell xml_hash 1 5)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E1") "< fro >")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "F1") "")
+            (from-cell xml_hash 1 6)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "F1") "<bas >")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "G1") "")
+            (from-cell xml_hash 1 7)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "G1") "<maybe")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "H1") "")
+            (from-cell xml_hash 1 8)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "H1") "<< not >>")
+
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "I1") "")
+            (from-cell xml_hash 1 9)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "I1") "show>")
+            )
+          )))))
+
    ))
 
 (run-tests test-cell)

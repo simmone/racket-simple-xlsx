@@ -16,11 +16,31 @@ second argument is a listof list.
 
 data type you can use: string, number, date.
 
-caution: each list of data's count must be same.
+data is a listof list, each list'length can be different.
 
-(add-data-sheet "Sheet1" '((1 2 3) ("1" "a" 5))) is ok.
+according to the longest list, function will pad value on the right to keep all the list have the same length.
 
-(add-data-sheet "Sheet1" '((1 2 3 4) ("1" "a" 7 8)) is error.
+default pad value is "", you can use #:fill? to specify other values.
+
+ie:
+@codeblock|{
+(add-data-sheet
+  "Sheet1"
+  '(
+    ("a" "b" "c")
+    (1)
+    (1.0 2.0)
+    ))
+
+ will add the data list below:
+ '(
+   ("a" "b" "c")
+   (1 "" "")
+   (1.0 2.0 "")
+   )
+}|
+
+use #:start_cell? to specify the datalist's start cell, default is "A1".
 
 combine write-xlsx and add-data-sheet, you can generate a xlsx file:
 

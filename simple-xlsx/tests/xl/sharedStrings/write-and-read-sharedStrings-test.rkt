@@ -58,8 +58,8 @@
              (check-equal? (hash-ref (XLSX-shared_index->string_map (*XLSX*)) 2) "陈思衡")
              )
            (lambda ()
-             (when (file-exists? shared_strings_file) (delete-file shared_strings_file))
-             )))))
-   ))
+             (delete-file shared_strings_file))
+         ))))
+  ))
 
 (run-tests test-shared-strings)

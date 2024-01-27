@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="9" uniqueCount="9">
+  <si>
+    <t>&lt;test&gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt;foo&gt; </t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t> &lt;baz&gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt; bar&gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt; fro &gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt;bas &gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt;maybe</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>&lt;&lt; not &gt;&gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+  <si>
+    <t>show&gt;</t>
+    <phoneticPr fontId="1" type="noConversion"/>
+  </si>
+</sst>

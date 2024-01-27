@@ -18,13 +18,19 @@
    "test-lib"
 
    (test-case
-    "test-check-data-integrity"
+    "test-maintain-sheet-data-consistency"
 
-    (check-exn exn:fail? (lambda () (check-data-integrity '())))
-    (check-exn exn:fail? (lambda () (check-data-integrity '((1) 4))))
-    (check-exn exn:fail? (lambda () (check-data-integrity '((1) (1 2)))))
+    (check-exn exn:fail? (lambda () (maintain-sheet-data-consistency '() "")))
+    (check-exn exn:fail? (lambda () (maintain-sheet-data-consistency '((1) 4) "")))
 
-    (check-not-exn (lambda () (check-data-integrity '((1 2) (3 4)))))
+    (check-equal? (maintain-sheet-data-consistency '((1) (1 2)) "")
+                 '((1 "") (1 2)))
+
+    (check-equal? (maintain-sheet-data-consistency '((1) (1 2)) 0)
+                 '((1 0) (1 2)))
+
+    (check-equal? (maintain-sheet-data-consistency '((1 2) (3 4)) 0)
+                 '((1 2) (3 4)))
     )
 
    (test-case

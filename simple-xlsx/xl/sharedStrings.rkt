@@ -44,8 +44,8 @@
                         [(hash-has-key? xml_hash key2) (hash-ref xml_hash key2)]
                         [else
                          ""]))])
-                  (hash-set! (XLSX-shared_string->index_map (*XLSX*)) str loop_count)
-                  (hash-set! (XLSX-shared_index->string_map (*XLSX*)) loop_count str))
+                (hash-set! (XLSX-shared_string->index_map (*XLSX*)) str loop_count)
+                (hash-set! (XLSX-shared_index->string_map (*XLSX*)) loop_count str))
               (loop (add1 loop_count)))))))
 
 (define (filter-string str)

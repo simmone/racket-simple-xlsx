@@ -27,7 +27,7 @@
           [*XLSX* (parameter/c (or/c XLSX? #f))]
           [*CURRENT_SHEET* (parameter/c (or/c DATA-SHEET? CHART-SHEET? #f))]
           [*CURRENT_SHEET_INDEX* (parameter/c natural?)]
-          [add-data-sheet (->* (string? (listof list?)) (cell?) void?)]
+          [add-data-sheet (->* (string? (listof list?)) (#:start_cell? cell? #:fill? (or/c string? number? date?)) void?)]
           [add-chart-sheet (-> string?
                                (or/c 'LINE 'LINE3D 'BAR 'BAR3D 'PIE 'PIE3D 'UNKNOWN)
                                string?
@@ -68,6 +68,7 @@
               [*CURRENT_SHEET_INDEX* sheet_index]
               [*CURRENT_SHEET_STYLE* (list-ref (STYLES-sheet_style_list (*STYLES*)) sheet_index)]
               )
+
              (user_proc))]
            [(CHART-SHEET? sheet)
             (parameterize
@@ -99,43 +100,43 @@
 
 (define (new-xlsx) (XLSX "" '() (make-hash) (make-hash) (new-styles)))
 
-(define (add-data-sheet sheet_name sheet_data [start_cell? "A1"])
-  (check-data-integrity sheet_data)
+(define (add-data-sheet sheet_name origin_sheet_data #:start_cell? [start_cell? "A1"] #:fill? [fill? ""])
+  (let ([sheet_data (maintain-sheet-data-consistency origin_sheet_data fill?)])
 
-  (if (not (member sheet_name (get-sheet-name-list)))
-      (let ([sheet_index (length (XLSX-sheet_list (*XLSX*)))]
-            [cell->value_map (make-hash)])
+    (if (not (member sheet_name (get-sheet-name-list)))
+        (let ([sheet_index (length (XLSX-sheet_list (*XLSX*)))]
+              [cell->value_map (make-hash)])
 
-        (let ([sheet_style (new-sheet-style)]
-              [start_cell_row_col (cell->row_col start_cell?)])
+          (let ([sheet_style (new-sheet-style)]
+                [start_cell_row_col (cell->row_col start_cell?)])
 
-          (let row-loop ([rows sheet_data]
-                         [row_index (car start_cell_row_col)])
-            (when (not (null? rows))
-              (let col-loop ([cols (car rows)]
-                             [col_index (cdr start_cell_row_col)])
-                (when (not (null? cols))
-                  (let ([cell (row_col->cell row_index col_index)])
-                    (hash-set! cell->value_map cell (car cols))
-                    (col-loop (cdr cols) (add1 col_index)))))
+            (let row-loop ([rows sheet_data]
+                           [row_index (car start_cell_row_col)])
+              (when (not (null? rows))
+                (let col-loop ([cols (car rows)]
+                               [col_index (cdr start_cell_row_col)])
+                  (when (not (null? cols))
+                    (let ([cell (row_col->cell row_index col_index)])
+                      (hash-set! cell->value_map cell (car cols))
+                      (col-loop (cdr cols) (add1 col_index)))))
 
                 (row-loop (cdr rows) (add1 row_index))))
 
-        (if (< sheet_index (length (STYLES-sheet_style_list (*STYLES*))))
-            (set-STYLES-sheet_style_list!
-             (*STYLES*)
-             (list-set (STYLES-sheet_style_list (*STYLES*)) sheet_index sheet_style))
-            (set-STYLES-sheet_style_list!
-             (*STYLES*)
-             `(,@(STYLES-sheet_style_list (*STYLES*)) ,sheet_style)))
+            (if (< sheet_index (length (STYLES-sheet_style_list (*STYLES*))))
+                (set-STYLES-sheet_style_list!
+                 (*STYLES*)
+                 (list-set (STYLES-sheet_style_list (*STYLES*)) sheet_index sheet_style))
+                (set-STYLES-sheet_style_list!
+                 (*STYLES*)
+                 `(,@(STYLES-sheet_style_list (*STYLES*)) ,sheet_style)))
 
-        (set-XLSX-sheet_list! (*XLSX*)
-                              `(,@(XLSX-sheet_list (*XLSX*))
-                                ,(DATA-SHEET
-                                  sheet_name
-                                  (capacity->range (cons (length sheet_data) (length (car sheet_data))) start_cell?)
-                                  cell->value_map)))))
-      (error (format "duplicate sheet name[~a]" sheet_name))))
+            (set-XLSX-sheet_list! (*XLSX*)
+                                  `(,@(XLSX-sheet_list (*XLSX*))
+                                    ,(DATA-SHEET
+                                      sheet_name
+                                      (capacity->range (cons (length sheet_data) (length (car sheet_data))) start_cell?)
+                                      cell->value_map)))))
+        (error (format "duplicate sheet name[~a]" sheet_name)))))
 
 (define (add-chart-sheet sheet_name chart_type topic serial)
   (if (not (member sheet_name (get-sheet-name-list)))
