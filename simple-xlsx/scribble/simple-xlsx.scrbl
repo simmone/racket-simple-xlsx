@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@title{simple-xlsx: access .xlsx file in Racket}
+@title{Simple-Xlsx: XLSX File Reading and Writing}
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
