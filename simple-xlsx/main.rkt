@@ -1,18 +1,18 @@
 #lang racket
 
-(require "lib/dimension.rkt")
-(require "lib/lib.rkt")
-(require "style/style-lib.rkt")
-(require "style/set-styles.rkt")
-(require "style/border-style.rkt")
-(require "style/fill-style.rkt")
-(require "style/alignment-style.rkt")
-(require "xlsx/xlsx.rkt")
-(require "sheet/sheet.rkt")
-(require "writer.rkt")
-(require "reader.rkt")
-(require "reader-writer.rkt")
-(require "lib/sheet-lib.rkt")
+(require "lib/dimension.rkt"
+         "lib/lib.rkt"
+         "style/style-lib.rkt"
+         "style/set-styles.rkt"
+         "style/border-style.rkt"
+         "style/fill-style.rkt"
+         "style/alignment-style.rkt"
+         "xlsx/xlsx.rkt"
+         "sheet/sheet.rkt"
+         "writer.rkt"
+         "reader.rkt"
+         "reader-writer.rkt"
+         "lib/sheet-lib.rkt")
 
 (provide (contract-out
           [write-xlsx (-> path-string? procedure? any)]

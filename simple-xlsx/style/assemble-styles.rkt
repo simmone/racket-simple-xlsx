@@ -1,13 +1,13 @@
 #lang racket
 
-(require "style.rkt")
-(require "styles.rkt")
-(require "border-style.rkt")
-(require "font-style.rkt")
-(require "alignment-style.rkt")
-(require "number-style.rkt")
-(require "fill-style.rkt")
-(require "style-lib.rkt")
+(require "style.rkt"
+         "styles.rkt"
+         "border-style.rkt"
+         "font-style.rkt"
+         "alignment-style.rkt"
+         "number-style.rkt"
+         "fill-style.rkt"
+         "style-lib.rkt")
 
 (provide (contract-out
           [strip-styles (-> void?)]

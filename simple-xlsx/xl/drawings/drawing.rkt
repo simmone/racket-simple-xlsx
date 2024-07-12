@@ -1,9 +1,8 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt")
 
 (provide (contract-out
           [drawing (-> natural? list?)]
@@ -74,5 +73,5 @@
                     (with-output-to-file (build-path dir (format "drawing~a.xml" chart_sheet_index))
                       #:exists 'replace
                       (lambda ()
-                        (printf (lists->xml (drawing chart_sheet_index)))))
+                        (printf (lists-to-xml (drawing chart_sheet_index)))))
                     (loop (cdr chart_sheets) (add1 chart_sheet_index))))))))

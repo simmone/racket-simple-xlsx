@@ -1,8 +1,8 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../style/number-style.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../style/number-style.rkt")
 
 (define test-number-style
   (test-suite

@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../lib/lib.rkt"
+         "../../../lib/sheet-lib.rkt"
+         "../../../xl/sharedStrings.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../lib/lib.rkt")
-(require "../../../lib/sheet-lib.rkt")
-
-(require"../../../xl/sharedStrings.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path shared_strings_file "sharedStrings.xml")
 
 (define test-shared-strings
@@ -33,7 +31,7 @@
              (call-with-input-file shared_strings_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (to-shared-strings))
+                  (lists-to-xml (to-shared-strings))
                   (lambda (actual)
                     (check-lines? expected actual)))))
 

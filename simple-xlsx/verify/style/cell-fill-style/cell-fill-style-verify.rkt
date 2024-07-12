@@ -5,10 +5,11 @@
           [set-more-cell-fills (-> void?)]
           ))
 
-(require rackunit/text-ui rackunit)
-(require "../../../main.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../../main.rkt"
+         racket/runtime-path)
 
-(require racket/runtime-path)
 (define-runtime-path cell_fill_file "_cell_fill.xlsx")
 (define-runtime-path cell_fill_read_and_write_file "_cell_fill_read_and_write.xlsx")
 

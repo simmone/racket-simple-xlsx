@@ -1,16 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt"
+         "../../lib/lib.rkt"
+         "../../lib/sheet-lib.rkt"
+         "../../content-type.rkt"
+         rackunit/text-ui
+         rackunit
+         racket/runtime-path)
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "../../lib/lib.rkt")
-(require "../../lib/sheet-lib.rkt")
-(require"../../content-type.rkt")
-
-(require rackunit/text-ui rackunit)
-
-(require racket/runtime-path)
 (define-runtime-path content_type_test1_file "content_type_test1.xml")
 (define-runtime-path content_type_test2_file "content_type_test2.xml")
 (define-runtime-path content_type_test3_file "content_type_test3.xml")
@@ -32,7 +31,7 @@
        (call-with-input-file content_type_test1_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-content-type))
+            (lists-to-xml_content (to-content-type))
             (lambda (actual)
               (check-lines? expected actual)))))))
 
@@ -61,7 +60,7 @@
        (call-with-input-file content_type_test2_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-content-type))
+            (lists-to-xml_content (to-content-type))
             (lambda (actual)
               (check-lines? expected actual)))))))
 
@@ -91,7 +90,7 @@
        (call-with-input-file content_type_test3_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-content-type))
+            (lists-to-xml_content (to-content-type))
             (lambda (actual)
               (check-lines? expected actual)))))))
 
@@ -127,7 +126,7 @@
        (call-with-input-file content_type_test4_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-content-type))
+            (lists-to-xml_content (to-content-type))
             (lambda (actual)
               (check-lines? expected actual)))))))
     (with-xlsx

@@ -1,11 +1,10 @@
 #lang racket
 
-(require racket/date)
-(require rackunit)
-(require file/zip)
-(require file/unzip)
-
-(require "dimension.rkt")
+(require racket/date
+         rackunit
+         file/zip
+         file/unzip
+         "dimension.rkt")
 
 (provide (contract-out
           [format-w3cdtf (-> date? string?)]

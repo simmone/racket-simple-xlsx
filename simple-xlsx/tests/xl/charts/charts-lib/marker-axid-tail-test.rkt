@@ -1,24 +1,22 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
+(define-runtime-path marker_axid_tail_file "marker_axid_tail.xml")
 
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
-(define-runtime-path catAx_file "catAx.xml")
-
-(define test-catAx
+(define test-marker-axid-tail
   (test-suite
-   "test-catAx"
+   "test-marker-axid-tail"
 
    (test-case
-    "test-catAx"
+    "test-marker-axid-tail"
 
     (with-xlsx
      (lambda ()
@@ -32,13 +30,13 @@
 
       (with-sheet
        (lambda ()
-       (call-with-input-file catAx_file
+       (call-with-input-file marker_axid_tail_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (catAx))
+            (lists-to-xml_content `("none" ,@(marker-axid-tail)))
             (lambda (actual)
               (check-lines? expected actual))))))))))
-   ))
+     ))
 
-(run-tests test-catAx)
+(run-tests test-marker-axid-tail)
 

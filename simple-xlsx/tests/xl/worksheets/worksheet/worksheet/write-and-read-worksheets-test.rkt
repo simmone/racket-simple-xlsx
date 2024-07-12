@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../lib/sheet-lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../lib/sheet-lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path sheet1_file "sheet1.xml")
 (define-runtime-path sheet2_file "sheet2.xml")
 (define-runtime-path sheet3_file "sheet3.xml")
@@ -79,7 +77,7 @@
                   0
                   (lambda ()
                     (call-with-input-string
-                     (lists->xml (to-work-sheet))
+                     (lists-to-xml (to-work-sheet))
                      (lambda (actual)
                        (check-lines? expected actual)))))))
 
@@ -89,7 +87,7 @@
                   1
                   (lambda ()
                     (call-with-input-string
-                     (lists->xml (to-work-sheet))
+                     (lists-to-xml (to-work-sheet))
                      (lambda (actual)
                        (check-lines? expected actual)))))))
 
@@ -99,7 +97,7 @@
                   3
                   (lambda ()
                     (call-with-input-string
-                     (lists->xml (to-work-sheet))
+                     (lists-to-xml (to-work-sheet))
                      (lambda (actual)
                        (check-lines? expected actual)))))))
 

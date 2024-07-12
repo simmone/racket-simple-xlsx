@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../lib/sheet-lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../lib/sheet-lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path worksheet_test_file "worksheet_test.xml")
 (define-runtime-path worksheet_no_dimension_test_file "worksheet_no_dimension_test.xml")
 (define-runtime-path worksheet_not_formated_test_file "worksheet_not_formated_test.xml")
@@ -45,7 +43,7 @@
           (call-with-input-file worksheet_test_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-work-sheet))
+               (lists-to-xml_content (to-work-sheet))
                (lambda (actual)
                  (check-lines? expected actual)))))
           )))))
@@ -72,7 +70,23 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (file->string worksheet_test_file)))])
+                 (xml-port-to-hash
+                  (open-input-string (file->string worksheet_test_file))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    )
+                  )])
 
             (from-work-sheet xml_hash)
 
@@ -116,7 +130,22 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (file->string worksheet_no_dimension_test_file)))])
+                 (xml-port-to-hash
+                  (open-input-string (file->string worksheet_no_dimension_test_file))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    ))])
 
             (from-work-sheet xml_hash)
 
@@ -160,7 +189,22 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (file->string worksheet_not_formated_test_file)))])
+                 (xml-port-to-hash
+                  (open-input-string (file->string worksheet_not_formated_test_file))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    ))])
 
             (from-work-sheet xml_hash)
 
@@ -190,7 +234,22 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (file->string worksheet_dimension_not_from_A1_file)))])
+                 (xml-port-to-hash
+                  (open-input-string (file->string worksheet_dimension_not_from_A1_file))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    ))])
 
             (from-work-sheet xml_hash)
 

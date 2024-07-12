@@ -1,7 +1,7 @@
 #lang racket
 
-(require "../../style/styles.rkt")
-(require "../../style/fill-style.rkt")
+(require "../../style/styles.rkt"
+         "../../style/fill-style.rkt")
 
 (provide (contract-out
           [to-fills (-> (listof FILL-STYLE?) list?)]
@@ -33,7 +33,7 @@
         (let ([prefix (format "styleSheet1.fills1.fill~a" (add1 loop_count))])
           (let ([fill_style
                  (FILL-STYLE
-                  (hash-ref xml_hash (format "~a.patternFill1.fgColor1.rgb" prefix) "FFFFFF")
-                  (hash-ref xml_hash (format "~a.patternFill1.patternType" prefix) "none"))])
+                  (hash-ref xml_hash (format "~a.patternFill1.fgColor1.rgb1" prefix) "FFFFFF")
+                  (hash-ref xml_hash (format "~a.patternFill1.patternType1" prefix) "none"))])
             (loop (add1 loop_count) (cons fill_style fill_list))))
         (set-STYLES-fill_list! (*STYLES*) (reverse fill_list)))))

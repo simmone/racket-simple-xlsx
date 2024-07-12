@@ -1,8 +1,8 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../style/font-style.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../style/font-style.rkt")
 
 (define test-font-style
   (test-suite

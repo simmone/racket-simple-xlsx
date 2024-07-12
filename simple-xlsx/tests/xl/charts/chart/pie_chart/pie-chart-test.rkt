@@ -1,16 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/charts/charts.rkt"
+         "../../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../xl/charts/charts.rkt")
-(require "../../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path pie_chart_file "pie_chart.xml")
 (define-runtime-path pie_3d_chart_file "pie_3d_chart.xml")
 
@@ -57,7 +56,7 @@
          (call-with-input-file pie_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart-pie))
+              (lists-to-xml_content (to-chart-pie))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -67,7 +66,7 @@
          (call-with-input-file pie_3d_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart-3d-pie))
+              (lists-to-xml_content (to-chart-3d-pie))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -77,7 +76,7 @@
          (call-with-input-file pie_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart))
+              (lists-to-xml_content (to-chart))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -87,7 +86,7 @@
          (call-with-input-file pie_3d_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart))
+              (lists-to-xml_content (to-chart))
               (lambda (actual)
                 (check-lines? expected actual)))))))
       )))
@@ -103,10 +102,16 @@
        (with-sheet-name
         "PieChart"
         (lambda ()
-          (let ([pie_chart
-                 (from-chart
-                  (xml->hash
-                   (open-input-string (file->string pie_chart_file))))])
+          (from-chart
+           (xml-port-to-hash
+            (open-input-string (file->string pie_chart_file))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:tx.c:v"
+              "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:cat.c:strRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:val.c:numRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:pieChart"
+              "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+              )))
 
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "PieChartExample")
@@ -114,15 +119,21 @@
               (check-equal? (length sers) 1)
 
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
-            )))
+            ))
 
        (with-sheet-name
         "Pie3DChart"
         (lambda ()
-          (let ([pie_3d_chart
-                 (from-chart
-                  (xml->hash
-                   (open-input-string (file->string pie_3d_chart_file))))])
+          (from-chart
+           (xml-port-to-hash
+            (open-input-string (file->string pie_3d_chart_file))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:tx.c:v"
+              "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:cat.c:strRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:val.c:numRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:pie3DChart"
+              "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+              )))
 
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE3D)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Pie3DChartExample")
@@ -130,7 +141,7 @@
               (check-equal? (length sers) 1)
 
               (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")))
-            ))))))
+            )))))
 
     ))
 

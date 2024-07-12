@@ -1,24 +1,22 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
+(define-runtime-path legend_file "legend.xml")
 
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
-(define-runtime-path marker_axid_tail_file "marker_axid_tail.xml")
-
-(define test-marker-axid-tail
+(define test-legend
   (test-suite
-   "test-marker-axid-tail"
+   "test-legend"
 
    (test-case
-    "test-marker-axid-tail"
+    "test-legend"
 
     (with-xlsx
      (lambda ()
@@ -32,13 +30,13 @@
 
       (with-sheet
        (lambda ()
-       (call-with-input-file marker_axid_tail_file
+         (call-with-input-file legend_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content `("none" ,@(marker-axid-tail)))
+            (lists-to-xml_content (legend))
             (lambda (actual)
               (check-lines? expected actual))))))))))
-     ))
+   ))
 
-(run-tests test-marker-axid-tail)
+(run-tests test-legend)
 

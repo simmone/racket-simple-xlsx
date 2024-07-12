@@ -1,10 +1,10 @@
 #lang racket
 
-(require "border-style.rkt")
-(require "font-style.rkt")
-(require "alignment-style.rkt")
-(require "number-style.rkt")
-(require "fill-style.rkt")
+(require "border-style.rkt"
+         "font-style.rkt"
+         "alignment-style.rkt"
+         "number-style.rkt"
+         "fill-style.rkt")
 
 (provide (contract-out
           [struct STYLE

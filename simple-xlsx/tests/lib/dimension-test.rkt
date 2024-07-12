@@ -1,8 +1,8 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require"../../lib/dimension.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../lib/dimension.rkt")
 
 (define test-dimension-lib
   (test-suite

@@ -1,12 +1,11 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         "../../../main.rkt"
+          rackunit/text-ui
+          rackunit
+          racket/runtime-path)
 
-(require "../../../main.rkt")
-
-(require rackunit/text-ui rackunit)
-
-(require racket/runtime-path)
 (define-runtime-path angles_file "angels.xlsx")
 
 (define test-specific-char

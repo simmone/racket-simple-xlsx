@@ -1,9 +1,8 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../xlsx/xlsx.rkt")
-(require "../sheet/sheet.rkt")
+(require fast-xml
+         "../xlsx/xlsx.rkt"
+         "../sheet/sheet.rkt")
 
 (provide (contract-out
           [to-docprops-app (-> list?)]
@@ -68,20 +67,23 @@
 
 (define (from-docprops-app doc_props_app_file)
   (when (file-exists? doc_props_app_file)
-    (let* ([xml_hash (xml->hash doc_props_app_file)]
-           [lpstr_count (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count" 0)]
+    (let* ([xml_hash (xml-file-to-hash
+                      doc_props_app_file
+                      '(
+                        "Properties.TitlesOfParts.vt:vector.vt:lpstr"
+                        ))]
            [sheet_list (XLSX-sheet_list (*XLSX*))])
-
-      (when (> lpstr_count 0)
-        (let loop ([loop_count 1])
-          (when (<= loop_count lpstr_count)
-            (let ([sheet_name (hash-ref xml_hash (format "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr~a" loop_count) "")])
+      
+      (let ([lpstr_count (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count" 0)])
+        (let loop ([lpstr_index 1])
+          (when (<= lpstr_index lpstr_count)
+            (let ([sheet_name (hash-ref xml_hash (format "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr~a" lpstr_index) "")])
               (cond
-               [(DATA-SHEET? (list-ref sheet_list (sub1 loop_count)))
-                (set-DATA-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)]
-               [(CHART-SHEET? (list-ref sheet_list (sub1 loop_count)))
-                (set-CHART-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)])
-              (loop (add1 loop_count)))))))))
+               [(DATA-SHEET? (list-ref sheet_list (sub1 lpstr_index)))
+                (set-DATA-SHEET-sheet_name! (list-ref sheet_list (sub1 lpstr_index)) sheet_name)]
+               [(CHART-SHEET? (list-ref sheet_list (sub1 lpstr_index)))
+                (set-CHART-SHEET-sheet_name! (list-ref sheet_list (sub1 lpstr_index)) sheet_name)])
+              (loop (add1 lpstr_index)))))))))
 
 (define (write-docprops-app [output_dir #f])
   (let ([dir (if output_dir output_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "docProps"))])
@@ -90,7 +92,7 @@
     (with-output-to-file (build-path dir "app.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (to-docprops-app)))))))
+        (printf "~a" (lists-to-xml (to-docprops-app)))))))
 
 (define (read-docprops-app [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "docProps"))])

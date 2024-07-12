@@ -1,15 +1,13 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../lib/lib.rkt"
+         "../../../xl/theme/theme.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../lib/lib.rkt")
-
-(require"../../../xl/theme/theme.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path theme_file "theme.xml")
 
 (define test-theme
@@ -24,7 +22,7 @@
        (call-with-input-file theme_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml (theme))
+            (lists-to-xml (theme))
             (lambda (actual)
               (check-lines? expected actual))))))))
    ))

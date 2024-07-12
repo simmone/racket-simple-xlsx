@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../sheet/sheet.rkt"
+         "../../../style/style.rkt"
+         "../../../lib/lib.rkt"
+         "../../../style/assemble-styles.rkt"
+         "../../../style/set-styles.rkt"
+         "../../../xl/styles/styles.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../sheet/sheet.rkt")
-(require "../../../style/style.rkt")
-(require "../../../lib/lib.rkt")
-(require "../../../style/assemble-styles.rkt")
-(require "../../../style/set-styles.rkt")
-
-(require"../../../xl/styles/styles.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path styles_file "styles.xml")
 
 (require "cellXfs/cellXfs-alignment-test.rkt")
@@ -45,7 +43,7 @@
              (call-with-input-file styles_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (to-styles))
+                  (lists-to-xml (to-styles))
                   (lambda (actual)
                     (check-lines? expected actual)))))
 

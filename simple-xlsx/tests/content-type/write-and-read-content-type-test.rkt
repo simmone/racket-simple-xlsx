@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt"
+         "../../lib/lib.rkt"
+         rackunit/text-ui
+         rackunit
+         "../../content-type.rkt"
+         racket/runtime-path)
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "../../lib/lib.rkt")
-
-(require rackunit/text-ui rackunit)
-
-(require"../../content-type.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path content_type_file "[Content_Types].xml")
 
 (define test-content-type
@@ -36,7 +34,7 @@
              (call-with-input-file content_type_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (to-content-type))
+                  (lists-to-xml (to-content-type))
                   (lambda (actual)
                     (check-lines? expected actual)))))
 

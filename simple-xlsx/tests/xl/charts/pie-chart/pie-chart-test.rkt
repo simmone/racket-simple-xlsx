@@ -1,17 +1,16 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         "../../../../xl/charts/pie-chart.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-(require "../../../../xl/charts/lib.rkt")
-(require"../../../../xl/charts/pie-chart.rkt")
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path pie_chart_file "pie_chart.xml")
 
 (define test-pie-chart
@@ -39,7 +38,7 @@
        (call-with-input-file pie_chart_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-pie-chart-sers '(("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))))
             (lambda (actual)
               (check-lines? expected actual))))))))

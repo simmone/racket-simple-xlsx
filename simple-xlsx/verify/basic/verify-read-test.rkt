@@ -1,11 +1,11 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../main.rkt"
+         "../../style/styles.rkt"
+         racket/runtime-path)
 
-(require "../../main.rkt")
-(require "../../style/styles.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path basic_write_google_file "basic_write_google.xlsx")
 (define-runtime-path basic_write_ms_file "basic_write_ms.xlsx")
 (define-runtime-path basic_write_wps_file "basic_write_wps.xlsx")

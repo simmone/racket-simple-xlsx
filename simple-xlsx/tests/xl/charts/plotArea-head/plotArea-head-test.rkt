@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/charts.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path plotArea_head_file "plotArea_head.xml")
 
 (define test-plotArea
@@ -30,7 +28,7 @@
        (call-with-input-file plotArea_head_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-plotArea-head))
+            (lists-to-xml_content (to-plotArea-head))
             (lambda (actual)
               (check-lines? expected actual))))))))
    ))

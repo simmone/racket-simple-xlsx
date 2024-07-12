@@ -1,11 +1,23 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../../main.rkt"
+         "../../../style/styles.rkt"
+         racket/runtime-path
+         "../cell-fill-style/cell-fill-style-verify.rkt"
+         "../cell-alignment-style/cell-alignment-style-verify.rkt"
+         "../cell-border-style/cell-border-style-verify.rkt"
+         "../cell-date-style/cell-date-style-verify.rkt"
+         "../cell-font-style/cell-font-style-verify.rkt"
+         "../cell-number-style/cell-number-style-verify.rkt"
+         "../col-style/col-style-verify.rkt"
+         "../freeze/freeze-verify.rkt"
+         "../merge-cells/merge-cells-verify.rkt"
+         "../row-col-overlap/row-col-overlap-verify.rkt"
+         "../row-style/row-style-verify.rkt"
+         "../width-height/width-height-verify.rkt")
 
-(require "../../../main.rkt")
-(require "../../../style/styles.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path styles_file "_styles.xlsx")
 (define-runtime-path styles_read_write_file "_styles_read_write.xlsx")
 (define-runtime-path gsheet_file "gsheet.xlsx")
@@ -17,18 +29,6 @@
 (define-runtime-path libre_file "libre.xlsx")
 (define-runtime-path libre_read_write_file "_libre_read_write.xlsx")
 
-(require "../cell-fill-style/cell-fill-style-verify.rkt")
-(require "../cell-alignment-style/cell-alignment-style-verify.rkt")
-(require "../cell-border-style/cell-border-style-verify.rkt")
-(require "../cell-date-style/cell-date-style-verify.rkt")
-(require "../cell-font-style/cell-font-style-verify.rkt")
-(require "../cell-number-style/cell-number-style-verify.rkt")
-(require "../col-style/col-style-verify.rkt")
-(require "../freeze/freeze-verify.rkt")
-(require "../merge-cells/merge-cells-verify.rkt")
-(require "../row-col-overlap/row-col-overlap-verify.rkt")
-(require "../row-style/row-style-verify.rkt")
-(require "../width-height/width-height-verify.rkt")
 
 (define test-styles
   (test-suite

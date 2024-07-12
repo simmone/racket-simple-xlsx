@@ -1,17 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         racket/date
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require racket/date)
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path date_cell_file "date_cell.xml")
 
 (define test-cell
@@ -32,7 +30,7 @@
           (call-with-input-file date_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 1))
+               (lists-to-xml_content (to-cell 1 1))
                (lambda (actual)
                  (check-lines? expected actual)))))
           )))))
@@ -48,9 +46,14 @@
         (lambda ()
           (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "")
           (from-cell
-           (xml->hash (open-input-string (format "<worksheet><sheetData><row r=\"1\">~a</row></sheetData></worksheet>"
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetData><row r=\"1\">~a</row></sheetData></worksheet>"
                                                  (file->string date_cell_file)
-                                                 )))
+                                                 ))
+            '(
+              "worksheet.sheetData.row.c.r"
+              "worksheet.sheetData.row.c.v"
+              ))
            1 1)
           (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") 43360)
 

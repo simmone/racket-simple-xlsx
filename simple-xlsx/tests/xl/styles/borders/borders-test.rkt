@@ -1,21 +1,18 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/border-style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/borders.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/border-style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/borders.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path borders_file "borders.xml")
 (define-runtime-path side_borders_file "side_borders.xml")
 
@@ -29,8 +26,7 @@
   (set-cell-range-border-style "A1" "all" "FF0000" "dashed")
   (set-cell-range-border-style "B1" "all" "000000" "dashed")
   (set-cell-range-border-style "C1" "bottom" "0000FF" "thick")
-  (set-cell-range-border-style "D1" "top" "000000" "thin")
-)
+  (set-cell-range-border-style "D1" "top" "000000" "thin"))
 
 (define (check-border-styles)
   (check-equal? (length (STYLES-border_list (*STYLES*))) 5)
@@ -44,8 +40,7 @@
   (check-equal? (list-ref (STYLES-border_list (*STYLES*)) 3)
                 (BORDER-STYLE #f #f #f #f #f #f "0000FF" "thick"))
   (check-equal? (list-ref (STYLES-border_list (*STYLES*)) 4)
-                (BORDER-STYLE #f #f #f #f "000000" "thin" #f #f))
-  )
+                (BORDER-STYLE #f #f #f #f "000000" "thin" #f #f)))
 
 (define test-styles
   (test-suite
@@ -69,7 +64,7 @@
        (call-with-input-file borders_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-borders (STYLES-border_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -85,7 +80,20 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )
+         ))
 
        (check-border-styles)
        )))
@@ -131,7 +139,7 @@
        (call-with-input-file side_borders_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-borders (STYLES-border_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))

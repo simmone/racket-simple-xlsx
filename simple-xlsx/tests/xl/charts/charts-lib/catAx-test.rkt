@@ -1,24 +1,21 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
+(define-runtime-path catAx_file "catAx.xml")
 
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
-(define-runtime-path plot_vis_only_file "plot_vis_only.xml")
-
-(define test-plot-vis-only
+(define test-catAx
   (test-suite
-   "test-plot-vis-only"
+   "test-catAx"
 
    (test-case
-    "test-plot-vis-only"
+    "test-catAx"
 
     (with-xlsx
      (lambda ()
@@ -32,13 +29,13 @@
 
       (with-sheet
        (lambda ()
-       (call-with-input-file plot_vis_only_file
+       (call-with-input-file catAx_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (plot-vis-only))
+            (lists-to-xml_content (catAx))
             (lambda (actual)
               (check-lines? expected actual))))))))))
-     ))
+   ))
 
-(run-tests test-plot-vis-only)
+(run-tests test-catAx)
 

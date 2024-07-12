@@ -1,13 +1,12 @@
 #lang racket
 
-(require "../lib/dimension.rkt")
-
-(require "style-lib.rkt")
-(require "border-style.rkt")
-(require "font-style.rkt")
-(require "number-style.rkt")
-(require "fill-style.rkt")
-(require "style.rkt")
+(require "../lib/dimension.rkt"
+         "style-lib.rkt"
+         "border-style.rkt"
+         "font-style.rkt"
+         "number-style.rkt"
+         "fill-style.rkt"
+         "style.rkt")
 
 (provide (contract-out
           [struct STYLES

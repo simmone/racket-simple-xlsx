@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/charts.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path chart_title_file "chart_title.xml")
 
 (define test-charts
@@ -36,7 +34,7 @@
          (call-with-input-file chart_title_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart-title "Chart1"))
+              (lists-to-xml_content (to-chart-title "Chart1"))
               (lambda (actual)
                 (check-lines? expected actual)))))))))
 
@@ -56,7 +54,12 @@
          (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "")
 
          (from-chart-title
-           (xml->hash (open-input-string (format "<c:chartSpace><c:chart>~a</c:chart></c:chartSpace>" (file->string chart_title_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<c:chartSpace><c:chart>~a</c:chart></c:chartSpace>" (file->string chart_title_file)))
+            '(
+              "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+              )
+            ))
 
          (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Chart1")))))
     )

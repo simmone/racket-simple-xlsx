@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/styles.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/styles.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path merge_cells1_file "merge_cells1.xml")
 (define-runtime-path merge_cells2_file "merge_cells2.xml")
 
@@ -41,7 +39,7 @@
           (call-with-input-file merge_cells1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-merge-cells))
+               (lists-to-xml_content (to-merge-cells))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -53,7 +51,7 @@
           (call-with-input-file merge_cells2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-merge-cells))
+               (lists-to-xml_content (to-merge-cells))
                (lambda (actual)
                  (check-lines? expected actual))))))))))
 
@@ -70,7 +68,12 @@
         (lambda ()
 
          (from-merge-cells
-           (xml->hash (open-input-string (format "<worksheet>~a</worksheet>" (file->string merge_cells1_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet>~a</worksheet>" (file->string merge_cells1_file)))
+            '(
+              "worksheet.mergeCells.mergeCell.ref"
+              )
+            ))
 
          (check-true (hash-has-key? (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*)) "A1:C2"))
          (check-true (hash-has-key? (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*)) "D3:F4"))
@@ -81,10 +84,14 @@
         (lambda ()
 
          (from-merge-cells
-           (xml->hash (open-input-string (format "<worksheet>~a</worksheet>" (file->string merge_cells2_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet>~a</worksheet>" (file->string merge_cells2_file)))
+            '(
+              "worksheet.mergeCells.mergeCell.ref"
+              )
+            ))
 
          (check-true (hash-has-key? (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*)) "D3:F4")))))))
-
    ))
 
 (run-tests test-merge-cells)

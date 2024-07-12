@@ -1,15 +1,13 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../lib/lib.rkt"
+         "../../../xl/printerSettings/printerSettings.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../lib/lib.rkt")
-
-(require"../../../xl/printerSettings/printerSettings.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path printerSettings_file1 "printerSettings1.bin")
 (define-runtime-path printerSettings_file2 "printerSettings2.bin")
 (define-runtime-path printerSettings_file3 "printerSettings3.bin")

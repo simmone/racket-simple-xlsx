@@ -5,11 +5,11 @@
           [set-more-width-height-styles (-> void?)]
           ))
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../../main.rkt"
+         racket/runtime-path)
 
-(require "../../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path width_height_file "_width_height.xlsx")
 (define-runtime-path width_height_read_and_write_file "_width_height_read_and_write.xlsx")
 

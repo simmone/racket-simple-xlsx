@@ -1,24 +1,22 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "../../style/style.rkt")
-(require "../../style/styles.rkt")
-(require "../../style/border-style.rkt")
-(require "../../style/fill-style.rkt")
-(require "../../style/alignment-style.rkt")
-(require "../../style/number-style.rkt")
-(require "../../style/font-style.rkt")
-(require "../../style/fill-style.rkt")
-(require "../../lib/lib.rkt")
-
-(require "numbers.rkt")
-(require "fills.rkt")
-(require "borders.rkt")
-(require "fonts.rkt")
-(require "cellXfs.rkt")
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt"
+         "../../style/style.rkt"
+         "../../style/styles.rkt"
+         "../../style/border-style.rkt"
+         "../../style/fill-style.rkt"
+         "../../style/alignment-style.rkt"
+         "../../style/number-style.rkt"
+         "../../style/font-style.rkt"
+         "../../style/fill-style.rkt"
+         "../../lib/lib.rkt"
+         "numbers.rkt"
+         "fills.rkt"
+         "borders.rkt"
+         "fonts.rkt"
+         "cellXfs.rkt")
 
 (provide (contract-out
           [dxfs (-> list?)]
@@ -50,7 +48,36 @@
    (tableStyles))))
 
 (define (from-styles styles_file)
-  (let ([xml_hash (xml->hash styles_file)])
+  (let ([xml_hash (xml-file-to-hash
+                   styles_file
+                   '(
+                     "styleSheet.borders.border"
+                     "styleSheet.borders.border.left.color.rgb"
+                     "styleSheet.borders.border.right.color.rgb"
+                     "styleSheet.borders.border.top.color.rgb"
+                     "styleSheet.borders.border.bottom.color.rgb"
+                     "styleSheet.borders.border.left.style"
+                     "styleSheet.borders.border.right.style"
+                     "styleSheet.borders.border.top.style"
+                     "styleSheet.borders.border.bottom.style"
+                     "styleSheet.fills.fill.patternFill.patternType"
+                     "styleSheet.fills.fill.patternFill.fgColor.rgb"
+                     "styleSheet.fonts.font.sz.val"
+                     "styleSheet.fonts.font.name.val"
+                     "styleSheet.fonts.font.color.rgb"
+                     "styleSheet.numFmts.numFmt.formatCode"
+                     "styleSheet.numFmts.numFmt.numFmtId"
+                     "styleSheet.cellXfs.xf.fillId"
+                     "styleSheet.cellXfs.xf.applyFont"
+                     "styleSheet.cellXfs.xf.fontId"
+                     "styleSheet.cellXfs.xf.applyBorder"
+                     "styleSheet.cellXfs.xf.borderId"
+                     "styleSheet.cellXfs.xf.numFmtId"
+                     "styleSheet.cellXfs.xf.alignment.horizontal"
+                     "styleSheet.cellXfs.xf.alignment.vertical"
+                     )
+                   )])
+
     (from-numbers xml_hash)
     (from-fonts xml_hash)
     (from-fills xml_hash)
@@ -64,7 +91,7 @@
     (with-output-to-file (build-path dir "styles.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (to-styles)))))))
+        (printf "~a" (lists-to-xml (to-styles)))))))
 
 (define (read-styles [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl"))])

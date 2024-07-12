@@ -1,24 +1,20 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         racket/date
+         rackunit/text-ui rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/border-style.rkt"
+         "../../../../../style/styles.rkt"
+         "../../../../../style/assemble-styles.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../lib/sheet-lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require racket/date)
-
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/border-style.rkt")
-(require "../../../../../style/styles.rkt")
-(require "../../../../../style/assemble-styles.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../lib/sheet-lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path row1_file "row1.xml")
 (define-runtime-path row2_file "row2.xml")
 (define-runtime-path row3_file "row3.xml")
@@ -60,28 +56,28 @@
           (call-with-input-file row1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-row 1 1 5))
+               (lists-to-xml_content (to-row 1 1 5))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file row2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-row 2 1 5))
+               (lists-to-xml_content (to-row 2 1 5))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file row3_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-row 3 1 5))
+               (lists-to-xml_content (to-row 3 1 5))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file row_with_oversize_dimension_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-row 1 1 10))
+               (lists-to-xml_content (to-row 1 1 10))
                (lambda (actual)
                  (check-lines? expected actual)))))
           )))))
@@ -115,11 +111,26 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet><sheetData>~a~a~a</sheetData></worksheet>"
-                                                       (file->string row1_file)
-                                                       (file->string row2_file)
-                                                       (file->string row3_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet><sheetData>~a~a~a</sheetData></worksheet>"
+                                             (file->string row1_file)
+                                             (file->string row2_file)
+                                             (file->string row3_file)
+                                             ))
+                  '(
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    )
+                  )])
 
             (check-false (hash-has-key? (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 1))
 
@@ -198,9 +209,24 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet><sheetData>~a</sheetData></worksheet>"
-                                                       (file->string row1_not_from_a1_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet><sheetData>~a</sheetData></worksheet>"
+                                             (file->string row1_not_from_a1_file)
+                                             ))
+                  '(
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    )
+                  )])
 
             (check-false (hash-has-key? (SHEET-STYLE-row->style_map (*CURRENT_SHEET_STYLE*)) 1))
 

@@ -1,7 +1,7 @@
 #lang racket
 
-(require "../../style/styles.rkt")
-(require "../../style/number-style.rkt")
+(require "../../style/styles.rkt"
+         "../../style/number-style.rkt")
 
 (provide (contract-out
           [to-numbers (-> (listof NUMBER-STYLE?) list?)]
@@ -28,10 +28,10 @@
              [number_list '()])
     (if (< loop_count (hash-ref xml_hash "styleSheet1.numFmts1.numFmt's count" 0))
         (let ([prefix (format "styleSheet1.numFmts1.numFmt~a" (add1 loop_count))])
-          (when (hash-has-key? xml_hash (format "~a.formatCode" prefix))
+          (when (hash-has-key? xml_hash (format "~a.formatCode1" prefix))
             (let ([number_style
                    (NUMBER-STYLE
-                    (hash-ref xml_hash (format "~a.numFmtId" prefix))
-                    (hash-ref xml_hash (format "~a.formatCode" prefix)))])
+                    (hash-ref xml_hash (format "~a.numFmtId1" prefix))
+                    (hash-ref xml_hash (format "~a.formatCode1" prefix)))])
               (loop (add1 loop_count) (cons number_style number_list)))))
         (set-STYLES-number_list! (*STYLES*) (reverse number_list)))))

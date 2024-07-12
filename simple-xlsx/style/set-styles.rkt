@@ -1,16 +1,15 @@
 #lang racket
 
-(require "../lib/dimension.rkt")
-(require "../lib/sheet-lib.rkt")
-
-(require "style-lib.rkt")
-(require "style.rkt")
-(require "styles.rkt")
-(require "border-style.rkt")
-(require "font-style.rkt")
-(require "alignment-style.rkt")
-(require "number-style.rkt")
-(require "fill-style.rkt")
+(require "../lib/dimension.rkt"
+         "../lib/sheet-lib.rkt"
+         "style-lib.rkt"
+         "style.rkt"
+         "styles.rkt"
+         "border-style.rkt"
+         "font-style.rkt"
+         "alignment-style.rkt"
+         "number-style.rkt"
+         "fill-style.rkt")
 
 (provide (contract-out
           [set-col-range-width (-> string? natural? void?)]

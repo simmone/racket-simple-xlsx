@@ -1,21 +1,19 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/font-style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/fonts.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/font-style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/fonts.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path fonts_file "fonts.xml")
 
 (provide (contract-out
@@ -61,7 +59,7 @@
        (call-with-input-file fonts_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-fonts (STYLES-font_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -77,7 +75,14 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )
+         ))
 
        (check-font-styles)
        )))

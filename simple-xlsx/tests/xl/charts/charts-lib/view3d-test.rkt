@@ -1,24 +1,22 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
+(define-runtime-path view3d_file "view3d.xml")
 
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
-(define-runtime-path valAx_file "valAx.xml")
-
-(define test-valAx
+(define test-view3d
   (test-suite
-   "test-valAx"
+   "test-view3d"
 
    (test-case
-    "test-valAx"
+    "test-view3d"
 
     (with-xlsx
      (lambda ()
@@ -32,13 +30,12 @@
 
        (with-sheet
         (lambda ()
-          (call-with-input-file valAx_file
+          (call-with-input-file view3d_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (valAx))
+               (lists-to-xml_content (view3d))
                (lambda (actual)
-                 (check-lines? expected actual))))))))))
-   ))
+                 (check-lines? expected actual))))))))))))
 
-(run-tests test-valAx)
+(run-tests test-view3d)
 

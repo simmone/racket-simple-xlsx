@@ -1,13 +1,13 @@
 #lang racket
 
-(require "../../style/style.rkt")
-(require "../../style/style-lib.rkt")
-(require "../../style/styles.rkt")
-(require "../../style/border-style.rkt")
-(require "../../style/fill-style.rkt")
-(require "../../style/alignment-style.rkt")
-(require "../../style/number-style.rkt")
-(require "../../style/font-style.rkt")
+(require "../../style/style.rkt"
+         "../../style/style-lib.rkt"
+         "../../style/styles.rkt"
+         "../../style/border-style.rkt"
+         "../../style/fill-style.rkt"
+         "../../style/alignment-style.rkt"
+         "../../style/number-style.rkt"
+         "../../style/font-style.rkt")
 
 (provide (contract-out
           [to-cellXfs (-> (listof STYLE?) list?)]
@@ -83,29 +83,29 @@
               [fill_style #f])
 
           ;; appFill is not mandatory
-          (when (hash-has-key? xml_hash (format "~a.fillId" prefix))
+          (when (hash-has-key? xml_hash (format "~a.fillId1" prefix))
             (set! fill_style
                   (list-ref (STYLES-fill_list (*STYLES*))
-                            (string->number (hash-ref xml_hash (format "~a.fillId" prefix))))))
+                            (string->number (hash-ref xml_hash (format "~a.fillId1" prefix))))))
 
-          (when (hash-has-key? xml_hash (format "~a.applyFont" prefix))
+          (when (hash-has-key? xml_hash (format "~a.applyFont1" prefix))
             (set! font_style
                   (list-ref (STYLES-font_list (*STYLES*))
-                            (string->number (hash-ref xml_hash (format "~a.fontId" prefix))))))
+                            (string->number (hash-ref xml_hash (format "~a.fontId1" prefix))))))
 
-          (when (hash-has-key? xml_hash (format "~a.applyBorder" prefix))
+          (when (hash-has-key? xml_hash (format "~a.applyBorder1" prefix))
             (set! border_style
                   (list-ref (STYLES-border_list (*STYLES*))
-                            (string->number (hash-ref xml_hash (format "~a.borderId" prefix))))))
+                            (string->number (hash-ref xml_hash (format "~a.borderId1" prefix))))))
 
           ;; Some App like Google Sheets has its own standard number formats,
           ;; So you can't skip numFmtId even it is not in the numFmts.
           (when
               (and
-               (hash-has-key? xml_hash (format "~a.numFmtId" prefix))
-               (> (string->number (hash-ref xml_hash (format "~a.numFmtId" prefix))) 0))
+               (hash-has-key? xml_hash (format "~a.numFmtId1" prefix))
+               (> (string->number (hash-ref xml_hash (format "~a.numFmtId1" prefix))) 0))
             (set! number_style
-                  (let ([number_fmt_id (hash-ref xml_hash (format "~a.numFmtId" prefix))])
+                  (let ([number_fmt_id (hash-ref xml_hash (format "~a.numFmtId1" prefix))])
                     (let search-loop ([number_styles (STYLES-number_list (*STYLES*))])
                       (if (not (null? number_styles))
                           (if (string=? number_fmt_id (NUMBER-STYLE-formatId (car number_styles)))
@@ -114,8 +114,8 @@
                           (NUMBER-STYLE number_fmt_id 'APP))))))
 
           (set! alignment_style (ALIGNMENT-STYLE
-                                 (hash-ref xml_hash (format "~a.alignment1.horizontal" prefix) "center")
-                                 (hash-ref xml_hash (format "~a.alignment1.vertical" prefix) "bottom")))
+                                 (hash-ref xml_hash (format "~a.alignment1.horizontal1" prefix) "center")
+                                 (hash-ref xml_hash (format "~a.alignment1.vertical1" prefix) "bottom")))
 
           (let ([style
                     (STYLE

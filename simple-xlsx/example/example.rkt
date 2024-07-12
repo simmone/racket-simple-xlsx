@@ -1,8 +1,7 @@
 #lang racket
 
-(require "../main.rkt")
-
-(require racket/date)
+(require "../main.rkt"
+         racket/date)
 
 (let ([sheet_data (list
                    (list "month/brand" "201601" "201602" "201603" "201604" "201605")

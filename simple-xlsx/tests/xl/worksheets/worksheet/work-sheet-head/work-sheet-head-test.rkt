@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path work_sheet_head_file "work_sheet_head.xml")
 (define-runtime-path work_sheet_not_start_from_A1_head_file "work_sheet_not_start_from_A1_head.xml")
 (define-runtime-path work_sheet_head_no_dimension_file "work_sheet_head_no_dimension.xml")
@@ -37,7 +35,7 @@
           (call-with-input-file work_sheet_head_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-work-sheet-head))
+               (lists-to-xml_content (to-work-sheet-head))
                (lambda (actual)
                  (check-lines? expected actual)))))))
        ))
@@ -49,7 +47,7 @@
        (with-sheet
         (lambda ()
 
-          (from-work-sheet-head (xml->hash work_sheet_head_file))
+          (from-work-sheet-head (xml-file-to-hash work_sheet_head_file '("worksheet.dimension.ref")))
 
           (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "A1:E2")))))
 
@@ -60,7 +58,7 @@
        (with-sheet
         (lambda ()
 
-          (from-work-sheet-head (xml->hash work_sheet_not_start_from_A1_head_file))
+          (from-work-sheet-head (xml-file-to-hash work_sheet_not_start_from_A1_head_file '("worksheet.dimension.ref")))
 
           (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "B1:E2")))))
 
@@ -70,7 +68,7 @@
 
        (with-sheet
         (lambda ()
-          (from-work-sheet-head (xml->hash work_sheet_head_no_dimension_file))
+          (from-work-sheet-head (xml-file-to-hash work_sheet_head_no_dimension_file '("worksheet.dimension.ref")))
 
           (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) #f)))))
     )

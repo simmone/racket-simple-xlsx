@@ -1,13 +1,11 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../xlsx/xlsx.rkt")
+(require fast-xml
+         "../xlsx/xlsx.rkt")
 
 (provide (contract-out
           [to-shared-strings (-> list?)]
           [from-shared-strings (-> path-string? void?)]
-          [filter-string (-> string? string?)]
           [write-shared-strings (->* () (path-string?) void?)]
           [read-shared-strings (->* () (path-string?) void?)]
           ))
@@ -26,14 +24,21 @@
           (cons
            (list
             "si"
-            (list "t" (filter-string (car strings)))
+            (list "t" (car strings))
             (list "phoneticPr" (cons "fontId" "1") (cons "type" "noConversion")))
            result_list))
          (reverse result_list)))))
 
 (define (from-shared-strings shared_strings_file)
   (when (file-exists? shared_strings_file)
-        (let ([xml_hash (xml->hash shared_strings_file)])
+        (let ([xml_hash (xml-file-to-hash
+                         shared_strings_file
+                         '(
+                           "sst.si.t"
+                           "sst.si.r.t"
+                           )
+                         )
+                        ])
           (let loop ([loop_count 0])
             (when (< loop_count (hash-ref xml_hash "sst1.si's count" 0))
               (let ([str
@@ -48,19 +53,6 @@
                 (hash-set! (XLSX-shared_index->string_map (*XLSX*)) loop_count str))
               (loop (add1 loop_count)))))))
 
-(define (filter-string str)
-  (regexp-replace*
-   #rx"<"
-   (regexp-replace*
-    #rx">"
-    (regexp-replace*
-     #rx"&amp;"
-     "&amp;"
-     str)
-     "\\&gt;")
-    "\\&lt;")
-   )
-
 (define (write-shared-strings [output_dir #f])
   (let ([dir (if output_dir output_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl"))])
     (make-directory* dir)
@@ -69,7 +61,7 @@
         (with-output-to-file (build-path dir "sharedStrings.xml")
           #:exists 'replace
           (lambda ()
-            (printf "~a" (lists->xml (to-shared-strings))))))))
+            (printf "~a" (lists-to-xml (to-shared-strings))))))))
 
 (define (read-shared-strings [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl"))])

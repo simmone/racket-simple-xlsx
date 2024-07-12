@@ -1,17 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../lib/lib.rkt"
+         "../../../xl/_rels/workbook-xml-rels.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../lib/lib.rkt")
-
-(require"../../../xl/_rels/workbook-xml-rels.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path workbook_xml_rels_file "workbook.xml.rels")
-
 
 (define test-workbook-xml-rels
   (test-suite
@@ -36,7 +33,7 @@
              (call-with-input-file workbook_xml_rels_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (xl-rels))
+                  (lists-to-xml (xl-rels))
                   (lambda (actual)
                     (check-lines? expected actual))))))
            (lambda ()

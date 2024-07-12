@@ -1,21 +1,18 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/fill-style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/fills.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/fill-style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/fills.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path fills_file "fills.xml")
 (define-runtime-path empty_fills_file "empty_fills.xml")
 (define-runtime-path theme_fills_file "theme_fills.xml")
@@ -64,7 +61,7 @@
        (call-with-input-file fills_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-fills (STYLES-fill_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -80,7 +77,13 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )
+         ))
 
        (check-fill-styles)
        )))
@@ -101,7 +104,7 @@
        (call-with-input-file empty_fills_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-fills (STYLES-fill_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -117,7 +120,13 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string theme_fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string theme_fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )
+         ))
 
        (check-equal? (length (STYLES-fill_list (*STYLES*))) 1)
        (check-equal? (list-ref (STYLES-fill_list (*STYLES*)) 0) (FILL-STYLE "FFFFFF" "none"))

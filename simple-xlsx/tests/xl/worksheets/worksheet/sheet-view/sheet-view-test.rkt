@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/styles.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/styles.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path sheet_view_file "sheet_view.xml")
 (define-runtime-path sheet_view_other_file "sheet_view_other.xml")
 (define-runtime-path sheet_view_freeze_1_1_file "sheet_view_freeze_1_1.xml")
@@ -45,7 +43,7 @@
           (call-with-input-file sheet_view_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -55,7 +53,7 @@
           (call-with-input-file sheet_view_other_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -67,7 +65,7 @@
           (call-with-input-file sheet_view_freeze_1_0_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -79,7 +77,7 @@
           (call-with-input-file sheet_view_freeze_0_1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -91,7 +89,7 @@
           (call-with-input-file sheet_view_freeze_1_1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -103,7 +101,7 @@
           (call-with-input-file sheet_view_freeze_3_2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-view))
+               (lists-to-xml_content (to-sheet-view))
                (lambda (actual)
                  (check-lines? expected actual)))))))
        )))
@@ -124,47 +122,77 @@
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+              )
+            ))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(0 . 0))))
 
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_other_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_other_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+              )
+            ))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(0 . 0))))
 
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_1_0_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_1_0_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+              )))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(1 . 0))))
 
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_1_1_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_1_1_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+            )))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(1 . 1))))
 
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_0_1_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_0_1_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+              )))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(0 . 1))))
 
        (with-sheet
         (lambda ()
           (from-sheet-view
-           (xml->hash (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_3_2_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet><sheetViews>~a</sheetViews></worksheet>" (file->string sheet_view_freeze_3_2_file)))
+            '(
+              "worksheet.sheetViews.sheetView.pane.xSplit"
+              "worksheet.sheetViews.sheetView.pane.ySplit"
+              )))
 
           (check-equal? (SHEET-STYLE-freeze_range (*CURRENT_SHEET_STYLE*)) '(3 . 2))))
-
        )))
-
    ))
 
 (run-tests test-worksheet)

@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
-
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/number-style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/numbers.rkt")
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/number-style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/numbers.rkt")
 
 (provide (contract-out
           [set-number-styles (-> void?)]
@@ -71,7 +69,7 @@
        (call-with-input-file numbers_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-numbers (STYLES-number_list (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -87,7 +85,13 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )
+         ))
 
        (check-number-styles)
        )))
@@ -103,7 +107,13 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string chaos_numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string chaos_numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )
+         ))
 
        (check-chaos-number-styles)
        )))

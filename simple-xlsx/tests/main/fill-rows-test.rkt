@@ -1,10 +1,10 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../main.rkt"
+         racket/runtime-path)
 
-(require "../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path fill_rows1_file "_fill_rows1.xlsx")
 (define-runtime-path fill_rows2_file "_fill_rows2.xlsx")
 

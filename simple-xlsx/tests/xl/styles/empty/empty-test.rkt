@@ -1,18 +1,16 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/styles.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/styles.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path test_file "empty.xml")
 
 (define test-empty-styles
@@ -35,7 +33,7 @@
        (call-with-input-file test_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-styles))
+            (lists-to-xml_content (to-styles))
             (lambda (actual)
               (check-lines? expected actual))))))))
      ))

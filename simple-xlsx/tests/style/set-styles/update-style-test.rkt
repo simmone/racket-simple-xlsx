@@ -1,14 +1,14 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../style/set-styles.rkt")
-(require "../../../style/border-style.rkt")
-(require "../../../style/font-style.rkt")
-(require "../../../style/alignment-style.rkt")
-(require "../../../style/number-style.rkt")
-(require "../../../style/fill-style.rkt")
-(require "../../../style/style.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../../style/set-styles.rkt"
+         "../../../style/border-style.rkt"
+         "../../../style/font-style.rkt"
+         "../../../style/alignment-style.rkt"
+         "../../../style/number-style.rkt"
+         "../../../style/fill-style.rkt"
+         "../../../style/style.rkt")
 
 (struct T_STYLE (
                  (a #:mutable)

@@ -1,40 +1,39 @@
 #lang racket
 
-(require racket/date)
-
 (provide (contract-out
           [read-xlsx (-> path-string? procedure? any)]
           [read-batch (-> void?)]
           ))
 
-(require "xlsx/xlsx.rkt")
-(require "style/style.rkt")
-(require "style/border-style.rkt")
-(require "style/font-style.rkt")
-(require "style/alignment-style.rkt")
-(require "style/number-style.rkt")
-(require "style/fill-style.rkt")
-(require "style/set-styles.rkt")
-(require "sheet/sheet.rkt")
-(require "lib/lib.rkt")
-(require "lib/dimension.rkt")
-(require "content-type.rkt")
-(require "_rels/rels.rkt")
-(require "docProps/docprops-app.rkt")
-(require "docProps/docprops-core.rkt")
-(require "xl/_rels/workbook-xml-rels.rkt")
-(require "xl/printerSettings/printerSettings.rkt")
-(require "xl/theme/theme.rkt")
-(require "xl/sharedStrings.rkt")
-(require "xl/styles/styles.rkt")
-(require "xl/workbook.rkt")
-(require "xl/worksheets/_rels/worksheets-rels.rkt")
-(require "xl/worksheets/worksheet.rkt")
-(require "xl/chartsheets/_rels/chartsheets-rels.rkt")
-(require "xl/chartsheets/chartsheet.rkt")
-(require "xl/charts/charts.rkt")
-(require "xl/drawings/_rels/drawing-rels.rkt")
-(require "xl/drawings/drawing.rkt")
+(require racket/date
+         "xlsx/xlsx.rkt"
+         "style/style.rkt"
+         "style/border-style.rkt"
+         "style/font-style.rkt"
+         "style/alignment-style.rkt"
+         "style/number-style.rkt"
+         "style/fill-style.rkt"
+         "style/set-styles.rkt"
+         "sheet/sheet.rkt"
+         "lib/lib.rkt"
+         "lib/dimension.rkt"
+         "content-type.rkt"
+         "_rels/rels.rkt"
+         "docProps/docprops-app.rkt"
+         "docProps/docprops-core.rkt"
+         "xl/_rels/workbook-xml-rels.rkt"
+         "xl/printerSettings/printerSettings.rkt"
+         "xl/theme/theme.rkt"
+         "xl/sharedStrings.rkt"
+         "xl/styles/styles.rkt"
+         "xl/workbook.rkt"
+         "xl/worksheets/_rels/worksheets-rels.rkt"
+         "xl/worksheets/worksheet.rkt"
+         "xl/chartsheets/_rels/chartsheets-rels.rkt"
+         "xl/chartsheets/chartsheet.rkt"
+         "xl/charts/charts.rkt"
+         "xl/drawings/_rels/drawing-rels.rkt"
+         "xl/drawings/drawing.rkt")
 
 (define (read-batch)
   ;; [Content_Types].xml
@@ -48,7 +47,7 @@
 
   ;; xl/sharedStrings.xml
   (read-shared-strings)
-
+  
   ;; xl/styles.xml
   (read-styles)
 

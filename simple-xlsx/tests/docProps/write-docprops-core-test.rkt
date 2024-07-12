@@ -1,14 +1,13 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../lib/lib.rkt"
+         rackunit/text-ui
+         rackunit
+         "../../docProps/docprops-core.rkt"
+         racket/runtime-path)
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../lib/lib.rkt")
-
-(require rackunit/text-ui rackunit)
-(require"../../docProps/docprops-core.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path core_file "core.xml")
 
 (define test-docprops-core
@@ -35,7 +34,7 @@
              (call-with-input-file core_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (docprops-core (date* 44 17 13 2 1 2015 5 1 #f 28800 996159076 "CST")))
+                  (lists-to-xml (docprops-core (date* 44 17 13 2 1 2015 5 1 #f 28800 996159076 "CST")))
                   (lambda (actual)
                     (check-lines? expected actual))))))
            (lambda ()

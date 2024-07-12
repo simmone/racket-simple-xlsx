@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path work_sheet_tail_phoneticPr_file "work_sheet_tail_phoneticPr.xml")
 (define-runtime-path work_sheet_tail_pageMargins_file "work_sheet_tail_pageMargins.xml")
 (define-runtime-path work_sheet_tail_pageSetup_file "work_sheet_tail_pageSetup.xml")
@@ -33,21 +31,21 @@
          (call-with-input-file work_sheet_tail_phoneticPr_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (first (work-sheet-tail)))
+              (lists-to-xml_content (first (work-sheet-tail)))
               (lambda (actual)
                 (check-lines? expected actual)))))
 
          (call-with-input-file work_sheet_tail_pageMargins_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (second (work-sheet-tail)))
+              (lists-to-xml_content (second (work-sheet-tail)))
               (lambda (actual)
                 (check-lines? expected actual)))))
 
          (call-with-input-file work_sheet_tail_pageSetup_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (third (work-sheet-tail)))
+              (lists-to-xml_content (third (work-sheet-tail)))
               (lambda (actual)
                 (check-lines? expected actual)))))
          ))))

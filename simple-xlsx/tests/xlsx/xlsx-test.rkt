@@ -1,10 +1,9 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../sheet/sheet.rkt")
-
-(require "../../xlsx/xlsx.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../sheet/sheet.rkt"
+         "../../xlsx/xlsx.rkt")
 
 (define test-xlsx
   (test-suite

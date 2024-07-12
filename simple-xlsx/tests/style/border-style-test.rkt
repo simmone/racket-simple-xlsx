@@ -1,8 +1,8 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../style/border-style.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../style/border-style.rkt")
 
 (define test-border-style
   (test-suite

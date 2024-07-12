@@ -1,16 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/line-chart.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-(require"../../../../xl/charts/line-chart.rkt")
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path line_3d_chart_file "line_3d_chart.xml")
 
 (define test-line-3d-chart
@@ -38,7 +37,7 @@
        (call-with-input-file line_3d_chart_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-line-3d-chart-sers
               '(
                 ("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2")

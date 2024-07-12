@@ -1,15 +1,15 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../xlsx/xlsx.rkt")
-(require "../../../sheet/sheet.rkt")
-(require "../../../style/style.rkt")
-(require "../../../style/styles.rkt")
-(require "../../../style/font-style.rkt")
-(require "../../../style/fill-style.rkt")
-(require "../../../style/assemble-styles.rkt")
-(require "../../../style/set-styles.rkt")
+(require rackunit/text-ui
+         rackunit
+         "../../../xlsx/xlsx.rkt"
+         "../../../sheet/sheet.rkt"
+         "../../../style/style.rkt"
+         "../../../style/styles.rkt"
+         "../../../style/font-style.rkt"
+         "../../../style/fill-style.rkt"
+         "../../../style/assemble-styles.rkt"
+         "../../../style/set-styles.rkt")
 
 (define test-styles
   (test-suite

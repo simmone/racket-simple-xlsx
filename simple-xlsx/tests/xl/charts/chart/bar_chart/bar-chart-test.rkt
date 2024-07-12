@@ -1,16 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/charts/charts.rkt"
+         "../../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../xl/charts/charts.rkt")
-(require "../../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path bar_chart_file "bar_chart.xml")
 (define-runtime-path bar_3d_chart_file "bar_3d_chart.xml")
 
@@ -61,7 +60,7 @@
          (call-with-input-file bar_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart-bar))
+              (lists-to-xml_content (to-chart-bar))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -71,7 +70,7 @@
          (call-with-input-file bar_3d_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart-3d-bar))
+              (lists-to-xml_content (to-chart-3d-bar))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -81,7 +80,7 @@
          (call-with-input-file bar_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart))
+              (lists-to-xml_content (to-chart))
               (lambda (actual)
                 (check-lines? expected actual)))))))
 
@@ -91,7 +90,7 @@
          (call-with-input-file bar_3d_chart_file
            (lambda (expected)
              (call-with-input-string
-              (lists->xml_content (to-chart))
+              (lists-to-xml_content (to-chart))
               (lambda (actual)
                 (check-lines? expected actual)))))))
       )))
@@ -107,28 +106,44 @@
        (with-sheet-name
         "BarChart"
         (lambda ()
-          (let ([bar_chart
-                 (from-chart
-                  (xml->hash
-                   (open-input-string (file->string bar_chart_file))))])
+          (from-chart
+           (xml-port-to-hash
+            (open-input-string (file->string bar_chart_file))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:tx.c:v"
+              "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:cat.c:strRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:val.c:numRef.c:f"
+              "c:chartSpace.c:chart.c:plotArea.c:barChart"
+              "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+              )
+            ))
 
-            (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR)
-            (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "BarChartExample")
-            (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
-              (check-equal? (length sers) 3)
+          (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR)
 
-              (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
-              (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
-              (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
-            )))
+          (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "BarChartExample")
+
+          (let ([sers (CHART-SHEET-serial (*CURRENT_SHEET*))])
+            (check-equal? (length sers) 3)
+            
+            (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "DataSheet" "B2-D2"))
+            (check-equal? (list-ref sers 1) '("Puma" "DataSheet" "B1-D1" "DataSheet" "B3-D3"))
+            (check-equal? (list-ref sers 2) '("Brooks" "DataSheet" "B1-D1" "DataSheet" "B4-D4")))
+          ))
 
        (with-sheet-name
         "Bar3DChart"
         (lambda ()
           (let ([bar_3d_chart
                  (from-chart
-                  (xml->hash
-                   (open-input-string (file->string bar_3d_chart_file))))])
+                  (xml-file-to-hash
+                   bar_3d_chart_file
+                   '(
+                     "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:tx.c:v"
+                     "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:cat.c:strRef.c:f"
+                     "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:val.c:numRef.c:f"
+                     "c:chartSpace.c:chart.c:plotArea.c:bar3DChart"
+                     "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+                     )))])
 
             (check-eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR3D)
             (check-equal? (CHART-SHEET-topic (*CURRENT_SHEET*)) "Bar3DChartExample")

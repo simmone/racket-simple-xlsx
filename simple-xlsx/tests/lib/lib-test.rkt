@@ -1,11 +1,11 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
-(require racket/date)
+(require rackunit/text-ui
+         rackunit
+         racket/date
+         "../../lib/lib.rkt"
+         racket/runtime-path)
 
-(require"../../lib/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path zip_xlsx_temp_directory "test-directory")
 (define-runtime-path content_type_file (build-path "test-directory" "[Content_Types].xml"))
 (define-runtime-path rels_directory (build-path "test-directory" "_rels"))

@@ -1,9 +1,9 @@
 #lang racket
 
-(require "../../lib/dimension.rkt")
-(require "../../lib/sheet-lib.rkt")
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
+(require "../../lib/dimension.rkt"
+         "../../lib/sheet-lib.rkt"
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt")
 
 (provide (contract-out
           [to-ser-head (-> natural? string? list?)]
@@ -37,23 +37,23 @@
 (define (get-chart-type-node)
   (cond
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'LINE)
-    "c:lineChart1"]
+    "c:lineChart"]
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'LINE3D)
-    "c:line3DChart1"]
+    "c:line3DChart"]
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE)
-    "c:pieChart1"]
+    "c:pieChart"]
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'PIE3D)
-    "c:pie3DChart1"]
+    "c:pie3DChart"]
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR)
-    "c:barChart1"]
+    "c:barChart"]
    [(eq? (CHART-SHEET-chart_type (*CURRENT_SHEET*)) 'BAR3D)
-    "c:bar3DChart1"]))
+    "c:bar3DChart"]))
 
 (define (from-ser-head xml_hash ser_index)
   (let* ([key_head "c:chartSpace1.c:chart1.c:plotArea1"]
          [chart_type (get-chart-type-node)]
          [key_suffix (format "c:ser~a.c:tx1.c:v1" ser_index)]
-         [key (format "~a.~a.~a" key_head chart_type key_suffix)])
+         [key (format "~a.~a1.~a" key_head chart_type key_suffix)])
     (hash-ref xml_hash key "")))
 
 (define (to-ser-cat sheet_name range)
@@ -63,9 +63,10 @@
   (let* ([key_head "c:chartSpace1.c:chart1.c:plotArea1"]
          [chart_type (get-chart-type-node)]
          [key_suffix (format "c:ser~a.c:cat1.c:strRef1.c:f1" ser_index)]
-         [key (format "~a.~a.~a" key_head chart_type key_suffix)]
-         [sheet_ref (hash-ref xml_hash key "")])
-    (if (regexp-match #rx"^.+!\\$.+\\$.+:\\$.+\\$.+$" sheet_ref)
+         [key (format "~a.~a1.~a" key_head chart_type key_suffix)]
+         [sheet_ref (hash-ref xml_hash key #f)])
+
+    (if sheet_ref
         (let ([ref_pair (regexp-split #rx"!" sheet_ref)])
           (cons
            (first ref_pair)
@@ -79,14 +80,27 @@
   (let* ([key_head "c:chartSpace1.c:chart1.c:plotArea1"]
          [chart_type (get-chart-type-node)]
          [key_suffix (format "c:ser~a.c:val1.c:numRef1.c:f1" ser_index)]
-         [key (format "~a.~a.~a" key_head chart_type key_suffix)]
-         [sheet_ref (hash-ref xml_hash key "")])
-    (if (regexp-match #rx"^.+!\\$.+\\$.+:\\$.+\\$.+$" sheet_ref)
+         [key (format "~a.~a1.~a" key_head chart_type key_suffix)]
+         [sheet_ref (hash-ref xml_hash key #f)])
+
+    (if sheet_ref
         (let ([ref_pair (regexp-split #rx"!" sheet_ref)])
           (cons
            (first ref_pair)
            (range_xml->range (second ref_pair))))
         '("" . ""))))
+
+(define (from-ser xml_hash ser_index)
+  (let ([ser_head (from-ser-head xml_hash ser_index)]
+        [ser_category (from-ser-cat xml_hash ser_index)]
+        [ser_value (from-ser-val xml_hash ser_index)])
+
+    (list
+     ser_head
+     (car ser_category)
+     (cdr ser_category)
+     (car ser_value)
+     (cdr ser_value))))
 
 (define (get-sheet-name-range-values sheet_name range)
   (with-sheet-name
@@ -129,17 +143,6 @@
    (list (to-ser-cat (second serial) (third serial)))
    (list (to-ser-val (fourth serial) (fifth serial)))))
 
-(define (from-ser xml_hash ser_index)
-  (let ([ser_head (from-ser-head xml_hash ser_index)]
-        [ser_category (from-ser-cat xml_hash ser_index)]
-        [ser_value (from-ser-val xml_hash ser_index)])
-    (list
-     ser_head
-     (car ser_category)
-     (cdr ser_category)
-     (car ser_value)
-     (cdr ser_value))))
-
 (define (to-sers ser_list)
   (let loop ([_sers ser_list]
              [ser_index 0]
@@ -155,9 +158,9 @@
   (let* ([key_head "c:chartSpace1.c:chart1.c:plotArea1"]
          [chart_type (get-chart-type-node)]
          [key_suffix "c:ser's count"]
-         [key (format "~a.~a.~a" key_head chart_type key_suffix)]
+         [key (format "~a.~a1.~a" key_head chart_type key_suffix)]
          [sers_count (hash-ref xml_hash key 0)])
-
+    
     (let loop ([ser_index 1]
                [sers_list '()])
       (if (<= ser_index sers_count)

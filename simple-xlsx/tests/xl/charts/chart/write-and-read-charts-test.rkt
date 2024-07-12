@@ -1,16 +1,15 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-(require"../../../../xl/charts/charts.rkt")
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path chart1_file "chart1.xml")
 (define-runtime-path chart2_file "chart2.xml")
 (define-runtime-path chart3_file "chart3.xml")
@@ -104,7 +103,7 @@
                (call-with-input-file chart1_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -115,7 +114,7 @@
                (call-with-input-file chart2_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -126,7 +125,7 @@
                (call-with-input-file chart3_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -137,7 +136,7 @@
                (call-with-input-file chart4_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -148,7 +147,7 @@
                (call-with-input-file chart5_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 
@@ -159,7 +158,7 @@
                (call-with-input-file chart6_file
                  (lambda (expected)
                    (call-with-input-string
-                    (lists->xml (to-chart))
+                    (lists-to-xml (to-chart))
                     (lambda (actual)
                       (check-lines? expected actual)))))))
 

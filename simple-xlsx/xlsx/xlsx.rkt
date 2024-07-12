@@ -1,13 +1,13 @@
 #lang racket
 
-(require "../lib/lib.rkt")
-(require "../lib/dimension.rkt")
-(require "../sheet/sheet.rkt")
-(require "../style/styles.rkt")
-(require "../style/border-style.rkt")
-(require "../style/fill-style.rkt")
-(require "../style/font-style.rkt")
-(require "../style/number-style.rkt")
+(require "../lib/lib.rkt"
+         "../lib/dimension.rkt"
+         "../sheet/sheet.rkt"
+         "../style/styles.rkt"
+         "../style/border-style.rkt"
+         "../style/fill-style.rkt"
+         "../style/font-style.rkt"
+         "../style/number-style.rkt")
 
 (provide (contract-out
           [struct XLSX

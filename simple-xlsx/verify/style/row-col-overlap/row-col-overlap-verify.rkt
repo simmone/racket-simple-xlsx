@@ -7,11 +7,11 @@
           [set-more-col-row-styles (-> void?)]
           ))
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../../main.rkt"
+         racket/runtime-path)
 
-(require "../../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path row_col_file "_row_col.xlsx")
 (define-runtime-path row_col_read_and_write_file "_row_col_read_and_write.xlsx")
 (define-runtime-path col_row_file "_col_row.xlsx")

@@ -1,8 +1,7 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../xlsx/xlsx.rkt")
+(require fast-xml
+         "../xlsx/xlsx.rkt")
 
 (provide (contract-out
           [rels (-> list?)]
@@ -32,4 +31,4 @@
     (with-output-to-file (build-path dir ".rels")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (rels)))))))
+        (printf "~a" (lists-to-xml (rels)))))))

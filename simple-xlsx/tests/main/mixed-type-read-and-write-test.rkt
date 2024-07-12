@@ -1,10 +1,10 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../main.rkt"
+         racket/runtime-path)
 
-(require "../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path mixed_file "_mixed.xlsx")
 (define-runtime-path mixed_read_and_write_file "_mixed_read_and_write.xlsx")
 

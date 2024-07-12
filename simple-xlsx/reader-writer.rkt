@@ -1,15 +1,14 @@
 #lang racket
 
-(require racket/date)
-
 (provide (contract-out
           [read-and-write-xlsx (-> path-string? path-string? procedure? any)]
           ))
 
-(require "xlsx/xlsx.rkt")
-(require "lib/lib.rkt")
-(require "reader.rkt")
-(require "writer.rkt")
+(require racket/date
+         "xlsx/xlsx.rkt"
+         "lib/lib.rkt"
+         "reader.rkt"
+         "writer.rkt")
 
 (define (read-and-write-xlsx from_file_name to_file_name user_proc)
   (when (not (file-exists? from_file_name))

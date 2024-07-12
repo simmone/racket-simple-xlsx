@@ -1,9 +1,8 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../xlsx/xlsx.rkt")
-(require "../sheet/sheet.rkt")
+(require fast-xml
+         "../xlsx/xlsx.rkt"
+         "../sheet/sheet.rkt")
 
 (provide (contract-out
           [to-workbook (-> list?)]
@@ -43,14 +42,19 @@
 
 (define (from-workbook workbook_file)
   (when (file-exists? workbook_file)
-    (let* ([xml_hash (xml->hash workbook_file)]
+    (let* ([xml_hash (xml-file-to-hash
+                      workbook_file
+                      '(
+                        "workbook.sheets.sheet.name"
+                        )
+                      )]
            [workbook_count (hash-ref xml_hash "workbook1.sheets1.sheet's count" 0)]
            [sheet_list (XLSX-sheet_list (*XLSX*))])
 
       (when (> workbook_count 0)
         (let loop ([loop_count 1])
           (when (<= loop_count workbook_count)
-            (let ([sheet_name (hash-ref xml_hash (format "workbook1.sheets1.sheet~a.name" loop_count) "")])
+            (let ([sheet_name (hash-ref xml_hash (format "workbook1.sheets1.sheet~a.name1" loop_count) "")])
               (cond
                [(DATA-SHEET? (list-ref sheet_list (sub1 loop_count)))
                 (set-DATA-SHEET-sheet_name! (list-ref sheet_list (sub1 loop_count)) sheet_name)]
@@ -65,7 +69,7 @@
     (with-output-to-file (build-path dir "workbook.xml")
     #:exists 'replace
     (lambda ()
-      (printf "~a" (lists->xml (to-workbook)))))))
+      (printf "~a" (lists-to-xml (to-workbook)))))))
 
 (define (read-workbook [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl"))])

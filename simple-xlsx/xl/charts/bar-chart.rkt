@@ -1,7 +1,7 @@
 #lang racket
 
-(require "lib.rkt")
-(require "../../sheet/sheet.rkt")
+(require "../../sheet/sheet.rkt"
+         "charts-lib.rkt")
 
 (provide (contract-out
           [bar-chart-head (-> list?)]

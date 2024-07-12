@@ -5,13 +5,12 @@
           [set-more-cell-dates (-> void?)]
           ))
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         racket/date
+         "../../../main.rkt"
+         racket/runtime-path)
 
-(require racket/date)
-
-(require "../../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path cell_date_file "_cell_date.xlsx")
 (define-runtime-path cell_date_read_and_write_file "_cell_date_read_and_write.xlsx")
 

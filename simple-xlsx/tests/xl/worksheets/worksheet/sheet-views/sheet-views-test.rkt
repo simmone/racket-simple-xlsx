@@ -1,18 +1,16 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path sheet_views1_file "sheet_views1.xml")
 (define-runtime-path sheet_views2_file "sheet_views2.xml")
 (define-runtime-path sheet_views3_file "sheet_views3.xml")
@@ -49,7 +47,7 @@
           (call-with-input-file sheet_views1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-views))
+               (lists-to-xml_content (to-sheet-views))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -59,7 +57,7 @@
           (call-with-input-file sheet_views2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-views))
+               (lists-to-xml_content (to-sheet-views))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -69,7 +67,7 @@
           (call-with-input-file sheet_views3_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-sheet-views))
+               (lists-to-xml_content (to-sheet-views))
                (lambda (actual)
                  (check-lines? expected actual)))))))
        )))

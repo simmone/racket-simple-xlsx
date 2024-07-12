@@ -1,10 +1,9 @@
 #lang racket
 
-(require simple-xml)
-
-(require "xlsx/xlsx.rkt")
-(require "sheet/sheet.rkt")
-(require "lib/lib.rkt")
+(require "../../racket-fast-xml/fast-xml/main.rkt"
+         "xlsx/xlsx.rkt"
+         "sheet/sheet.rkt"
+         "lib/lib.rkt")
 
 (provide (contract-out
           [to-content-type (-> list?)]
@@ -85,24 +84,27 @@
     ,(xlsx->shared-string)))
 
 (define (from-content-type content_type_file)
-  (let* ([xml_hash (xml->hash content_type_file)]
-         [types_override_count (hash-ref xml_hash "Types1.Override's count" 0)])
+  (let* ([xml_hash (xml-file-to-hash
+                    content_type_file
+                    '(
+                      "Types.Override.PartName"
+                      ))])
 
-    (when (> types_override_count 0)
-          (let loop ([loop_count 1]
-                     [data_sheet_count 1]
-                     [chart_sheet_count 1])
-            (when (<= loop_count types_override_count)
-                  (let ([part_name (hash-ref xml_hash (format "Types1.Override~a.PartName" loop_count) "")])
-                    (cond
-                     [(regexp-match #rx"worksheets" part_name)
-                      (add-data-sheet (format "Sheet~a" data_sheet_count) '(("none")))
-                      (loop (add1 loop_count) (add1 data_sheet_count) chart_sheet_count)]
-                     [(regexp-match #rx"chartsheets" part_name)
-                      (add-chart-sheet (format "Chart~a" chart_sheet_count) 'UNKNOWN "" '())
-                      (loop (add1 loop_count) data_sheet_count (add1 chart_sheet_count))]
-                     [else
-                      (loop (add1 loop_count) data_sheet_count chart_sheet_count)])))))))
+    (let ([override_count (hash-ref xml_hash "Types1.Override's count" 0)])
+      (let loop ([override_index 1]
+                 [data_sheet_count 1]
+                 [chart_sheet_count 1])
+        (when (<= override_index override_count)
+          (let ([part_name (hash-ref xml_hash (format "Types1.Override~a.PartName1" override_index) "")])
+            (cond
+             [(regexp-match #rx"worksheets" part_name)
+              (add-data-sheet (format "Sheet~a" data_sheet_count) '(("none")))
+              (loop (add1 override_index) (add1 data_sheet_count) chart_sheet_count)]
+             [(regexp-match #rx"chartsheets" part_name)
+              (add-chart-sheet (format "Chart~a" chart_sheet_count) 'UNKNOWN "" '())
+              (loop (add1 override_index) data_sheet_count (add1 chart_sheet_count))]
+             [else
+              (loop (add1 override_index) data_sheet_count chart_sheet_count)])))))))
 
 (define (write-content-type [output_dir #f])
   (let ([dir (if output_dir output_dir (XLSX-xlsx_dir (*XLSX*)))])
@@ -111,7 +113,7 @@
     (with-output-to-file (build-path dir "[Content_Types].xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (to-content-type)))))))
+        (printf "~a" (lists-to-xml (to-content-type)))))))
 
 (define (read-content-type [output_dir #f])
   (let ([dir (if output_dir output_dir (XLSX-xlsx_dir (*XLSX*)))])

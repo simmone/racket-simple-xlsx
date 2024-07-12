@@ -1,20 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../lib/lib.rkt"
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../xl/drawings/_rels/drawing-rels.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../lib/lib.rkt")
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-
-(require"../../../../xl/drawings/_rels/drawing-rels.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path drawing1_rels_file "drawing1.xml.rels")
 (define-runtime-path drawing2_rels_file "drawing2.xml.rels")
 (define-runtime-path drawing3_rels_file "drawing3.xml.rels")
-
 
 (define test-drawing-rels
   (test-suite
@@ -43,15 +40,15 @@
                     (call-with-input-file drawing3_rels_file
                       (lambda (expected3)
                         (call-with-input-string
-                         (lists->xml (drawing-rels 1))
+                         (lists-to-xml (drawing-rels 1))
                          (lambda (actual)
                            (check-lines? expected1 actual)))
                         (call-with-input-string
-                         (lists->xml (drawing-rels 2))
+                         (lists-to-xml (drawing-rels 2))
                          (lambda (actual)
                            (check-lines? expected2 actual)))
                         (call-with-input-string
-                         (lists->xml (drawing-rels 3))
+                         (lists-to-xml (drawing-rels 3))
                          (lambda (actual)
                            (check-lines? expected3 actual))))))))))
           (lambda ()

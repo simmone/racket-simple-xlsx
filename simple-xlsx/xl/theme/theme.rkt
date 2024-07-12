@@ -1,15 +1,14 @@
 #lang racket
 
-(require simple-xml)
-
 (provide (contract-out
           [theme (-> list?)]
           [write-theme (->* () (path-string?) void?)]
           [read-theme (-> void?)]
           ))
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt")
 
 (define (theme)
   '("a:theme"
@@ -167,7 +166,7 @@
     (with-output-to-file (build-path dir "theme1.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (theme)))))))
+        (printf "~a" (lists-to-xml (theme)))))))
 
 (define (read-theme)
   (void))

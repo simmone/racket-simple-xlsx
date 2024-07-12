@@ -1,7 +1,7 @@
 #lang racket
 
-(require "lib.rkt")
-(require "../../sheet/sheet.rkt")
+(require "charts-lib.rkt"
+         "../../sheet/sheet.rkt")
 
 (provide (contract-out
           [pie-chart-head (-> list?)]

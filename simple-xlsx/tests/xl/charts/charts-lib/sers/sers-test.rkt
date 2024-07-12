@@ -1,15 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-(require"../../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path sers_file "sers.xml")
 
 (define test-sers
@@ -40,7 +39,7 @@
           (call-with-input-file sers_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content
+               (lists-to-xml_content
                 (append
                  '("c:lineChart")
                  (to-sers
@@ -66,11 +65,16 @@
         (lambda ()
           (let ([sers
                  (from-sers
-                  (xml->hash
+                  (xml-port-to-hash
                    (open-input-string
                     (format "<c:chartSpace><c:chart><c:plotArea>~a</c:plotArea></c:chart></c:chartSpace>"
-                            (file->string sers_file)))))])
-
+                            (file->string sers_file)))
+                   '(
+                     "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:tx.c:v"
+                     "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:cat.c:strRef.c:f"
+                     "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:val.c:numRef.c:f"
+                     )))])
+                
             (check-equal? (length sers) 3)
 
             (check-equal? (list-ref sers 0) '("CAT" "DataSheet" "B1-D1" "Sheet2" "B1-D1"))

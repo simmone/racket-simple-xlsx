@@ -1,13 +1,12 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "./lib.rkt")
-(require "./line-chart.rkt")
-(require "./pie-chart.rkt")
-(require "./bar-chart.rkt")
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt"
+         "./charts-lib.rkt"
+         "./line-chart.rkt"
+         "./pie-chart.rkt"
+         "./bar-chart.rkt")
 
 (provide (contract-out
           [to-chart-head (-> list?)]
@@ -155,32 +154,22 @@
 
 (define (from-chart xml_hash)
   (cond
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:lineChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'LINE)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:line3DChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'LINE3D)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:barChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'BAR)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:bar3DChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'BAR3D)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:pieChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'PIE)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:pie3DChart's count")
-    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'PIE3D)
-    (from-chart-title xml_hash)
-    (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash))]
-   [else
-    (void)]))
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:lineChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'LINE)]
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:line3DChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'LINE3D)]
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:barChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'BAR)]
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:bar3DChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'BAR3D)]
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:pieChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'PIE)]
+   [(hash-has-key? xml_hash "c:chartSpace1.c:chart1.c:plotArea1.c:pie3DChart1")
+    (set-CHART-SHEET-chart_type! (*CURRENT_SHEET*) 'PIE3D)])
+
+  (from-chart-title xml_hash)
+
+  (set-CHART-SHEET-serial! (*CURRENT_SHEET*) (from-sers xml_hash)))
 
 (define (write-charts [output_dir #f])
   (let loop ([sheets (XLSX-sheet_list (*XLSX*))]
@@ -197,7 +186,7 @@
                (with-output-to-file (build-path dir (format "chart~a.xml" chart_sheet_index))
                  #:exists 'replace
                  (lambda ()
-                   (printf (lists->xml (to-chart)))))))
+                   (printf (lists-to-xml (to-chart)))))))
 
             (loop (cdr sheets) (add1 sheet_index) (add1 chart_sheet_index)))
           (loop (cdr sheets) (add1 sheet_index) chart_sheet_index)))))
@@ -213,6 +202,34 @@
               (with-sheet-ref
                sheet_index
                (lambda ()
-                 (from-chart (xml->hash (build-path dir (format "chart~a.xml" chart_sheet_index))))))
+                 (from-chart (xml-file-to-hash
+                              (build-path dir (format "chart~a.xml" chart_sheet_index))
+                              '(
+                                "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:line3DChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:line3DChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:line3DChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:tx.c:v"
+                                "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:cat.c:strRef.c:f"
+                                "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:val.c:numRef.c:f"
+                                "c:chartSpace.c:chart.c:title.c:tx.c:rich.a:p.a:r.a:t"
+                                "c:chartSpace.c:chart.c:plotArea.c:lineChart"
+                                "c:chartSpace.c:chart.c:plotArea.c:line3DChart"
+                                "c:chartSpace.c:chart.c:plotArea.c:barChart"
+                                "c:chartSpace.c:chart.c:plotArea.c:bar3DChart"
+                                "c:chartSpace.c:chart.c:plotArea.c:pieChart"
+                                "c:chartSpace.c:chart.c:plotArea.c:pie3DChart"
+                                )))))
               (loop (cdr sheets) (add1 sheet_index) (add1 chart_sheet_index)))
             (loop (cdr sheets) (add1 sheet_index) chart_sheet_index))))))

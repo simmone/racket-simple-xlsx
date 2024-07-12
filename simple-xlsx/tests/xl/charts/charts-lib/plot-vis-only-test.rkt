@@ -1,24 +1,22 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
+(define-runtime-path plot_vis_only_file "plot_vis_only.xml")
 
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
-(define-runtime-path legend_file "legend.xml")
-
-(define test-legend
+(define test-plot-vis-only
   (test-suite
-   "test-legend"
+   "test-plot-vis-only"
 
    (test-case
-    "test-legend"
+    "test-plot-vis-only"
 
     (with-xlsx
      (lambda ()
@@ -32,13 +30,13 @@
 
       (with-sheet
        (lambda ()
-         (call-with-input-file legend_file
+       (call-with-input-file plot_vis_only_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (legend))
+            (lists-to-xml_content (plot-vis-only))
             (lambda (actual)
               (check-lines? expected actual))))))))))
-   ))
+     ))
 
-(run-tests test-legend)
+(run-tests test-plot-vis-only)
 

@@ -1,12 +1,11 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         racket/date
+         "../../main.rkt"
+         racket/runtime-path)
 
-(require racket/date)
-
-(require "../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path date_write_file "_date_write.xlsx")
 (define-runtime-path date_read_and_write_file "_date_read_and_write.xlsx")
 

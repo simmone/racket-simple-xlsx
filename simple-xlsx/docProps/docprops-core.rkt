@@ -1,10 +1,9 @@
 #lang racket
 
-(require simple-xml)
-
-(require "../xlsx/xlsx.rkt")
-(require "../sheet/sheet.rkt")
-(require "../lib/lib.rkt")
+(require fast-xml
+         "../xlsx/xlsx.rkt"
+         "../sheet/sheet.rkt"
+         "../lib/lib.rkt")
 
 (provide (contract-out
           [docprops-core (-> date? list?)]
@@ -35,4 +34,4 @@
     (with-output-to-file (build-path dir "core.xml")
       #:exists 'replace
       (lambda ()
-        (printf "~a" (lists->xml (docprops-core the_date)))))))
+        (printf "~a" (lists-to-xml (docprops-core the_date)))))))

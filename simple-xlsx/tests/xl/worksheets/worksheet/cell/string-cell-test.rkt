@@ -1,22 +1,20 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/border-style.rkt"
+         "../../../../../style/styles.rkt"
+         "../../../../../style/assemble-styles.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../lib/sheet-lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/border-style.rkt")
-(require "../../../../../style/styles.rkt")
-(require "../../../../../style/assemble-styles.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../lib/sheet-lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path string1_cell_file "string1_cell.xml")
 (define-runtime-path string2_cell_file "string2_cell.xml")
 (define-runtime-path string3_cell_file "string3_cell.xml")
@@ -47,35 +45,35 @@
           (call-with-input-file string1_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 1))
+               (lists-to-xml_content (to-cell 1 1))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file string2_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 2))
+               (lists-to-xml_content (to-cell 1 2))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file string3_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 3))
+               (lists-to-xml_content (to-cell 1 3))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file string4_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 4))
+               (lists-to-xml_content (to-cell 1 4))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
           (call-with-input-file string5_cell_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cell 1 5))
+               (lists-to-xml_content (to-cell 1 5))
                (lambda (actual)
                  (check-lines? expected actual)))))
 
@@ -121,7 +119,7 @@
           (check-false (hash-has-key? (SHEET-STYLE-cell->style_map (*CURRENT_SHEET_STYLE*)) "E1"))
 
           (let ([xml_hash
-                 (xml->hash
+                 (xml-port-to-hash
                   (open-input-string
                    (format "<worksheet><sheetData><row r=\"1\">~a~a~a~a~a~a</row></sheetData></worksheet>"
                            (file->string string5_cell_file)
@@ -130,7 +128,14 @@
                            (file->string string4_cell_file)
                            (file->string string1_cell_file)
                            (file->string string6_cell_file)
-                           )))])
+                           ))
+                  '(
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    )
+                  )])
 
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "")
             (from-cell xml_hash 1 5)
@@ -201,7 +206,7 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash
+                 (xml-port-to-hash
                   (open-input-string
                    (format "<worksheet><sheetData><row r=\"1\">~a~a~a~a~a~a~a~a~a</row></sheetData></worksheet>"
                            "<c r=\"A1\" t=\"s\"><v>0</v></c>"
@@ -213,7 +218,13 @@
                            "<c r=\"G1\" t=\"s\"><v>6</v></c>"
                            "<c r=\"H1\" t=\"s\"><v>7</v></c>"
                            "<c r=\"I1\" t=\"s\"><v>8</v></c>"
-                           )))])
+                           ))
+                  '(
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    ))])
 
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "")
             (from-cell xml_hash 1 1)

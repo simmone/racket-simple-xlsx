@@ -1,16 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/charts/pie-chart.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/charts/pie-chart.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path pie_chart_tail_file "pie_chart_tail.xml")
 
 (define test-pie-chart-tail
@@ -33,7 +31,7 @@
        (call-with-input-file pie_chart_tail_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (append '("c:pieChart") (pie-chart-tail)))
+            (lists-to-xml_content (append '("c:pieChart") (pie-chart-tail)))
             (lambda (actual)
               (check-lines? expected actual))))))))
    ))

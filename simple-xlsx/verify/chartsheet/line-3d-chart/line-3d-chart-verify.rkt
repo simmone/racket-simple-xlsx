@@ -1,10 +1,10 @@
 #lang racket
 
-(require rackunit/text-ui rackunit)
+(require rackunit/text-ui
+         rackunit
+         "../../../main.rkt"
+         racket/runtime-path)
 
-(require"../../../main.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path line_3d_chart_file "_line_3d_chart.xlsx")
 (define-runtime-path line_3d_chart_read_and_write_file "_line_3d_chart_read_and_write.xlsx")
 

@@ -1,15 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         "../../xlsx/xlsx.rkt"
+         "../../sheet/sheet.rkt"
+         "../../lib/lib.rkt"
+         rackunit/text-ui
+         rackunit
+         "../../docProps/docprops-app.rkt"
+         racket/runtime-path)
 
-(require "../../xlsx/xlsx.rkt")
-(require "../../sheet/sheet.rkt")
-(require "../../lib/lib.rkt")
-
-(require rackunit/text-ui rackunit)
-(require"../../docProps/docprops-app.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path app_file "app.xml")
 
 (define test-docprops-app
@@ -34,7 +33,7 @@
              (call-with-input-file app_file
                (lambda (expected)
                  (call-with-input-string
-                  (lists->xml (to-docprops-app))
+                  (lists-to-xml (to-docprops-app))
                   (lambda (actual)
                     (check-lines? expected actual)))))
 

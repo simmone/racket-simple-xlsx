@@ -1,38 +1,35 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../lib/lib.rkt"
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/number-style.rkt"
+         "../../../../style/font-style.rkt"
+         "../../../../style/fill-style.rkt"
+         "../../../../style/border-style.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../xl/styles/styles.rkt"
+         racket/runtime-path
+         "../borders/borders-test.rkt"
+         "../fills/fills-test.rkt"
+         "../fonts/fonts-test.rkt"
+         "../numbers/numbers-test.rkt"
+         "../cellXfs/cellXfs-alignment-test.rkt"
+         "../../../../xl/styles/borders.rkt"
+         "../../../../xl/styles/fills.rkt"
+         "../../../../xl/styles/numbers.rkt"
+         "../../../../xl/styles/fonts.rkt"
+         "../../../../xl/styles/cellXfs.rkt")
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../lib/lib.rkt")
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/number-style.rkt")
-(require "../../../../style/font-style.rkt")
-(require "../../../../style/fill-style.rkt")
-(require "../../../../style/border-style.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../xl/styles/styles.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path styles_file "styles.xml")
 (define-runtime-path chaos_number_styles_file "chaos_number_styles.xml")
 (define-runtime-path complex_styles_file "complex_styles_test.xml")
-
-(require "../borders/borders-test.rkt")
-(require "../fills/fills-test.rkt")
-(require "../fonts/fonts-test.rkt")
-(require "../numbers/numbers-test.rkt")
-(require "../cellXfs/cellXfs-alignment-test.rkt")
-
-(require "../../../../xl/styles/borders.rkt")
-(require "../../../../xl/styles/fills.rkt")
-(require "../../../../xl/styles/numbers.rkt")
-(require "../../../../xl/styles/fonts.rkt")
-(require "../../../../xl/styles/cellXfs.rkt")
 
 (provide (contract-out
           [check-styles (-> void?)]
@@ -71,7 +68,7 @@
        (call-with-input-file styles_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-styles))
+            (lists-to-xml_content (to-styles))
             (lambda (actual)
               (check-lines? expected actual))))))))
 
@@ -87,23 +84,66 @@
 
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )))
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
+         
        (check-font-styles)
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )))
+         
        (check-number-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
+         
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )
+         ))
        (check-cellXfses)
 
        (from-styles styles_file)

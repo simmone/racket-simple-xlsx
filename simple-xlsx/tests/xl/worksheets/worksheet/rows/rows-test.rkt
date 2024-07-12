@@ -1,21 +1,18 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         racket/date
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../lib/sheet-lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require racket/date)
-
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-(require "../../../../../lib/sheet-lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path rows1_file "rows1.xml")
 (define-runtime-path rows2_file "rows2.xml")
 (define-runtime-path rows_have_not_same_cols_file "rows_have_not_same_cols.xml")
@@ -50,7 +47,7 @@
           (call-with-input-file rows1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-rows))
+               (lists-to-xml_content (to-rows))
                (lambda (actual)
                  (check-lines? expected actual)))))
           )))))
@@ -77,10 +74,25 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet>~a~a</worksheet>"
-                                                       "<dimension ref=\"A1:E3\"/>"
-                                                       (file->string rows1_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet>~a~a</worksheet>"
+                                             "<dimension ref=\"A1:E3\"/>"
+                                             (file->string rows1_file)))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    )
+                  )])
             (from-work-sheet-head xml_hash)
 
             (check-equal? (DATA-SHEET-dimension (*CURRENT_SHEET*)) "A1:E3")
@@ -131,9 +143,24 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet>~a</worksheet>"
-                                                       (file->string rows1_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet>~a</worksheet>"
+                                             (file->string rows1_file)
+                                             ))
+                  '(
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    )
+                  )])
             (from-work-sheet-head xml_hash)
 
             (check-false (DATA-SHEET-dimension (*CURRENT_SHEET*)))
@@ -191,7 +218,7 @@
           (call-with-input-file rows2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-rows))
+               (lists-to-xml_content (to-rows))
                (lambda (actual)
                  (check-lines? expected actual)))))
           )))))
@@ -218,10 +245,26 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet>~a~a</worksheet>"
-                                                       "<dimension ref=\"C3:G5\"/>"
-                                                       (file->string rows2_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet>~a~a</worksheet>"
+                                             "<dimension ref=\"C3:G5\"/>"
+                                             (file->string rows2_file)
+                                             ))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    ))
+                  ])
 
             (hash-clear! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)))
 
@@ -273,9 +316,24 @@
        (with-sheet
         (lambda ()
           (let ([xml_hash
-                 (xml->hash (open-input-string (format "<worksheet>~a</worksheet>"
-                                                       (file->string rows_have_not_same_cols_file)
-                                                       )))])
+                 (xml-port-to-hash
+                  (open-input-string (format "<worksheet>~a</worksheet>"
+                                             (file->string rows_have_not_same_cols_file)
+                                             ))
+                  '(
+                    "worksheet.dimension.ref"
+                    "worksheet.sheetData.row.r"
+                    "worksheet.sheetData.row.spans"
+                    "worksheet.sheetData.row.s"
+                    "worksheet.sheetData.row.customFormat"
+                    "worksheet.sheetData.row.ht"
+                    "worksheet.sheetData.row.customHeight"
+                    "worksheet.sheetData.row.c.r"
+                    "worksheet.sheetData.row.c.s"
+                    "worksheet.sheetData.row.c.t"
+                    "worksheet.sheetData.row.c.v"
+                    "worksheet.mergeCells.mergeCell.ref"
+                    ))])
 
             (hash-clear! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)))
 

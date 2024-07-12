@@ -1,7 +1,7 @@
 #lang racket
 
-(require "../../style/styles.rkt")
-(require "../../style/border-style.rkt")
+(require "../../style/styles.rkt"
+         "../../style/border-style.rkt")
 
 (provide (contract-out
           [to-borders (-> (listof BORDER-STYLE?) list?)]
@@ -59,21 +59,21 @@
         (let* ([prefix (format "styleSheet1.borders1.border~a" (add1 loop_count))]
                [border_style
                 (BORDER-STYLE
-                 (let ([left_color (hash-ref xml_hash (format "~a.left1.color1.rgb" prefix) "")])
+                 (let ([left_color (hash-ref xml_hash (format "~a.left1.color1.rgb1" prefix) "")])
                    (if (string=? left_color "") #f left_color))
-                 (let ([left_style (hash-ref xml_hash (format "~a.left1.style" prefix) "")])
+                 (let ([left_style (hash-ref xml_hash (format "~a.left1.style1" prefix) "")])
                    (if (string=? left_style "") #f left_style))
-                 (let ([right_color (hash-ref xml_hash (format "~a.right1.color1.rgb" prefix) "")])
+                 (let ([right_color (hash-ref xml_hash (format "~a.right1.color1.rgb1" prefix) "")])
                    (if (string=? right_color "") #f right_color))
-                 (let ([right_style (hash-ref xml_hash (format "~a.right1.style" prefix) "")])
+                 (let ([right_style (hash-ref xml_hash (format "~a.right1.style1" prefix) "")])
                    (if (string=? right_style "") #f right_style))
-                 (let ([top_color (hash-ref xml_hash (format "~a.top1.color1.rgb" prefix) "")])
+                 (let ([top_color (hash-ref xml_hash (format "~a.top1.color1.rgb1" prefix) "")])
                    (if (string=? top_color "") #f top_color))
-                 (let ([top_style (hash-ref xml_hash (format "~a.top1.style" prefix) "")])
+                 (let ([top_style (hash-ref xml_hash (format "~a.top1.style1" prefix) "")])
                    (if (string=? top_style "") #f top_style))
-                 (let ([bottom_color (hash-ref xml_hash (format "~a.bottom1.color1.rgb" prefix) "")])
+                 (let ([bottom_color (hash-ref xml_hash (format "~a.bottom1.color1.rgb1" prefix) "")])
                    (if (string=? bottom_color "") #f bottom_color))
-                 (let ([bottom_style (hash-ref xml_hash (format "~a.bottom1.style" prefix) "")])
+                 (let ([bottom_style (hash-ref xml_hash (format "~a.bottom1.style1" prefix) "")])
                    (if (string=? bottom_style "") #f bottom_style))
                  )])
           (loop (add1 loop_count) (cons border_style border_list)))

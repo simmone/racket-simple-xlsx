@@ -1,41 +1,37 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../xlsx/xlsx.rkt"
+         "../../../../sheet/sheet.rkt"
+         "../../../../style/style.rkt"
+         "../../../../style/alignment-style.rkt"
+         "../../../../style/border-style.rkt"
+         "../../../../style/font-style.rkt"
+         "../../../../style/fill-style.rkt"
+         "../../../../style/number-style.rkt"
+         "../../../../style/styles.rkt"
+         "../../../../style/assemble-styles.rkt"
+         "../../../../style/set-styles.rkt"
+         "../../../../lib/lib.rkt"
+         "../../../../xl/styles/cellXfs.rkt"
+         racket/runtime-path
+         "../borders/borders-test.rkt"
+         "../fills/fills-test.rkt"
+         "../numbers/numbers-test.rkt"
+         "../fonts/fonts-test.rkt"
+         "../../../../xl/styles/borders.rkt"
+         "../../../../xl/styles/fills.rkt"
+         "../../../../xl/styles/numbers.rkt"
+         "../../../../xl/styles/fonts.rkt")
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../xlsx/xlsx.rkt")
-(require "../../../../sheet/sheet.rkt")
-(require "../../../../style/style.rkt")
-(require "../../../../style/alignment-style.rkt")
-(require "../../../../style/border-style.rkt")
-(require "../../../../style/font-style.rkt")
-(require "../../../../style/fill-style.rkt")
-(require "../../../../style/number-style.rkt")
-(require "../../../../style/styles.rkt")
-(require "../../../../style/assemble-styles.rkt")
-(require "../../../../style/set-styles.rkt")
-(require "../../../../lib/lib.rkt")
-
-(require"../../../../xl/styles/cellXfs.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path cellXfs_file "cellXfs.xml")
 (define-runtime-path cellXfs_apply_true_file "cellXfs_apply_true.xml")
 (define-runtime-path cellXfs_alignment_empty_file "cellXfs_alignment_empty.xml")
 (define-runtime-path empty_cellXfs_file "empty_cellXfs.xml")
 (define-runtime-path chaos_number_cellXfs_file "chaos_number_cellXfs.xml")
 (define-runtime-path number_not_numfmts_cellXfs_file "number_not_numfmts_cellXfs.xml")
-
-(require "../borders/borders-test.rkt")
-(require "../fills/fills-test.rkt")
-(require "../numbers/numbers-test.rkt")
-(require "../fonts/fonts-test.rkt")
-
-(require "../../../../xl/styles/borders.rkt")
-(require "../../../../xl/styles/fills.rkt")
-(require "../../../../xl/styles/numbers.rkt")
-(require "../../../../xl/styles/fonts.rkt")
 
 (provide (contract-out
           [set-cellXfses (-> void?)]
@@ -115,24 +111,23 @@
                  (BORDER-STYLE "000000" "dashed" "000000" "dashed" "000000" "dashed" "000000" "dashed")
                  (FONT-STYLE 15 "Arial" "0000FF")
                  (ALIGNMENT-STYLE "center" "top")
-                 (NUMBER-STYLE "3" "#,###.00")
+                 (NUMBER-STYLE "3" "yyyymmdd")
                  (FILL-STYLE "000000" "solid")))
   (check-equal? (list-ref (STYLES-styles (*STYLES*)) 4)
                 (STYLE
                  (BORDER-STYLE #f #f #f #f #f #f "0000FF" "thick")
                  (FONT-STYLE 15 "宋体" "0000FF")
                  (ALIGNMENT-STYLE "right" "bottom")
-                 (NUMBER-STYLE "5" "yyyymmdd")
+                 (NUMBER-STYLE "5" 'APP)
                  (FILL-STYLE "FFFF00" "solid")))
   (check-equal? (list-ref (STYLES-styles (*STYLES*)) 5)
                 (STYLE
                  (BORDER-STYLE #f #f #f #f "000000" "thin" #f #f)
                  (FONT-STYLE 15 "宋体" "FF0000")
                  (ALIGNMENT-STYLE "center" "bottom")
-                 (NUMBER-STYLE "7" "yyyy-mm-dd")
+                 (NUMBER-STYLE "7" 'APP)
                  (FILL-STYLE "FFFFFF" "solid")))
   )
-
 
 (define (check-number-not-in-numfmts-cellXfses)
   (check-equal? (length (STYLES-styles (*STYLES*))) 6)
@@ -193,7 +188,7 @@
        (call-with-input-file cellXfs_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-cellXfs (STYLES-styles (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual))))))))
@@ -210,23 +205,63 @@
 
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )
+         ))
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
        (check-font-styles)
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )))
        (check-number-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )))
        (check-cellXfses)
        )))
 
@@ -243,24 +278,63 @@
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
 
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )
+         ))
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
        (check-font-styles)
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )))
        (check-number-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>"
-                                              (file->string cellXfs_apply_true_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_apply_true_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )))
        (check-cellXfses)
        )))
 
@@ -277,24 +351,63 @@
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
 
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )
+         ))
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
        (check-font-styles)
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )))
        (check-number-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>"
-                                              (file->string cellXfs_alignment_empty_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string cellXfs_alignment_empty_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )))
        (check-cellXfses)
        )))
 
@@ -309,31 +422,71 @@
        (add-data-sheet "Sheet3" '((1)))
 
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
+
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )
+         ))
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
        (check-font-styles)
 
        (from-numbers
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string chaos_numbers_file)))))
-       (check-chaos-number-styles)
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string numbers_file)))
+         '(
+           "styleSheet.numFmts.numFmt.formatCode"
+           "styleSheet.numFmts.numFmt.numFmtId"
+           )))
+       (check-number-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>"
-                                              (file->string chaos_number_cellXfs_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string chaos_number_cellXfs_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )))
        (check-chaos-number-cellXfses)
 
        (call-with-input-file chaos_number_cellXfs_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-cellXfs (STYLES-styles (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual)))))
@@ -351,26 +504,64 @@
 
        (check-equal? (length (STYLES-styles (*STYLES*))) 0)
        (from-borders
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string borders_file)))
+         '(
+           "styleSheet.borders.border"
+           "styleSheet.borders.border.left.color.rgb"
+           "styleSheet.borders.border.right.color.rgb"
+           "styleSheet.borders.border.top.color.rgb"
+           "styleSheet.borders.border.bottom.color.rgb"
+           "styleSheet.borders.border.left.style"
+           "styleSheet.borders.border.right.style"
+           "styleSheet.borders.border.top.style"
+           "styleSheet.borders.border.bottom.style"
+           )))
+
        (check-border-styles)
 
        (from-fonts
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fonts_file)))
+         '(
+           "styleSheet.fonts.font.sz.val"
+           "styleSheet.fonts.font.name.val"
+           "styleSheet.fonts.font.color.rgb"
+           )))
+         
        (check-font-styles)
 
        (from-fills
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>" (file->string fills_file)))
+         '(
+           "styleSheet.fills.fill.patternFill.patternType"
+           "styleSheet.fills.fill.patternFill.fgColor.rgb"
+           )))
+
        (check-fill-styles)
 
        (from-cellXfs
-        (xml->hash (open-input-string (format "<styleSheet>~a</styleSheet>"
-                                              (file->string chaos_number_cellXfs_file)))))
+        (xml-port-to-hash
+         (open-input-string (format "<styleSheet>~a</styleSheet>"
+                                    (file->string chaos_number_cellXfs_file)))
+         '(
+           "styleSheet.cellXfs.xf.fillId"
+           "styleSheet.cellXfs.xf.applyFont"
+           "styleSheet.cellXfs.xf.fontId"
+           "styleSheet.cellXfs.xf.applyBorder"
+           "styleSheet.cellXfs.xf.borderId"
+           "styleSheet.cellXfs.xf.numFmtId"
+           "styleSheet.cellXfs.xf.alignment.horizontal"
+           "styleSheet.cellXfs.xf.alignment.vertical"
+           )))
+
        (check-number-not-in-numfmts-cellXfses)
 
        (call-with-input-file chaos_number_cellXfs_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content
+            (lists-to-xml_content
              (to-cellXfs (STYLES-styles (*STYLES*))))
             (lambda (actual)
               (check-lines? expected actual)))))

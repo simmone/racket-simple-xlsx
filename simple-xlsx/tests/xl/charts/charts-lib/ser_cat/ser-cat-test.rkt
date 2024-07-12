@@ -1,15 +1,14 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/charts/charts-lib.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../lib/lib.rkt")
-(require"../../../../../xl/charts/lib.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path ser_cat_file "ser_cat.xml")
 (define-runtime-path sers_file "sers.xml")
 
@@ -35,7 +34,7 @@
        (call-with-input-file ser_cat_file
          (lambda (expected)
            (call-with-input-string
-            (lists->xml_content (to-ser-cat "Sheet1" "A1-D1"))
+            (lists-to-xml_content (to-ser-cat "Sheet1" "A1-D1"))
             (lambda (actual)
               (check-lines? expected actual))))))))))
 
@@ -56,10 +55,14 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:lineChart>~a</c:lineChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:lineChart.c:ser.c:cat.c:strRef.c:f"
+              )
+            )
            1)
           '("DataSheet1" . "A1-C1"))))
 
@@ -68,10 +71,14 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:line3DChart>~a</c:line3DChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:line3DChart.c:ser.c:cat.c:strRef.c:f"
+              )
+            )
            2)
           '("DataSheet2" . "D1-F1"))))
 
@@ -80,10 +87,14 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:pieChart>~a</c:pieChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:pieChart.c:ser.c:cat.c:strRef.c:f"
+              )
+            )
            3)
           '("DataSheet3" . "G1-I1"))))
 
@@ -92,10 +103,13 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:pie3DChart>~a</c:pie3DChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:pie3DChart.c:ser.c:cat.c:strRef.c:f"
+              ))
            4)
           '("DataSheet4" . "J1-L1"))))
 
@@ -104,10 +118,13 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:barChart>~a</c:barChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:barChart.c:ser.c:cat.c:strRef.c:f"
+              ))
            5)
           '("DataSheet5" . "M1-O1"))))
 
@@ -116,10 +133,13 @@
        (lambda ()
          (check-equal?
           (from-ser-cat
-           (xml->hash
+           (xml-port-to-hash
             (open-input-string
              (format "<c:chartSpace><c:chart><c:plotArea><c:bar3DChart>~a</c:bar3DChart></c:plotArea></c:chart></c:chartSpace>"
-                     (file->string sers_file))))
+                     (file->string sers_file)))
+            '(
+              "c:chartSpace.c:chart.c:plotArea.c:bar3DChart.c:ser.c:cat.c:strRef.c:f"
+              ))
            6)
           '("DataSheet6" . "P1-R1"))))
       )))
@@ -127,4 +147,3 @@
    ))
 
 (run-tests test-ser-cat)
-

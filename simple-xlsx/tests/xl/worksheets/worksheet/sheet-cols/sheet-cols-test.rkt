@@ -1,19 +1,17 @@
 #lang racket
 
-(require simple-xml)
+(require fast-xml
+         rackunit/text-ui
+         rackunit
+         "../../../../../xlsx/xlsx.rkt"
+         "../../../../../sheet/sheet.rkt"
+         "../../../../../style/style.rkt"
+         "../../../../../style/styles.rkt"
+         "../../../../../style/set-styles.rkt"
+         "../../../../../lib/lib.rkt"
+         "../../../../../xl/worksheets/worksheet.rkt"
+         racket/runtime-path)
 
-(require rackunit/text-ui rackunit)
-
-(require "../../../../../xlsx/xlsx.rkt")
-(require "../../../../../sheet/sheet.rkt")
-(require "../../../../../style/style.rkt")
-(require "../../../../../style/styles.rkt")
-(require "../../../../../style/set-styles.rkt")
-(require "../../../../../lib/lib.rkt")
-
-(require"../../../../../xl/worksheets/worksheet.rkt")
-
-(require racket/runtime-path)
 (define-runtime-path sheet_cols1_file "sheet_cols1.xml")
 (define-runtime-path sheet_cols2_file "sheet_cols2.xml")
 (define-runtime-path sheet_no_cols_file "sheet_no_cols.xml")
@@ -44,7 +42,7 @@
           (call-with-input-file sheet_cols1_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cols))
+               (lists-to-xml_content (to-cols))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -56,7 +54,7 @@
           (call-with-input-file sheet_cols2_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cols))
+               (lists-to-xml_content (to-cols))
                (lambda (actual)
                  (check-lines? expected actual)))))))
 
@@ -66,7 +64,7 @@
           (call-with-input-file sheet_no_cols_file
             (lambda (expected)
               (call-with-input-string
-               (lists->xml_content (to-cols))
+               (lists-to-xml_content (to-cols))
                (lambda (actual)
                  (check-lines? expected actual)))))))
           )))
@@ -87,7 +85,14 @@
        (with-sheet
         (lambda ()
           (from-col-width-style
-           (xml->hash (open-input-string (format "<worksheet>~a</worksheet>" (file->string sheet_cols1_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet>~a</worksheet>" (file->string sheet_cols1_file)))
+            '(
+              "worksheet.cols.col.min"
+              "worksheet.cols.col.max"
+              "worksheet.cols.col.width"
+              )
+            ))
 
           (check-equal? (hash-count (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))) 10)
           (check-equal? (hash-ref (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)) 1) 5)
@@ -105,7 +110,13 @@
         1
         (lambda ()
           (from-col-width-style
-           (xml->hash (open-input-string (format "<worksheet>~a</worksheet>" (file->string sheet_cols2_file)))))
+           (xml-port-to-hash
+            (open-input-string (format "<worksheet>~a</worksheet>" (file->string sheet_cols2_file)))
+            '(
+              "worksheet.cols.col.min"
+              "worksheet.cols.col.max"
+              "worksheet.cols.col.width"
+              )))
 
           (check-equal? (hash-count (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*))) 5)
           (check-equal? (hash-ref (SHEET-STYLE-col->width_map (*CURRENT_SHEET_STYLE*)) 6) 7)

@@ -1,8 +1,8 @@
 #lang racket
 
-(require "../xlsx/xlsx.rkt")
-(require "../sheet/sheet.rkt")
-(require "dimension.rkt")
+(require "../xlsx/xlsx.rkt"
+         "../sheet/sheet.rkt"
+         "dimension.rkt")
 
 (provide (contract-out
           [get-sheet-dimension (-> string?)]
