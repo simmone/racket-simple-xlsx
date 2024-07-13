@@ -9,7 +9,7 @@
 
 (define deps '("base"
                "rackunit-lib"
-               "simple-xml"
+               "fast-xml"
                "scribble-lib"
                ))
 
