@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../../racket-fast-xml/fast-xml/main.rkt"
+(require fast-xml
          "xlsx/xlsx.rkt"
          "sheet/sheet.rkt"
          "lib/lib.rkt")
