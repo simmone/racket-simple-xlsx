@@ -33,6 +33,7 @@
           [from-work-sheet (-> hash? void?)]
           [write-worksheets (->* () (path-string?) void?)]
           [read-worksheets (->* () (path-string?) void?)]
+          [read-worksheet (-> path-string? void?)]
           ))
 
 (define (to-work-sheet)
@@ -256,8 +257,9 @@
          [cell (hash-ref xml_hash cell_ref #f)]
          [cell_type (hash-ref xml_hash (format "~a.c~a.t1" prefix loop_cell_index) "number")]
          [cell_style (hash-ref xml_hash (format "~a.c~a.s1" prefix loop_cell_index) #f)]
-         [cell_value (hash-ref xml_hash (format "~a.c~a.v1" prefix loop_cell_index) #f)])
-
+         [cell_value (if (string=? cell_type "inlineStr")
+                         (hash-ref xml_hash (format "~a.c~a.is1.t1" prefix loop_cell_index) #f)
+                         (hash-ref xml_hash (format "~a.c~a.v1" prefix loop_cell_index) #f))])
     (when (and cell cell_value)
       (when (and cell_style
                  (< (string->number cell_style) (length (STYLES-styles (*STYLES*)))))
@@ -271,7 +273,11 @@
        [(string=? cell_type "s")
         (hash-set! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))
                    cell
-                   (hash-ref (XLSX-shared_index->string_map (*XLSX*)) (string->number cell_value)))]))))
+                   (hash-ref (XLSX-shared_index->string_map (*XLSX*)) (string->number cell_value)))]
+       [(string=? cell_type "inlineStr")
+        (hash-set! (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*))
+                   cell
+                   cell_value)]))))
 
 (define (to-merge-cells)
   (let ([cell_range_merge_map (SHEET-STYLE-cell_range_merge_map (*CURRENT_SHEET_STYLE*))])
@@ -402,6 +408,27 @@
             (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
           (loop (cdr sheets) (add1 sheet_index) work_sheet_index)))))
 
+(define (read-worksheet path)
+  (from-work-sheet
+   (xml-file-to-hash
+    path
+    '(
+      "worksheet.dimension.ref"
+      "worksheet.sheetData.row.r"
+      "worksheet.sheetData.row.spans"
+      "worksheet.sheetData.row.s"
+      "worksheet.sheetData.row.customFormat"
+      "worksheet.sheetData.row.ht"
+      "worksheet.sheetData.row.customHeight"
+      "worksheet.sheetData.row.c.r"
+      "worksheet.sheetData.row.c.s"
+      "worksheet.sheetData.row.c.t"
+      "worksheet.sheetData.row.c.v"
+      "worksheet.sheetData.row.c.is.t"
+      "worksheet.mergeCells.mergeCell.ref"
+      )
+    )))
+
 (define (read-worksheets [input_dir #f])
   (let ([dir (if input_dir input_dir (build-path (XLSX-xlsx_dir (*XLSX*)) "xl" "worksheets"))])
     (let loop ([sheets (XLSX-sheet_list (*XLSX*))]
@@ -409,28 +436,11 @@
                [work_sheet_index 1])
       (when (not (null? sheets))
         (if (DATA-SHEET? (car sheets))
-            (begin
+            (let
+              ([path (build-path dir (format "sheet~a.xml" work_sheet_index))])
               (with-sheet-ref
                sheet_index
-               (lambda ()
-                 (from-work-sheet
-                  (xml-file-to-hash
-                   (build-path dir (format "sheet~a.xml" work_sheet_index))
-                   '(
-                    "worksheet.dimension.ref"
-                    "worksheet.sheetData.row.r"
-                    "worksheet.sheetData.row.spans"
-                    "worksheet.sheetData.row.s"
-                    "worksheet.sheetData.row.customFormat"
-                    "worksheet.sheetData.row.ht"
-                    "worksheet.sheetData.row.customHeight"
-                    "worksheet.sheetData.row.c.r"
-                    "worksheet.sheetData.row.c.s"
-                    "worksheet.sheetData.row.c.t"
-                    "worksheet.sheetData.row.c.v"
-                    "worksheet.mergeCells.mergeCell.ref"
-                    )
-                   ))))
+               (lambda () (read-worksheet path)))
               (loop (cdr sheets) (add1 sheet_index) (add1 work_sheet_index)))
             (loop (cdr sheets) (add1 sheet_index) work_sheet_index))))))
 
