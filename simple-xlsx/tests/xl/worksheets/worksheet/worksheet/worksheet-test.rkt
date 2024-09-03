@@ -16,6 +16,7 @@
 (define-runtime-path worksheet_no_dimension_test_file "worksheet_no_dimension_test.xml")
 (define-runtime-path worksheet_not_formated_test_file "worksheet_not_formated_test.xml")
 (define-runtime-path worksheet_dimension_not_from_A1_file "worksheet_dimension_not_from_A1_test.xml")
+(define-runtime-path worksheet_inlineStr_file "worksheet_inlineStr_test.xml")
 
 (define test-worksheet
   (test-suite
@@ -268,7 +269,22 @@
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "E2") 6.9)
 
             ))))))
+   
+   (test-case
+    "test-inlineStr-worksheet"
 
+    (with-xlsx
+     (lambda ()
+       (add-data-sheet "Sheet1" '(("none")))
+
+       (with-sheet
+          (lambda ()
+            (read-worksheet worksheet_inlineStr_file)
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "id")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "name"))
+        
+          ))))
+   
    ))
 
 (run-tests test-worksheet)
