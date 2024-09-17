@@ -280,7 +280,7 @@
        (with-sheet
           (lambda ()
             (read-worksheet worksheet_inlineStr_file)
-            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "id")
+            (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "A1") "反馈人id")
             (check-equal? (hash-ref (DATA-SHEET-cell->value_hash (*CURRENT_SHEET*)) "B1") "name"))
         
           ))))
