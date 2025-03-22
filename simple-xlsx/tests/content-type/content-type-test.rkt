@@ -14,6 +14,7 @@
 (define-runtime-path content_type_test2_file "content_type_test2.xml")
 (define-runtime-path content_type_test3_file "content_type_test3.xml")
 (define-runtime-path content_type_test4_file "content_type_test4.xml")
+(define-runtime-path content_type_test5_file "content_type_test5.xml")
 
 (define test-content-type
   (test-suite
@@ -110,7 +111,7 @@
     )
 
    (test-case
-    "test-content-type"
+    "test-content-type4"
 
     (with-xlsx
      (lambda ()
@@ -129,9 +130,10 @@
             (lists-to-xml_content (to-content-type))
             (lambda (actual)
               (check-lines? expected actual)))))))
+
     (with-xlsx
      (lambda ()
-       (from-content-type content_type_test3_file)
+       (from-content-type content_type_test4_file)
 
        (let ([sheet_list (XLSX-sheet_list (*XLSX*))])
          (check-equal? (length sheet_list) 6)
@@ -141,6 +143,19 @@
          (check-true (CHART-SHEET? (list-ref sheet_list 3)))
          (check-true (CHART-SHEET? (list-ref sheet_list 4)))
          (check-true (CHART-SHEET? (list-ref sheet_list 5)))
+         )))
+    )
+
+   (test-case
+    "test-content-type5"
+
+    (with-xlsx
+     (lambda ()
+       (from-content-type content_type_test5_file)
+
+       (let ([sheet_list (XLSX-sheet_list (*XLSX*))])
+         (check-equal? (length sheet_list) 1)
+         (check-true (DATA-SHEET? (list-ref sheet_list 0)))
          )))
     )
 
