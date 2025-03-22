@@ -97,7 +97,8 @@
         (when (<= override_index override_count)
           (let ([part_name (hash-ref xml_hash (format "Types1.Override~a.PartName1" override_index) "")])
             (cond
-             [(regexp-match #rx"worksheets" part_name)
+              [(and (regexp-match #rx"worksheets" part_name)
+                    (not (regexp-match #rx"_rels" part_name)))
               (add-data-sheet (format "Sheet~a" data_sheet_count) '(("none")))
               (loop (add1 override_index) (add1 data_sheet_count) chart_sheet_count)]
              [(regexp-match #rx"chartsheets" part_name)
